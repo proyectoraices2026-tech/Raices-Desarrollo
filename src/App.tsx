@@ -1,100 +1,238 @@
 import { useState } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import { OnboardingScreen } from './components/OnboardingScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { RegisterScreen } from './components/RegisterScreen';
 import { VerifyAccountScreen } from './components/VerifyAccountScreen';
 import { ForgotPasswordScreen } from './components/ForgotPasswordScreen';
 import { CreateNewPasswordScreen } from './components/CreateNewPasswordScreen';
+import { HomeScreen } from './components/HomeScreen';
+import { EditProfileScreen } from './components/EditProfileScreen';
+import { supabase } from './lib/supabase';
+import { useAuth } from './context/AuthContext';
 
-export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<
-    'onboarding' | 'login' | 'register' | 'verify' | 'forgot' | 'reset-password'
-  >('forgot');
-  const [targetEmail, setTargetEmail] = useState('johndoe@gmail.com');
+function Loading() {
+  return (
+    <div className="min-h-screen bg-[#DFE5DC] flex items-center justify-center">
+      Cargando...
+    </div>
+  );
+}
 
-  const handleLoginSubmit = (data: { email: string; password: string }) => {
-    console.log('Login data:', data);
-    alert(`Logging in with: ${data.email}`);
-  };
+// Solo accesible si HAY sesión (home, profile)
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading />;
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+}
 
-  const handleRegisterSubmit = (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-  }) => {
-    setTargetEmail(data.email);
-    setCurrentScreen('verify');
-  };
+// Solo accesible si NO hay sesión (onboarding, login, register, forgot)
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading />;
+  return user ? <Navigate to="/home" replace /> : <>{children}</>;
+}
 
-  const handleSendResetInstruction = (email: string) => {
-    setTargetEmail(email);
-    setCurrentScreen('verify');
-  };
+function OnboardingRoute() {
+  const navigate = useNavigate();
+  return (
+    <OnboardingScreen
+      onSelectLogin={() => navigate('/login')}
+      onSelectRegister={() => navigate('/register')}
+    />
+  );
+}
 
-  const handleVerifySubmit = (code: string) => {
-    console.log('Verification code:', code);
-    setCurrentScreen('reset-password');
-  };
+function LoginRoute() {
+  const navigate = useNavigate();
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleResetPasswordSubmit = (newPassword: string) => {
-    console.log('New Password set:', newPassword);
-    alert('Password reset successfully! Please login with your new password.');
-    setCurrentScreen('login');
-  };
-
-  const handleGoogleLogin = () => {
-    console.log('Logging in with Google...');
+  const handleLoginSubmit = async (data: { email: string; password: string }) => {
+    setAuthError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+    if (error) {
+      setAuthError(error.message);
+      alert(`Error al iniciar sesión: ${error.message}`);
+      return;
+    }
+    navigate('/home');
   };
 
   return (
-    <main className="w-full min-h-screen">
-      {currentScreen === 'onboarding' && (
-        <OnboardingScreen
-          onSelectLogin={() => setCurrentScreen('login')}
-          onSelectRegister={() => setCurrentScreen('register')}
-          onGoogleLogin={handleGoogleLogin}
-        />
-      )}
+    <>
+      <LoginScreen
+        onLoginSubmit={handleLoginSubmit}
+        onForgotPassword={() => navigate('/forgot')}
+        onBackToOnboarding={() => navigate('/')}
+      />
+      {authError && <p className="text-red-600 text-sm text-center mt-4">{authError}</p>}
+    </>
+  );
+}
 
-      {currentScreen === 'login' && (
-        <LoginScreen
-          onLoginSubmit={handleLoginSubmit}
-          onGoogleLogin={handleGoogleLogin}
-          onForgotPassword={() => setCurrentScreen('forgot')}
-          onBackToOnboarding={() => setCurrentScreen('onboarding')}
-        />
-      )}
+function RegisterRoute() {
+  const navigate = useNavigate();
+  const [authError, setAuthError] = useState<string | null>(null);
 
-      {currentScreen === 'register' && (
-        <RegisterScreen
-          onRegisterSubmit={handleRegisterSubmit}
-          onBackToOnboarding={() => setCurrentScreen('onboarding')}
-        />
-      )}
+  const handleRegisterSubmit = async (data: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    password: string;
+  }) => {
+    setAuthError(null);
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: { name: `${data.firstName} ${data.lastName}`.trim(), phone: data.phone },
+      },
+    });
+    if (error) {
+      setAuthError(error.message);
+      alert(`Error al registrar: ${error.message}`);
+      return;
+    }
+    navigate('/verify', { state: { email: data.email } });
+  };
 
-      {currentScreen === 'forgot' && (
-        <ForgotPasswordScreen
-          onSendResetInstruction={handleSendResetInstruction}
-          onBackToLogin={() => setCurrentScreen('login')}
-        />
-      )}
+  return (
+    <>
+      <RegisterScreen onRegisterSubmit={handleRegisterSubmit} onBackToOnboarding={() => navigate('/')} />
+      {authError && <p className="text-red-600 text-sm text-center mt-4">{authError}</p>}
+    </>
+  );
+}
 
-      {currentScreen === 'verify' && (
-        <VerifyAccountScreen
-          email={targetEmail}
-          onVerifySubmit={handleVerifySubmit}
-          onResendCode={() => alert('New code sent')}
-          onBackToRegister={() => setCurrentScreen('forgot')}
-        />
-      )}
+function VerifyRoute() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = (location.state as { email?: string } | null)?.email ?? '';
 
-      {currentScreen === 'reset-password' && (
-        <CreateNewPasswordScreen
-          onResetPasswordSubmit={handleResetPasswordSubmit}
-          onBackToVerify={() => setCurrentScreen('verify')}
-        />
-      )}
-    </main>
+  return (
+    <VerifyAccountScreen
+      email={email}
+      onResendCode={async () => {
+        const { error } = await supabase.auth.resend({ type: 'signup', email });
+        alert(error ? `No se pudo reenviar: ${error.message}` : 'Correo reenviado.');
+      }}
+      onBackToRegister={() => navigate('/register')}
+    />
+  );
+}
+
+function ForgotRoute() {
+  const navigate = useNavigate();
+
+  const handleSendResetInstruction = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      alert(`Error: ${error.message}`);
+      return;
+    }
+    alert('Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.');
+    navigate('/login');
+  };
+
+  return (
+    <ForgotPasswordScreen
+      onSendResetInstruction={handleSendResetInstruction}
+      onBackToLogin={() => navigate('/login')}
+    />
+  );
+}
+
+// OJO: esta ruta NO está protegida por PublicOnlyRoute ni PrivateRoute a propósito.
+// Cuando el usuario hace clic en el link de recuperación, Supabase SÍ crea una
+// sesión temporal — si esta ruta fuera "PrivateRoute" no pasaría nada raro, pero
+// si fuera "PublicOnlyRoute" te mandaría a /home en vez de dejarte cambiar la
+// contraseña. Por eso queda libre.
+function ResetPasswordRoute() {
+  const navigate = useNavigate();
+
+  const handleResetPasswordSubmit = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      alert(`Error al cambiar contraseña: ${error.message}`);
+      return;
+    }
+    alert('¡Contraseña cambiada! Inicia sesión con la nueva.');
+    await supabase.auth.signOut();
+    navigate('/login', { replace: true });
+  };
+
+  return (
+    <CreateNewPasswordScreen
+      onResetPasswordSubmit={handleResetPasswordSubmit}
+      onBackToVerify={() => navigate('/login')}
+    />
+  );
+}
+
+function HomeRoute() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/', { replace: true });
+  };
+
+  return (
+    <HomeScreen
+      email={user?.email ?? ''}
+      onLogout={handleLogout}
+      onEditProfile={() => navigate('/profile')}
+    />
+  );
+}
+
+function ProfileRoute() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSaveProfile = async ({ name, email }: { name: string; email: string }) => {
+    const updatePayload: { email?: string; data?: Record<string, unknown> } = { data: { name } };
+    if (email !== user?.email) updatePayload.email = email;
+    const { error } = await supabase.auth.updateUser(updatePayload);
+    if (error) throw error;
+  };
+
+  return (
+    <EditProfileScreen
+      currentName={(user?.user_metadata?.name as string) ?? ''}
+      currentEmail={user?.email ?? ''}
+      onSave={handleSaveProfile}
+      onBack={() => navigate('/home')}
+    />
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PublicOnlyRoute><OnboardingRoute /></PublicOnlyRoute>} />
+        <Route path="/login" element={<PublicOnlyRoute><LoginRoute /></PublicOnlyRoute>} />
+        <Route path="/register" element={<PublicOnlyRoute><RegisterRoute /></PublicOnlyRoute>} />
+        <Route path="/verify" element={<VerifyRoute />} />
+        <Route path="/forgot" element={<PublicOnlyRoute><ForgotRoute /></PublicOnlyRoute>} />
+        <Route path="/reset-password" element={<ResetPasswordRoute />} />
+        <Route path="/home" element={<PrivateRoute><HomeRoute /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><ProfileRoute /></PrivateRoute>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
