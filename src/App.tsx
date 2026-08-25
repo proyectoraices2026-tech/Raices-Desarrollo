@@ -1,3 +1,4 @@
+import { logAuthError, getFriendlyAuthErrorMessage } from './lib/logger';
 import { useState } from 'react';
 import {
   BrowserRouter,
@@ -54,15 +55,17 @@ function LoginRoute() {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleLoginSubmit = async (data: { email: string; password: string }) => {
+    const handleLoginSubmit = async (data: { email: string; password: string }) => {
     setAuthError(null);
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
     });
     if (error) {
-      setAuthError(error.message);
-      alert(`Error al iniciar sesión: ${error.message}`);
+      logAuthError('login', error);
+      const message = getFriendlyAuthErrorMessage(error);
+      setAuthError(message);
+      alert(message);
       return;
     }
     navigate('/home');
@@ -84,7 +87,7 @@ function RegisterRoute() {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleRegisterSubmit = async (data: {
+    const handleRegisterSubmit = async (data: {
     firstName: string;
     lastName: string;
     phone: string;
@@ -100,8 +103,10 @@ function RegisterRoute() {
       },
     });
     if (error) {
-      setAuthError(error.message);
-      alert(`Error al registrar: ${error.message}`);
+      logAuthError('register', error);
+      const message = getFriendlyAuthErrorMessage(error);
+      setAuthError(message);
+      alert(message);
       return;
     }
     navigate('/verify', { state: { email: data.email } });
@@ -125,7 +130,12 @@ function VerifyRoute() {
       email={email}
       onResendCode={async () => {
         const { error } = await supabase.auth.resend({ type: 'signup', email });
-        alert(error ? `No se pudo reenviar: ${error.message}` : 'Correo reenviado.');
+        if (error) {
+          logAuthError('resend-verification', error);
+          alert(getFriendlyAuthErrorMessage(error));
+          return;
+        }
+        alert('Correo reenviado.');
       }}
       onBackToRegister={() => navigate('/register')}
     />
@@ -135,10 +145,11 @@ function VerifyRoute() {
 function ForgotRoute() {
   const navigate = useNavigate();
 
-  const handleSendResetInstruction = async (email: string) => {
+    const handleSendResetInstruction = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
-      alert(`Error: ${error.message}`);
+      logAuthError('reset-password-request', error);
+      alert(getFriendlyAuthErrorMessage(error));
       return;
     }
     alert('Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.');
@@ -153,18 +164,18 @@ function ForgotRoute() {
   );
 }
 
-// OJO: esta ruta NO está protegida por PublicOnlyRoute ni PrivateRoute a propósito.
-// Cuando el usuario hace clic en el link de recuperación, Supabase SÍ crea una
-// sesión temporal — si esta ruta fuera "PrivateRoute" no pasaría nada raro, pero
-// si fuera "PublicOnlyRoute" te mandaría a /home en vez de dejarte cambiar la
-// contraseña. Por eso queda libre.
+// esta ruta NO está protegida por PublicOnlyRoute ni PrivateRoute a propósito.
+// queda libre porque el usuario puede llegar a ella desde un correo de restablecimiento de contraseña, y
+// no necesariamente tiene sesión iniciada.
+
 function ResetPasswordRoute() {
   const navigate = useNavigate();
 
-  const handleResetPasswordSubmit = async (newPassword: string) => {
+    const handleResetPasswordSubmit = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
-      alert(`Error al cambiar contraseña: ${error.message}`);
+      logAuthError('reset-password-confirm', error);
+      alert(getFriendlyAuthErrorMessage(error));
       return;
     }
     alert('¡Contraseña cambiada! Inicia sesión con la nueva.');
@@ -202,11 +213,14 @@ function ProfileRoute() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const handleSaveProfile = async ({ name, email }: { name: string; email: string }) => {
+    const handleSaveProfile = async ({ name, email }: { name: string; email: string }) => {
     const updatePayload: { email?: string; data?: Record<string, unknown> } = { data: { name } };
     if (email !== user?.email) updatePayload.email = email;
     const { error } = await supabase.auth.updateUser(updatePayload);
-    if (error) throw error;
+    if (error) {
+      logAuthError('update-profile', error);
+      throw new Error(getFriendlyAuthErrorMessage(error));
+    }
   };
 
   return (
