@@ -26,31 +26,50 @@ Del lado del frontend, se agregó manejo específico para el error `429`: cuando
 
 **Evidencia de prueba:** se probaron 12 intentos de login fallidos seguidos (contraseña incorrecta) y el sistema no llegó a bloquear por rate limit — cada intento devolvió un error normal `400 Invalid login credentials`, registrado correctamente por el logger. Esto confirma que el límite de 30 solicitudes de la "cubeta" sigue activo en el proyecto (no fue desactivado), ya que 12 intentos no lo agotan.
 
-**PENDIENTE:**
+**Confirmado en el dashboard (Authentication > Rate Limits):**
 
-- Confirmar con Ricardo qué proveedor de SMTP están usando y qué límites de envío tiene ese proveedor.
-- Verificar en el dashboard de Supabase (Authentication > Rate Limits) los valores exactos configurados para este proyecto en particular, y decidir si el equipo quiere ajustarlos antes de producción.
+Límite -> Valor configurado
+Envío de correos -> 30/hora
+Envío de SMS -> 30/hora
+Refresco de tokens de sesión -> 150 cada 5 min (1800/hora)
+Verificación de OTP/magic link -> 30 cada 5 min (360/hora)
+Sign-ups y sign-ins -> 30 cada 5 min (360/hora)
+Usuarios anónimos -> 30/hora
 
-- _Falta de acceso al dashboard de Supabase._
+**Confirmado en Project Settings > Auth > SMTP Settings:** el proyecto
+usa SMTP personalizado (`smtp.gmail.com`, puerto 587), no el de
+Supabase.
+
+**⚠️ Hallazgo:** Supabase muestra una advertencia activa : el proveedor configurado (una cuenta de Gmail personal está pensado para correo personal, no
+transaccional, y puede tener problemas de entrega o bloqueos).
+Recomendación: considerar un proveedor SMTP transaccional (SendGrid, Resend, Mailgun, etc.) antes de producción.
 
 ## Row Level Security (RLS)
 
-**Estado: pendiente, bloqueado por falta de acceso.**
+**Estado: verificado**
 
-**PENDIENTE:** verificar en Authentication > Policies que las tablas de datos de usuario tengan RLS activado, con políticas que limiten a cada usuario a ver/editar solo sus propios datos. Como resultado de la integración, el proyecto actualmente NO tiene una tabla `profiles` (se decidió usar `user_metadata` de Supabase Auth en su lugar), así que este punto aplica sobre todo a futuras tablas que el equipo cree (por ejemplo, para plantas o recordatorios).
+Confirmado en Authentication > Policies:
 
-_Falta de acceso al dashboard de Supabase_
+- **Tabla `profiles`**: SÍ existe (contrario a lo que se documentó antes durante la integración) y tiene RLS activado con 3 políticas:
+  - `Permitir inserción de perfil propio` (INSERT, authenticated)
+  - `Usuario edita su propio perfil` (UPDATE, authenticated)
+  - `Usuario ve su propio perfil` (SELECT, authenticated)
+
+- **Tabla `roles`**: tiene RLS activado pero **cero políticas creadas**, lo que significa que actualmente nadie puede leer ni escribir esa tabla desde el frontend (bloqueo total por API).
 
 ## Logging y monitoreo básico
 
-**Estado: logging del frontend completo y probado. Falta revisar logs de Supabase (requiere acceso al dashboard).**
+**Estado: logging del frontend completo y probado**
 
 - **Errores críticos del frontend:** se agregó `src/lib/logger.ts`, que registra en la consola del navegador cada error de autenticación con fecha, acción y código de estado (`[auth-error] {...}`). Probado en vivo: cada intento fallido de login genera su entrada correspondiente en consola.
 - **Accesos:** Supabase registra automáticamente los intentos de login, registro y errores de autenticación en Authentication > Logs del dashboard.
 
-**PENDIENTE:**
+Se revisó Authentication > Logs, Supabase sí registra automáticamente, con severidad y hora exacta:
 
-- Revisar Authentication > Logs en el dashboard para confirmar qué información queda disponible ahí y documentar cómo consultarla.
-- _Requiere acceso al dashboard de Supabase (solicitado a Ricardo)._
-
----
+- Logins (`Login`, `/token`)
+- Registros (`/signup`)
+- Cierres de sesión (`/logout`)
+- Verificación de correo (`/verify`), incluyendo el caso de enlaces
+  inválidos o expirados (`403: Email link is invalid or has expired`)
+- Recuperación de contraseña (`/recover`)
+- Consultas de usuario (`/user`)
