@@ -1,3 +1,7 @@
+
+import logoImage from '../assets/Raiz.png';
+
+
 interface OnboardingScreenProps {
   onSelectRegister: () => void;
   onSelectLogin: () => void;
@@ -10,9 +14,11 @@ export function OnboardingScreen({
   return (
     <div className="min-h-screen bg-[#DCE3DB] flex flex-col items-center justify-between p-8 md:p-12">
       <div className="flex-1 flex flex-col items-center justify-center my-auto">
-        <h1 className="text-5xl md:text-6xl font-serif text-[#537A63] tracking-tight">
-          Aqui va el logo , no lo tengo
-        </h1>
+        <img 
+            src={logoImage} 
+            alt="Raíces Logo" 
+            className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain mx-auto transition-all"
+          />
       </div>
 
       <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
