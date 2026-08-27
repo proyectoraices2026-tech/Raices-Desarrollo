@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { validatePassword } from '../utils/ValidatePassword';
 
 interface CreateNewPasswordScreenProps {
   onResetPasswordSubmit: (newPassword: string) => void;
@@ -20,15 +21,17 @@ export function CreateNewPasswordScreen({
     e.preventDefault();
     setError(null);
 
-    if (password.length < 8) {
-      setError('Password must contain at least 8 characters.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    const passwordResult = validatePassword(password);
+    
+        if (!passwordResult.valid) {
+          setError(passwordResult.message!);
+          return;
+        }
+    
+        if (password !== confirmPassword) {
+          setError("Las contraseñas no coinciden");
+          return;
+        }
 
     onResetPasswordSubmit(password);
   };
