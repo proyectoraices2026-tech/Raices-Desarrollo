@@ -35,15 +35,13 @@ export function VerifyAccountScreen({
 
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
-      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
-        <button
+       <button
           onClick={onBackToRegister}
-          className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
+          className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
           title="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-      </div>
 
       <div className="w-full max-w-sm mx-auto my-auto py-6 flex flex-col items-center justify-between min-h-[400px]">
         <div className="flex flex-col items-center">
