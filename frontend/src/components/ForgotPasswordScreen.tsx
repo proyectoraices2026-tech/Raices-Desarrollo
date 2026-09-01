@@ -23,16 +23,18 @@ export function ForgotPasswordScreen({
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
       
       {/* Botón Superior Back */}
-         <button
+      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
+        <button
           onClick={onBackToLogin}
-          className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
+          className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
           title="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
+      </div>
 
       {/* Contenido Principal */}
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
+      <div className="w-full max-w-sm mx-auto my-auto py-6 flex flex-col justify-between min-h-[480px]">
         
         <div>
           {/* Título y Descripción */}
@@ -40,7 +42,7 @@ export function ForgotPasswordScreen({
             Forgot Password
           </h1>
           <p className="text-center text-xs md:text-sm font-medium text-[#2D4A3E]/80 leading-relaxed max-w-xs mx-auto mb-8">
-            No worries! Enter your email address below and we will send you a code to reset password.
+            No worries! Enter your email address below and we will send you a link to reset password.
           </p>
 
           {/* Formulario */}

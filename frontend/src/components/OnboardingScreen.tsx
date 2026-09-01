@@ -1,6 +1,4 @@
-
 import logoImage from '../assets/Raiz.png';
-
 
 interface OnboardingScreenProps {
   onSelectRegister: () => void;
@@ -13,15 +11,18 @@ export function OnboardingScreen({
 }: OnboardingScreenProps) {
   return (
     <div className="min-h-screen bg-[#DCE3DB] flex flex-col items-center justify-between p-8 md:p-12">
+
+      {/* Contenido Central: Logo */}
       <div className="flex-1 flex flex-col items-center justify-center my-auto">
-        <img 
-            src={logoImage} 
-            alt="Raíces Logo" 
-            className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain mx-auto transition-all"
-          />
+        <img
+          src={logoImage}
+          alt="Raíces Logo"
+          className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain mx-auto"
+        />
       </div>
 
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
+      {/* Contenedor Inferior de Botones */}
+      <div className="w-full max-w-sm space-y-3 mb-4">
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onSelectRegister}
@@ -38,6 +39,7 @@ export function OnboardingScreen({
           </button>
         </div>
       </div>
+
     </div>
   );
 }

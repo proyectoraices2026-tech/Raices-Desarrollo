@@ -22,37 +22,35 @@ export function CreateNewPasswordScreen({
     setError(null);
 
     const passwordResult = validatePassword(password);
-    
-        if (!passwordResult.valid) {
-          setError(passwordResult.message!);
-          return;
-        }
-    
-        if (password !== confirmPassword) {
-          setError("Las contraseñas no coinciden");
-          return;
-        }
+    if (!passwordResult.valid) {
+      setError(passwordResult.message!);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
 
     onResetPasswordSubmit(password);
   };
 
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
-      
-      {/* Botón Superior Back */}
-      <button
+
+      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
+        <button
           onClick={onBackToVerify}
-          className="absolute w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
+          className="w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
           title="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
+      </div>
 
-      {/* Contenido Principal */}
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
-        
+      <div className="w-full max-w-sm mx-auto my-auto py-6 flex flex-col justify-between min-h-[500px]">
+
         <div>
-          {/* Título y Descripción */}
           <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-3">
             Create New Password
           </h1>
@@ -60,9 +58,7 @@ export function CreateNewPasswordScreen({
             Please enter and confirm your new password. You will need to login after you reset.
           </p>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Campo Password */}
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
                 Password
@@ -89,11 +85,10 @@ export function CreateNewPasswordScreen({
                 </button>
               </div>
               <p className="text-[11px] font-medium text-[#4E705B] mt-1">
-                must contain 8 char.
+                must contain 8 char. + 1 special char.
               </p>
             </div>
 
-            {/* Campo Confirm Password */}
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
                 Confirm Password
@@ -121,7 +116,6 @@ export function CreateNewPasswordScreen({
               </div>
             </div>
 
-            {/* Mensaje de Error */}
             {error && (
               <p className="text-xs text-red-600 font-semibold text-center pt-1">
                 {error}
@@ -130,7 +124,6 @@ export function CreateNewPasswordScreen({
           </form>
         </div>
 
-        {/* Botón Reset Password */}
         <button
           onClick={handleSubmit}
           className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] shadow-md transition duration-200 mt-8"
