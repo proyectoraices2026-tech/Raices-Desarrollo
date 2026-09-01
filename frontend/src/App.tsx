@@ -8,6 +8,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import MainPage from './pages/MainPage';
 import UpdateUser from './pages/UpdateUser';
 import ResetPassword from './pages/ResetPassword';
+import Catalog from './pages/Catalog';
+import AdminProducts from './pages/AdminProducts';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -17,6 +19,19 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   </div>;
 
   return user ? <>{children}</> : <Navigate to="/login" />;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, role, loading } = useAuth();
+
+  if (loading) return <div className="flex min-h-screen items-center justify-center">
+    <span className="loading loading-spinner loading-lg" />
+  </div>;
+
+  if (!user) return <Navigate to="/login" />;
+  if (role !== "admin") return <Navigate to="/home" />;
+
+  return <>{children}</>;
 }
 
 function App() {
@@ -39,6 +54,16 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/catalog" element={
+          <PrivateRoute>
+            <Catalog />
+          </PrivateRoute>
+        } />
+        <Route path="/admin/products/new" element={
+          <AdminRoute>
+            <AdminProducts/>
+          </AdminRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )

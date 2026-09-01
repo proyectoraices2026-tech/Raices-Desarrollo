@@ -32,6 +32,10 @@ export default function MainPage() {
         navigate("/profile");
     };
 
+    const handleCatalog = async () => {
+    navigate("/catalog");
+};
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-fondoGlobal">
 
@@ -63,6 +67,14 @@ export default function MainPage() {
                         label="Editar Perfil"
                     >
                         {loading ? <span className="loading loading-spinner" /> : "Editar Perfil"}
+                    </PButton>
+
+                    <PButton
+                        onClick={handleCatalog}
+                        disabled={loading}
+                        label="Catalogo"
+                    >
+                        {loading ? <span className="loading loading-spinner" /> : "Catalogo"}
                     </PButton>
                 </div>
             </div>
