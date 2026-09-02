@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { logAuthError } from "../lib/logger";
 
+/* Página privada para editar el nombre y correo del usuario actual */
 export default function UpdateUser() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -15,10 +16,12 @@ export default function UpdateUser() {
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
 
+    /* Carga los datos del usuario y su perfil cuando existe una sesión */
     useEffect(() => {
         if (user) {
             setEmail(user.email ?? "");
 
+            /* Consulta el nombre guardado en el perfil relacionado */
             supabase
                 .from("profiles")
                 .select("name")
@@ -30,17 +33,20 @@ export default function UpdateUser() {
         }
     }, [user]);
 
+    /* Actualiza el correo de autenticación y el nombre del perfil */
     const handleUpdate = async () => {
         setLoading(true);
         setError("");
         setSuccess("");
 
         try {
+            /* El cambio de correo requiere confirmación desde los correos recibidos */
             if (email !== user?.email) {
                 const { error: emailError } = await supabase.auth.updateUser({ email });
                 if (emailError) throw emailError;
             }
 
+            /* Guarda el nombre y la fecha de modificación en el perfil */
             const { error: profileError } = await supabase
                 .from("profiles")
                 .update({ name, updated_at: new Date().toISOString() })
@@ -48,6 +54,7 @@ export default function UpdateUser() {
 
             if (profileError) throw profileError;
 
+            /* Muestra un mensaje diferente si también se solicitó cambiar el correo */
             setSuccess("Perfil actualizado correctamente.");
 
             if (email !== user?.email) {
@@ -56,9 +63,11 @@ export default function UpdateUser() {
                 );
             }
         } catch (err: any) {
+            /* Registra y muestra cualquier error de autenticación o base de datos */
             logAuthError("update-profile", err);
             setError(err.message);
         } finally {
+            /* Reactiva los controles al finalizar la actualización */
             setLoading(false);
         }
     };

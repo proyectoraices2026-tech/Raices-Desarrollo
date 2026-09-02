@@ -5,6 +5,7 @@ interface OnboardingScreenProps {
   onSelectLogin: () => void;
 }
 
+/* Pantalla inicial que permite elegir entre registrarse o iniciar sesión */
 export function OnboardingScreen({
   onSelectRegister,
   onSelectLogin,

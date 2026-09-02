@@ -6,14 +6,18 @@ interface ForgotPasswordScreenProps {
   onBackToLogin: () => void;
 }
 
+/* Pantalla que solicita el correo para iniciar la recuperación de contraseña */
 export function ForgotPasswordScreen({
   onSendResetInstruction,
   onBackToLogin,
 }: ForgotPasswordScreenProps) {
+  /* Guarda el correo que el usuario escribe en el formulario */
   const [email, setEmail] = useState('');
 
+  /* Evita el envío tradicional y solicita las instrucciones a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    /* Solo se envía la solicitud cuando existe un correo capturado */
     if (email) {
       onSendResetInstruction(email);
     }
