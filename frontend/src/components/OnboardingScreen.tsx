@@ -23,7 +23,7 @@ export function OnboardingScreen({
       </div>
 
       {/* Contenedor Inferior de Botones */}
-      <div className="w-full max-w-sm space-y-3 mb-4">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onSelectRegister}
