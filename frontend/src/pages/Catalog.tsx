@@ -9,7 +9,7 @@ export default function Catalog() {
     const navigate = useNavigate();
     const { role } = useAuth();
     console.log("role actual:", role);
-    const [loading, setLoading] = useState(false);
+    const [loading,] = useState(false);
 
     const handleAddProduct = async () => {
         navigate("/admin/products/new");
