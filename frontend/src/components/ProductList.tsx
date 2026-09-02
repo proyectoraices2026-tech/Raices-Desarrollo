@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 
+/* Componente que consulta y muestra únicamente los productos activos */
 export function ProductList() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    /* Obtiene los productos una sola vez cuando se monta el componente */
     useEffect(() => {
         getActiveProducts()
             .then(setProducts)
@@ -14,9 +16,12 @@ export function ProductList() {
             .finally(() => setLoading(false));
     }, []);
 
+    /* Mientras llega la respuesta se informa que la consulta sigue en proceso */
     if (loading) return <p>Cargando productos...</p>;
+    /* Si la consulta falla, se muestra el mensaje recibido */
     if (error) return <p role="alert">Error: {error}</p>;
 
+    /* Recorre los productos y presenta sus datos principales */
     return (
         <div>
             {products.map((product) => (

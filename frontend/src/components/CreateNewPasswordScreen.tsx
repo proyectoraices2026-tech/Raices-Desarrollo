@@ -7,31 +7,37 @@ interface CreateNewPasswordScreenProps {
   onBackToVerify: () => void;
 }
 
+/* Pantalla donde el usuario captura y confirma su nueva contraseña */
 export function CreateNewPasswordScreen({
   onResetPasswordSubmit,
   onBackToVerify,
 }: CreateNewPasswordScreenProps) {
+  /* Estados de los campos, visibilidad de contraseñas y mensajes del formulario */
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* Valida la contraseña y envía el valor correcto a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    /* Reutiliza la validación común de contraseñas */
     const passwordResult = validatePassword(password);
     if (!passwordResult.valid) {
       setError(passwordResult.message!);
       return;
     }
 
+    /* Comprueba que ambos campos tengan exactamente la misma contraseña */
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
 
+    /* Solicita a la página que actualice la contraseña en Supabase */
     onResetPasswordSubmit(password);
   };
 

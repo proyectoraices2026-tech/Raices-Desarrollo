@@ -7,7 +7,9 @@ interface ProductFormProps {
     onSuccess?: () => void;
 }
 
+/* Formulario utilizado para capturar los datos de un nuevo producto */
 export function ProductForm({ categories, onSuccess }: ProductFormProps) {
+    /* Estados que guardan temporalmente la información introducida en el formulario */
     const [sku, setSku] = useState("");
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -19,17 +21,21 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    /* Valida los datos básicos, crea el producto y controla los estados de la operación */
     async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         setError(null);
 
+        /* La imagen es necesaria porque también se sube al almacenamiento */
         if (!imageFile) {
             setError("Debes seleccionar una imagen.");
             return;
         }
 
+        /* Desactiva acciones mientras se guarda la información */
         setLoading(true);
         try {
+            /* Convierte los valores de texto a números antes de enviarlos al servicio */
             await createProduct({
                 category_id: categoryId,
                 sku,
@@ -41,7 +47,7 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
                 imageFile,
             });
 
-            // limpiar formulario
+            /* Limpia los campos después de crear el producto correctamente */
             setSku("");
             setName("");
             setDescription("");
@@ -51,10 +57,13 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
             setMinStock("0");
             setImageFile(null);
 
+            /* Avisa al componente padre que el registro terminó correctamente */
             onSuccess?.();
         } catch (err) {
+            /* Muestra el error producido durante la creación del producto */
             setError(err instanceof Error ? err.message : "Error al crear el producto.");
         } finally {
+            /* Permite volver a utilizar el formulario al terminar la operación */
             setLoading(false);
         }
     }

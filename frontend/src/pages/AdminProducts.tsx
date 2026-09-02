@@ -7,10 +7,12 @@ interface Category {
     name: string;
 }
 
+/* Página administrativa para cargar categorías y crear productos */
 export default function AdminProducts() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
+    /* Consulta las categorías disponibles cuando se abre la página */
     useEffect(() => {
         getCategories()
             .then(setCategories)
@@ -18,6 +20,7 @@ export default function AdminProducts() {
             .finally(() => setLoading(false));
     }, []);
 
+    /* Evita mostrar el formulario antes de tener las categorías */
     if (loading) return <p>Cargando...</p>;
 
     return (

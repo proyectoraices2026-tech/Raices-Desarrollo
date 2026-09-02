@@ -7,15 +7,18 @@ interface LoginScreenProps {
   onBackToOnboarding: () => void;
 }
 
+/* Pantalla que captura las credenciales para iniciar sesión */
 export function LoginScreen({
   onLoginSubmit,
   onForgotPassword,
   onBackToOnboarding,
 }: LoginScreenProps) {
+  /* Estados de los campos y de la visibilidad de la contraseña */
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  /* Detiene el envío del navegador y entrega las credenciales a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onLoginSubmit({ email, password });

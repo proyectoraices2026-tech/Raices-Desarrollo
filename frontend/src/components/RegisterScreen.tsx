@@ -13,10 +13,12 @@ interface RegisterScreenProps {
   onBackToOnboarding: () => void;
 }
 
+/* Pantalla que captura los datos necesarios para crear una cuenta */
 export function RegisterScreen({
   onRegisterSubmit,
   onBackToOnboarding,
 }: RegisterScreenProps) {
+  /* Estados que almacenan la información de registro y los mensajes del formulario */
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -28,21 +30,25 @@ export function RegisterScreen({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* Valida los datos y entrega la información de registro a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    /* Comprueba que la contraseña cumpla las reglas definidas en la utilidad */
     const passwordResult = validatePassword(password);
     if (!passwordResult.valid) {
       setError(passwordResult.message!);
       return;
     }
 
+    /* Comprueba que la contraseña y su confirmación sean iguales */
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
 
+    /* Envía los datos validados al componente que realiza el registro */
     onRegisterSubmit({ firstName, lastName, phone, email, password });
   };
 
