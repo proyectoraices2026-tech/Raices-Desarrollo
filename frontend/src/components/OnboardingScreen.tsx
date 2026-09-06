@@ -5,6 +5,7 @@ interface OnboardingScreenProps {
   onSelectLogin: () => void;
 }
 
+/* Pantalla inicial que permite elegir entre registrarse o iniciar sesión */
 export function OnboardingScreen({
   onSelectRegister,
   onSelectLogin,
@@ -22,20 +23,20 @@ export function OnboardingScreen({
       </div>
 
       {/* Contenedor Inferior de Botones */}
-      <div className="w-full max-w-sm space-y-3 mb-4">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onSelectRegister}
             className="w-full py-3.5 rounded-full border border-[#4E705B] text-[#4E705B] font-semibold text-sm hover:bg-[#4E705B]/10 transition duration-200"
           >
-            Register
+            Registrar
           </button>
 
           <button
             onClick={onSelectLogin}
             className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition duration-200"
           >
-            Login
+            Iniciar
           </button>
         </div>
       </div>

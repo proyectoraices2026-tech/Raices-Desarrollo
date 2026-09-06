@@ -8,6 +8,7 @@ interface PButtonProps {
     children?: React.ReactNode;
 }
 
+/* Botón reutilizable que muestra un estado de carga y evita acciones repetidas */
 export default function PButton({loading, onClick, disabled, label}: PButtonProps) {
     return (
         <button

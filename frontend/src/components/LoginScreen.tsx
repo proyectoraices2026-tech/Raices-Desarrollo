@@ -7,15 +7,18 @@ interface LoginScreenProps {
   onBackToOnboarding: () => void;
 }
 
+/* Pantalla que captura las credenciales para iniciar sesión */
 export function LoginScreen({
   onLoginSubmit,
   onForgotPassword,
   onBackToOnboarding,
 }: LoginScreenProps) {
+  /* Estados de los campos y de la visibilidad de la contraseña */
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  /* Detiene el envío del navegador y entrega las credenciales a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onLoginSubmit({ email, password });
@@ -24,19 +27,14 @@ export function LoginScreen({
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
 
-      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
-        <button
-          onClick={onBackToOnboarding}
-          className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
-          title="Volver"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-      </div>
+      <button
+        onClick={onBackToOnboarding} className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200" title="Volver" >
+        <ArrowLeft className="w-6 h-6" />
+      </button>
 
-      <div className="w-full max-w-sm mx-auto my-auto py-8">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
         <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
-          Login
+          Inicio
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -49,14 +47,14 @@ export function LoginScreen({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Ingresa tu correo electrónico"
               className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FFFFFF] text-sm  transition"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
-              Password
+              Contraseña
             </label>
             <div className="relative">
               <input
@@ -64,7 +62,7 @@ export function LoginScreen({
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="Ingresa tu contraseña"
                 className="w-full pl-4 pr-11 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
               />
               <button
@@ -86,7 +84,7 @@ export function LoginScreen({
                 onClick={onForgotPassword}
                 className="text-xs font-semibold text-[#2D4A3E] hover:underline"
               >
-                Forgot Password?
+                ¿Olvidaste tu contraseña?
               </button>
             </div>
           </div>
@@ -95,7 +93,7 @@ export function LoginScreen({
             type="submit"
             className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A]  transition duration-200 mt-4"
           >
-            Login
+            Inicio de Sesión
           </button>
         </form>
       </div>
