@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
-import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
 const ITEMS_PER_PAGE = 5;
 
