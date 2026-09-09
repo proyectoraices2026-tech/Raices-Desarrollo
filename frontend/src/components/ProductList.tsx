@@ -4,6 +4,10 @@ import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
+import { useCart } from "../context/CartContext";
+import { useAlert } from "../context/AlertContext";
+
+
 const ITEMS_PER_PAGE = 5;
 
 /* Categorías */
@@ -106,6 +110,9 @@ export function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState("Todo");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { addToCart } = useCart();
+  const { showAlert } = useAlert();
+
   useEffect(() => {
     getActiveProducts()
       .then(setProducts)
@@ -207,8 +214,10 @@ export function ProductList() {
               key={product.id}
               product={product}
               onProductClick={(id) => navigate(`/product/${id}`)}
-              onAddToCart={(p) => alert(`Añadido a lista de interés: ${p.name}`)}
-            />
+              onAddToCart={(p) => {
+                addToCart(p);
+                showAlert({ title: "Añadido al carrito", message: p.name, variant: "success" });
+              }}            />
           ))}
         </div>
       ) : (
