@@ -54,6 +54,13 @@ export default function AdminProducts() {
                                 variant: "success",
                             })
                         }
+                         onError={(message) =>
+                            showAlert({
+                                title: "No se pudo guardar el producto",
+                                message,
+                                variant: "error",
+                            })
+                        }
                     />
                 )}
             </main>
