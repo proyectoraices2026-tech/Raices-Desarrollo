@@ -6,6 +6,10 @@ interface ProductFormProps {
     categories: { id: string; name: string }[];
     onSuccess?: () => void;
 }
+/* Clase de estilo para los inputs del formulario */
+
+const inputClass =
+    "w-full px-4 py-3 bg-white border-2 border-[#c8dcc2] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#4E705B] text-sm transition";const labelClass = "block text-sm font-semibold text-[#2D4A3E] mb-1.5";
 
 /* Formulario utilizado para capturar los datos de un nuevo producto */
 export function ProductForm({ categories, onSuccess }: ProductFormProps) {
@@ -68,79 +72,113 @@ export function ProductForm({ categories, onSuccess }: ProductFormProps) {
         }
     }
 
+    /* Renderiza el formulario con los campos necesarios para crear un producto */
     return (
-        <form onSubmit={handleSubmit}>
-            {error && <p role="alert">{error}</p>}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+            {error && (
+                <p role="alert" className="text-xs text-red-600 font-semibold text-center bg-red-50 rounded-xl py-2 px-3">
+                    {error}
+                </p>
+            )}
 
-            <label>
-                SKU
-                <input value={sku} onChange={(e) => setSku(e.target.value)} required />
-            </label>
+            <div className="grid grid-cols-2 gap-3">
+                <div>
+                    <label className={labelClass}>SKU</label>
+                    <input
+                        value={sku}
+                        onChange={(e) => setSku(e.target.value)}
+                        required
+                        className={inputClass}
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Nombre</label>
+                    <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className={inputClass}
+                    />
+                </div>
+            </div>
 
-            <label>
-                Nombre
-                <input value={name} onChange={(e) => setName(e.target.value)} required />
-            </label>
+            <div>
+                <label className={labelClass}>Descripción</label>
+                <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                    className={inputClass}
+                />
+            </div>
 
-            <label>
-                Descripción
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-            </label>
-
-            <label>
-                Categoría
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required>
+            <div>
+                <label className={labelClass}>Categoría</label>
+                <select
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    required
+                    className={inputClass}
+                >
                     <option value="">Selecciona una categoría</option>
                     {categories.map((c) => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                 </select>
-            </label>
+            </div>
 
-            <label>
-                Precio
-                <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    required
-                />
-            </label>
+            <div className="grid grid-cols-3 gap-3">
+                <div>
+                    <label className={labelClass}>Precio</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        required
+                        className={inputClass}
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Stock</label>
+                    <input
+                        type="number"
+                        min="0"
+                        value={stock}
+                        onChange={(e) => setStock(e.target.value)}
+                        required
+                        className={inputClass}
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Stock mín.</label>
+                    <input
+                        type="number"
+                        min="0"
+                        value={minStock}
+                        onChange={(e) => setMinStock(e.target.value)}
+                        className={inputClass}
+                    />
+                </div>
+            </div>
 
-            <label>
-                Stock
-                <input
-                    type="number"
-                    min="0"
-                    value={stock}
-                    onChange={(e) => setStock(e.target.value)}
-                    required
-                />
-            </label>
-
-            <label>
-                Stock mínimo
-                <input
-                    type="number"
-                    min="0"
-                    value={minStock}
-                    onChange={(e) => setMinStock(e.target.value)}
-                />
-            </label>
-
-            <label>
-                Imagen
+            <div>
+                <label className={labelClass}>Imagen</label>
                 <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
                     required
+                    className="w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#4E705B] file:text-white hover:file:bg-[#3E5C4A] file:cursor-pointer cursor-pointer"
                 />
-            </label>
+            </div>
 
-            <button type="submit" disabled={loading}>
+            <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition duration-200 disabled:opacity-60"
+            >
                 {loading ? "Guardando..." : "Añadir producto"}
             </button>
         </form>
