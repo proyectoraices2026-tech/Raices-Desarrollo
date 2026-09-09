@@ -77,7 +77,7 @@ export default function UpdateUser() {
 
             <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
                 <button
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate("/my-plants")}
                     className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
                     title="Volver"
                 >
@@ -138,7 +138,7 @@ export default function UpdateUser() {
                     </button>
 
                     <button
-                        onClick={() => navigate("/home")}
+                        onClick={() => navigate("/my-plants")}
                         className="w-full py-3.5 rounded-full bg-transparent border border-[#4E705B] text-[#4E705B] font-semibold text-sm hover:bg-[#4E705B]/10 transition duration-200"
                     >
                         Volver

@@ -44,30 +44,28 @@ export function CreateNewPasswordScreen({
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
 
-      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
-        <button
-          onClick={onBackToVerify}
-          className="w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
-          title="Back"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-      </div>
+      <button
+        onClick={onBackToVerify}
+        className="absolute w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
+        title="Back"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
 
-      <div className="w-full max-w-sm mx-auto my-auto py-6 flex flex-col justify-between min-h-[500px]">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6 flex flex-col justify-between min-h-[500px]">
 
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-3">
-            Create New Password
+            Crear Nueva Contraseña
           </h1>
           <p className="text-center text-xs md:text-sm font-medium text-[#2D4A3E]/80 leading-relaxed max-w-xs mx-auto mb-8">
-            Please enter and confirm your new password. You will need to login after you reset.
+            Por favor, ingrese y confirme su nueva contraseña. Necesitará iniciar sesión después de restablecer.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
-                Password
+                Contraseña
               </label>
               <div className="relative">
                 <input
@@ -91,13 +89,13 @@ export function CreateNewPasswordScreen({
                 </button>
               </div>
               <p className="text-[11px] font-medium text-[#4E705B] mt-1">
-                must contain 8 char. + 1 special char.
+                Debe contener 8 caracteres + 1 caracter especial
               </p>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
-                Confirm Password
+                Confirmar Contraseña
               </label>
               <div className="relative">
                 <input
@@ -134,7 +132,7 @@ export function CreateNewPasswordScreen({
           onClick={handleSubmit}
           className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] shadow-md transition duration-200 mt-8"
         >
-          Reset Password
+          Restablecer Contraseña
         </button>
 
       </div>

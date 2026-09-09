@@ -27,27 +27,25 @@ export function ForgotPasswordScreen({
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
       
       {/* Botón Superior Back */}
-      <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
-        <button
-          onClick={onBackToLogin}
-          className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
-          title="Back"
+      <button
+        onClick={onBackToLogin}
+        className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200" title="Back"
         >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-      </div>
+        <ArrowLeft className="w-5 h-5" />
+      </button>
 
       {/* Contenido Principal */}
-      <div className="w-full max-w-sm mx-auto my-auto py-6 flex flex-col justify-between min-h-[480px]">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6 flex flex-col justify-between min-h-[480px]">
         
         <div>
           {/* Título y Descripción */}
           <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-3">
-            Forgot Password
+            Olvidé mi Contraseña
           </h1>
           <p className="text-center text-xs md:text-sm font-medium text-[#2D4A3E]/80 leading-relaxed max-w-xs mx-auto mb-8">
-            No worries! Enter your email address below and we will send you a link to reset password.
+            ¡No te preocupes! Ingresa tu correo electrónico a continuación y te enviaremos un enlace para restablecer tu contraseña.
           </p>
+        
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,7 +58,7 @@ export function ForgotPasswordScreen({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Ingresa tu correo electrónico"
                 className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
               />
             </div>
@@ -72,7 +70,7 @@ export function ForgotPasswordScreen({
           onClick={handleSubmit}
           className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition duration-200 mt-8"
         >
-          Send Reset Instruction
+          Enviar Instrucciones
         </button>
 
       </div>
