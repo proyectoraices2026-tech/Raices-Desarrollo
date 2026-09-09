@@ -11,6 +11,11 @@ import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
 
+//Prueba
+import MyPlants from './pages/MyPlants';
+import AboutUs from './pages/AboutUs';
+import Cart from './pages/Cart';
+
 /* 
     Rutas privadas
 
@@ -69,7 +74,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
     Por otro lado, si el usuario si se encuentra logueado, pero su rol no es admin, se le 
     "denienga" el acceso enviando al usuario a HomePage
   */
-  if (role !== "admin") return <Navigate to="/home" />;
+  if (role !== "admin") return <Navigate to="/my-plants" />;
 
   return <>{children}</>;
 }
@@ -112,6 +117,22 @@ function App() {
           <AdminRoute>
             <AdminProducts/>
           </AdminRoute>
+        } />
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/my-plants" element={
+          <PrivateRoute>
+            <MyPlants />
+          </PrivateRoute>
+        } />
+        <Route path="/about" element={
+          <PrivateRoute>
+            <AboutUs />
+          </PrivateRoute>
+        } />
+        <Route path="/cart" element={
+          <PrivateRoute>
+            <Cart />
+          </PrivateRoute>
         } />
       </Routes>
     </BrowserRouter>
