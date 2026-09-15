@@ -34,6 +34,7 @@ export default function Cart() {
         <div className="w-6" />
       </header>
 
+      
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
           <ShoppingCart className="w-12 h-12 text-[#c8dcc2] mb-4" strokeWidth={1.5} />
@@ -41,12 +42,14 @@ export default function Cart() {
           <p className="text-xs text-[#537a63]">Agrega productos desde la tienda</p>
         </div>
       ) : (
+        
         <>
-          <div className="flex-1 p-5 space-y-3">
+        <div className="flex items-center gap-4 md:max-w-2xl md:mx-auto md:w-full">
+          <div className="flex-1 p-5 md:px-0 space-y-3 md:space-y-4">
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-[#f5f7f2] border border-[#e8efe4] rounded-2xl p-3 flex gap-3 items-start"
+                className="bg-[#f5f7f2] border border-[#e8efe4] rounded-2xl p-3 md:p-4 flex gap-3 md:gap-4 items-start"
               >
                 <div className="w-14 h-14 rounded-2xl bg-[#e8efe4] overflow-hidden flex-shrink-0">
                   {item.image_url && (
@@ -80,13 +83,16 @@ export default function Cart() {
                         <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
+                    
                   </div>
                 </div>
               </div>
             ))}
+            </div>
           </div>
+          
 
-          <div className="bg-white border-t border-[#e8efe4] px-5 py-4">
+          <div className="bg-white border-t border-[#e8efe4] px-5 py-4 md:max-w-2xl md:mx-auto md:w-full">
             <div className="flex justify-between items-center mb-1">
               <p className="text-xs font-medium text-[#537a63]">Subtotal</p>
               <p className="text-xs text-[#537a63]">
@@ -99,6 +105,7 @@ export default function Cart() {
                 CLP
               </span>
             </div>
+            
             <button
               onClick={handleConfirm}
               className="w-full h-12 rounded-2xl bg-[#537a63] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"
@@ -108,6 +115,7 @@ export default function Cart() {
           </div>
         </>
       )}
+      
     </div>
   );
 }

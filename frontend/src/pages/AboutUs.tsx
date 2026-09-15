@@ -12,7 +12,7 @@ export default function AboutUs() {
       >
         <ArrowLeft className="w-6 h-6" />
       </button>
-
+    <div className="md:max-w-5xl md:mx-auto">
       <h1 className="text-2xl font-bold text-[#1e2d24] mb-4">Sobre nosotros</h1>
       <p className="text-sm text-[#537a63] leading-relaxed mb-6">
         Raíces es un proyecto pensado para aquellas personas amantes de las plantas, que quieran hacer crecer su colección de plantas y aprender a cuidarlas.
@@ -24,6 +24,7 @@ export default function AboutUs() {
         <p>📧 Correo: proyectoraices2026@gmail.com</p>
         <p>📍 Ubicación: Palmares, Costa Rica</p>
         <p>📱 Número de teléfono: +506 0000-0000</p>
+      </div>
       </div>
     </div>
   );
