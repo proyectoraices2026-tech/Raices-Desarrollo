@@ -130,6 +130,13 @@ export default function UpdateUser() {
                     )}
 
                     <button
+                        onClick={() => navigate("/forgot-password")}
+                        className="w-full py-3.5 rounded-full bg-[#645244] text-white font-semibold text-sm hover:bg-[#2B1C1C] transition duration-200 mt-4 disabled:opacity-60"
+                    >
+                        Cambiar mi contraseña
+                    </button>
+
+                    <button
                         onClick={handleUpdate}
                         disabled={loading}
                         className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition duration-200 mt-4 disabled:opacity-60"
