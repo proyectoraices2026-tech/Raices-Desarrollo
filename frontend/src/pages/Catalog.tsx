@@ -35,7 +35,7 @@ export default function Catalog() {
                     src={logoIcon}
                     alt="Raíces Logo"
                     className="h-7 w-auto object-contain" />
-                    <span className="text-2xl font-semibold text-[#537A63]"></span>
+                    <span className="text-2xl font-semibold text-[#537A63]">Raíces</span>
                 </div>
 
                 {/* esto está dentro de un div para que se mantenga el diseño correcto */}
