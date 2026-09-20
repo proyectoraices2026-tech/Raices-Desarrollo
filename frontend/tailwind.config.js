@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
 
+      fontFamily: {
+        // Cuerpo de texto de toda la app (ya queda como default más abajo, en index.css)
+        sans: ["Inter", "sans-serif"],
+        // Solo para títulos: usar la clase "font-poppins" en el elemento que lo necesite
+        poppins: ["Poppins", "sans-serif"],
+      },
+
       colors: {
       //paleta primaria
       fondoGlobal: "#E4E1DA",       

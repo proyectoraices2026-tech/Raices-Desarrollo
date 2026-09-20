@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { logAuthError } from "../lib/logger";
+import NavBar from "../components/NavBar";
+import SideMenu from "../components/SideMenu";
 
 /* Página privada para editar el nombre y correo del usuario actual */
 export default function UpdateUser() {
@@ -15,6 +17,7 @@ export default function UpdateUser() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
+    const [menuOpen, setMenuOpen] = useState(false);
 
     /* Carga los datos del usuario y su perfil cuando existe una sesión */
     useEffect(() => {
@@ -73,29 +76,30 @@ export default function UpdateUser() {
     };
 
     return (
-        <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
+        <div className="min-h-screen bg-[#DFE5DC] flex flex-col relative">
+            <NavBar onMenuClick={() => setMenuOpen(true)} />
+            <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
-            <div className="w-full max-w-sm mx-auto flex items-center justify-start pt-2">
+            <div className="w-full max-w-sm mx-auto my-auto py-8 px-6 md:px-12">
                 <button
                     onClick={() => navigate("/my-plants")}
-                    className="p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
-                    title="Volver"
+                    className="p-2 -ml-2 mb-4 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
+                    aria-label="Volver a Mis Plantas"
                 >
-                    <ArrowLeft className="w-6 h-6" />
+                    <ArrowLeft className="w-6 h-6" aria-hidden="true" />
                 </button>
-            </div>
 
-            <div className="w-full max-w-sm mx-auto my-auto py-8">
                 <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
                     Editar perfil
                 </h1>
 
                 <div className="space-y-5">
                     <div>
-                        <label className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                        <label htmlFor="profile-name" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
                             Nombre
                         </label>
                         <input
+                            id="profile-name"
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -105,10 +109,11 @@ export default function UpdateUser() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                        <label htmlFor="profile-email" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
                             Correo electrónico
                         </label>
                         <input
+                            id="profile-email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -118,13 +123,13 @@ export default function UpdateUser() {
                     </div>
 
                     {error && (
-                        <p className="text-xs text-red-600 font-semibold text-center pt-1">
+                        <p role="alert" className="text-xs text-red-600 font-semibold text-center pt-1">
                             {error}
                         </p>
                     )}
 
                     {success && (
-                        <p className="text-xs text-[#3E5C4A] font-semibold text-center pt-1">
+                        <p role="status" className="text-xs text-[#3E5C4A] font-semibold text-center pt-1">
                             {success}
                         </p>
                     )}

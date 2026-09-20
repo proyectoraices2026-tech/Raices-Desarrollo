@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { validatePassword } from '../utils/ValidatePassword';
 
@@ -28,6 +29,7 @@ export function RegisterScreen({
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /* Valida los datos y entrega la información de registro a la página */
@@ -45,6 +47,12 @@ export function RegisterScreen({
     /* Comprueba que la contraseña y su confirmación sean iguales */
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    /* No deja avanzar sin aceptar los términos y la política de privacidad */
+    if (!acceptedTerms) {
+      setError('Debes aceptar los términos y condiciones y la política de privacidad');
       return;
     }
 
@@ -184,8 +192,28 @@ export function RegisterScreen({
             </div>
           </div>
 
+          <div className="flex items-start gap-2 pt-1">
+            <input
+              id="accept-terms"
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-[#4E705B] flex-shrink-0"
+            />
+            <label htmlFor="accept-terms" className="text-xs text-[#2D4A3E] leading-relaxed">
+              Acepta los{' '}
+              <Link to="/terminos" target="_blank" className="font-semibold underline hover:text-[#4E705B]">
+                términos y condiciones
+              </Link>{' '}
+              de uso y las{' '}
+              <Link to="/privacidad" target="_blank" className="font-semibold underline hover:text-[#4E705B]">
+                políticas de privacidad
+              </Link>
+            </label>
+          </div>
+
           {error && (
-            <p className="text-xs text-red-600 font-semibold text-center pt-1">
+            <p role="alert" className="text-xs text-red-600 font-semibold text-center pt-1">
               {error}
             </p>
           )}
