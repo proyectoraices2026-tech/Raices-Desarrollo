@@ -12,7 +12,8 @@ export default function UpdateUser() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState("");
@@ -24,14 +25,21 @@ export default function UpdateUser() {
         if (user) {
             setEmail(user.email ?? "");
 
-            /* Consulta el nombre guardado en el perfil relacionado */
+            /* Consulta el nombre guardado en el perfil relacionado.
+               En la base de datos sigue siendo un solo campo ("name"), igual que
+               cuando se registró la cuenta, así que aquí se separa en nombre y
+               apellido solo para mostrarlo en dos campos (todo lo que esté después
+               del primer espacio se toma como apellido). */
             supabase
                 .from("profiles")
                 .select("name")
                 .eq("id", user.id)
                 .single()
                 .then(({ data }) => {
-                    if (data) setName(data.name ?? "");
+                    const fullName = data?.name ?? "";
+                    const [first, ...rest] = fullName.split(" ");
+                    setFirstName(first ?? "");
+                    setLastName(rest.join(" "));
                 });
         }
     }, [user]);
@@ -48,6 +56,10 @@ export default function UpdateUser() {
                 const { error: emailError } = await supabase.auth.updateUser({ email });
                 if (emailError) throw emailError;
             }
+
+            /* Vuelve a unir nombre y apellido en un solo texto para guardarlo,
+               igual que se arma en el registro (RegisterScreen.tsx) */
+            const name = `${firstName} ${lastName}`.trim();
 
             /* Guarda el nombre y la fecha de modificación en el perfil */
             const { error: profileError } = await supabase
@@ -94,18 +106,34 @@ export default function UpdateUser() {
                 </h1>
 
                 <div className="space-y-5">
-                    <div>
-                        <label htmlFor="profile-name" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
-                            Nombre
-                        </label>
-                        <input
-                            id="profile-name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Tu nombre"
-                            className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
-                        />
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label htmlFor="profile-first-name" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                                Nombre
+                            </label>
+                            <input
+                                id="profile-first-name"
+                                type="text"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                placeholder="Tu nombre"
+                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="profile-last-name" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                                Apellido
+                            </label>
+                            <input
+                                id="profile-last-name"
+                                type="text"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                placeholder="Tu apellido"
+                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            />
+                        </div>
                     </div>
 
                     <div>
