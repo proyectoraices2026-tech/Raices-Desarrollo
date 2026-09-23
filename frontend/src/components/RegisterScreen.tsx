@@ -192,6 +192,7 @@ export function RegisterScreen({
             </div>
           </div>
 
+          {/* Checkbox de Términos y Condiciones unificado */}
           <div className="flex items-start gap-2 pt-1">
             <input
               id="accept-terms"
@@ -201,14 +202,11 @@ export function RegisterScreen({
               className="mt-0.5 w-4 h-4 accent-[#4E705B] flex-shrink-0"
             />
             <label htmlFor="accept-terms" className="text-xs text-[#2D4A3E] leading-relaxed">
-              Acepta los{' '}
-              <Link to="/terminos" target="_blank" className="font-semibold underline hover:text-[#4E705B]">
+              Acepto los{' '}
+              <Link to="/terms" className="font-semibold underline hover:text-[#4E705B]">
                 términos y condiciones
               </Link>{' '}
-              de uso y las{' '}
-              <Link to="/privacidad" target="_blank" className="font-semibold underline hover:text-[#4E705B]">
-                políticas de privacidad
-              </Link>
+                de uso
             </label>
           </div>
 

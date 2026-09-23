@@ -15,6 +15,7 @@ import AdminProducts from './pages/AdminProducts';
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
 import Cart from './pages/Cart';
+import TermsAndConditions from './pages/TermsAndConditions';
 
 /* 
     Rutas privadas
@@ -90,6 +91,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
 
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/home" element={
@@ -134,6 +136,7 @@ function App() {
             <Cart />
           </PrivateRoute>
         } />
+
       </Routes>
     </BrowserRouter>
   )
