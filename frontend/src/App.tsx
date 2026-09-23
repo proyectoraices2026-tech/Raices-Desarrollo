@@ -12,7 +12,7 @@ import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
 
-//aaaaaaaaaaaaaaaaa si
+//aaa
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
 import Cart from './pages/Cart';
