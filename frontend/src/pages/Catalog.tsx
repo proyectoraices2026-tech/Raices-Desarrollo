@@ -15,8 +15,8 @@ export default function Catalog() {
     /* Controla si el panel lateral (menú) está abierto o cerrado */
     const [menuOpen, setMenuOpen] = useState(false);
 
-    /* Envía al administrador al formulario para añadir productos */
-    const handleAddProduct = async () => {
+    /* Envía al administrador a la pantalla de gestión de productos (crear, editar, desactivar) */
+    const handleManageProducts = async () => {
         navigate("/admin/products/new");
     };
 
@@ -28,8 +28,8 @@ export default function Catalog() {
                 extraActions={
                     /* El botón de alta solo se muestra a usuarios con rol administrador */
                     role === "admin" ? (
-                        <PButton onClick={handleAddProduct} disabled={loading} label="Añadir">
-                            {loading ? <span className="loading loading-spinner" /> : "Añadir"}
+                        <PButton onClick={handleManageProducts} disabled={loading} label="Gestionar productos">
+                            {loading ? <span className="loading loading-spinner" /> : "Gestionar productos"}
                         </PButton>
                     ) : undefined
                 }

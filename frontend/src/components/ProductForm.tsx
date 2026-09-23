@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
-import { createProduct } from "../services/ProductService";
+import { createProduct, getErrorMessage } from "../services/ProductService";
 
 interface ProductFormProps {
     categories: { id: string; name: string }[];
@@ -77,7 +77,7 @@ export function ProductForm({ categories, onSuccess, onError }: ProductFormProps
             onSuccess?.();
         } catch (err) {
             /* Muestra el error producido durante la creación del producto */
-            onError?.(err instanceof Error ? err.message : "Error al crear el producto.");
+            onError?.(getErrorMessage(err, "Error al crear el producto."));
         } finally {
             /* Permite volver a utilizar el formulario al terminar la operación */
             setLoading(false);
