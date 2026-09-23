@@ -9,7 +9,8 @@ type AuthAction =
   | 'logout'
   | 'reset-password-request'
   | 'reset-password-confirm'
-  | 'update-profile';
+  | 'update-profile'
+  | 'update-password';
 
 export function logAuthError(action: AuthAction, error: unknown) {
   const err = error as { message?: string; status?: number } | null;

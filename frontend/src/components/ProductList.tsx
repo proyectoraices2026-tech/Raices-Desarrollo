@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
+import ProductDetailModal from "./ProductDetailModal";
 
 
 const ITEMS_PER_PAGE = 5;
@@ -20,7 +20,7 @@ function ProductCard({
   onAddToCart,
 }: {
   product: Product;
-  onProductClick: (id: string) => void;
+  onProductClick: (product: Product) => void;
   onAddToCart: (product: Product) => void;
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -34,7 +34,7 @@ function ProductCard({
         
         {/* Imagen del Producto */}
         <div
-          onClick={() => onProductClick(product.id)}
+          onClick={() => onProductClick(product)}
           className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 cursor-pointer"
         >
         
@@ -65,11 +65,11 @@ function ProductCard({
         {/* Información textual */}
         <div className="flex-1 min-w-0 space-y-0.5">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            {(product as any).category || "PLANTAS"}
+            {product.categories?.name || "Plantas"}
           </span>
 
           <h3
-            onClick={() => onProductClick(product.id)}
+            onClick={() => onProductClick(product)}
             className="font-bold text-[#1F2937] text-sm sm:text-base truncate cursor-pointer hover:underline"
           >
             {product.name}
@@ -101,7 +101,6 @@ function ProductCard({
 }
 
 export function ProductList() {
-  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +108,7 @@ export function ProductList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todo");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { addToCart } = useCart();
   const { showAlert } = useAlert();
@@ -126,10 +126,18 @@ export function ProductList() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const productCat = (product as any).category || "Plantas";
+
+      // El nombre de la categoría viene de la relación con la tabla `categories`
+      // (product.categories.name), igual que en la etiqueta que se muestra en la tarjeta.
+      const productCat = product.categories?.name || "Plantas";
+
+      // En la base de datos las categorías están en singular ("Planta", "Herramienta"),
+      // pero los chips de filtro están en plural ("Plantas", "Herramientas"). Se le quita
+      // la "s" final a ambos lados antes de comparar para que sí coincidan.
+      const normalize = (value: string) => value.toLowerCase().trim().replace(/s$/, "");
       const matchesCategory =
         selectedCategory === "Todo" ||
-        productCat.toLowerCase() === selectedCategory.toLowerCase();
+        normalize(productCat) === normalize(selectedCategory);
 
       return matchesSearch && matchesCategory;
     });
@@ -213,7 +221,7 @@ export function ProductList() {
             <ProductCard
               key={product.id}
               product={product}
-              onProductClick={(id) => navigate(`/product/${id}`)}
+              onProductClick={(p) => setSelectedProduct(p)}
               onAddToCart={(p) => {
                 addToCart(p);
                 showAlert({ title: "Añadido al carrito", message: p.name, variant: "success" });
@@ -225,6 +233,8 @@ export function ProductList() {
           No se encontraron productos disponibles.
         </div>
       )}
+
+      <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
 
       {/* Paginación */}
       {totalPages > 1 && (

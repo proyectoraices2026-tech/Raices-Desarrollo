@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
@@ -10,8 +10,30 @@ interface SideMenuProps {
 
 export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [showInfo, setShowInfo] = useState(false);
+
+  /* Nombre y teléfono guardados en el perfil (tabla `profiles`), NO en el metadata de
+     Auth: el metadata solo se llena una vez al registrarse y nunca se actualiza, así
+     que si se lee de ahí se puede desincronizar con lo que la persona edite después
+     en "Editar perfil" (UpdateUser.tsx). Se consulta igual que en UpdateUser.tsx para
+     que ambas pantallas siempre muestren lo mismo. */
+  const [profileName, setProfileName] = useState("");
+  const [profilePhone, setProfilePhone] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+
+    supabase
+      .from("profiles")
+      .select("name, phone")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        setProfileName(data?.name ?? "");
+        setProfilePhone(data?.phone ?? "");
+      });
+  }, [user, isOpen]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -62,9 +84,9 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
           {showInfo && (
             <div className="bg-[#f0f4ee] rounded-xl px-3 py-3 -mt-1 mb-1 text-xs text-[#537a63] space-y-1">
-              <p><span className="font-semibold">Nombre:</span> {(user?.user_metadata?.name as string) ?? "—"}</p>
+              <p><span className="font-semibold">Nombre:</span> {profileName || "—"}</p>
               <p><span className="font-semibold">Correo:</span> {user?.email}</p>
-              <p><span className="font-semibold">Teléfono:</span> {(user?.user_metadata?.phone as string) ?? "—"}</p>
+              <p><span className="font-semibold">Teléfono:</span> {profilePhone || "—"}</p>
             </div>
           )}
 
@@ -76,10 +98,35 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           </button>
 
           <button
+            onClick={() => go("/my-requests")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Mis pedidos
+          </button>
+
+          {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
+          {role === "admin" && (
+            <button
+              onClick={() => go("/admin/requests")}
+              className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+            >
+              Pedidos pendientes (admin)
+            </button>
+          )}
+
+          <button
             onClick={() => go("/about")}
             className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
           >
             Sobre nosotros / Contáctenos
+          </button>
+
+          {/* Opción de Términos y Condiciones */}
+          <button
+            onClick={() => go("/terms")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Términos y Condiciones
           </button>
 
           <hr className="my-3 border-[#e8efe4]" />

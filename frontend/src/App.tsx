@@ -10,11 +10,14 @@ import UpdateUser from './pages/UpdateUser';
 import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
+import AdminRequests from './pages/AdminRequests';
 
-//Prueba
+//aaa
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
 import Cart from './pages/Cart';
+import MyRequests from './pages/MyRequests';
+import TermsAndConditions from './pages/TermsAndConditions';
 
 /* 
     Rutas privadas
@@ -90,6 +93,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
 
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/home" element={
@@ -118,6 +122,12 @@ function App() {
             <AdminProducts/>
           </AdminRoute>
         } />
+        {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
+        <Route path="/admin/requests" element={
+          <AdminRoute>
+            <AdminRequests/>
+          </AdminRoute>
+        } />
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/my-plants" element={
           <PrivateRoute>
@@ -132,6 +142,11 @@ function App() {
         <Route path="/cart" element={
           <PrivateRoute>
             <Cart />
+          </PrivateRoute>
+        } />
+        <Route path="/my-requests" element={
+          <PrivateRoute>
+            <MyRequests />
           </PrivateRoute>
         } />
       </Routes>

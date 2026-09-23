@@ -22,7 +22,7 @@ export default function Register() {
             /* Une el nombre y apellido para guardarlos como un solo dato del perfil */
             const name = `${data.firstName} ${data.lastName}`.trim();
 
-            const { error } = await supabase.auth.signUp({
+            const { data: signUpData, error } = await supabase.auth.signUp({
                 email: data.email,
                 password: data.password,
                 options: {
@@ -33,7 +33,19 @@ export default function Register() {
         /* Registra el error y muestra una explicación al usuario */
         if (error) {
             logAuthError("register", error);
-            showAlert({ title: "No se pudo completar el registro", message: getFriendlyAuthErrorMessage(error), variant: "error" });           
+            showAlert({ title: "No se pudo completar el registro", message: getFriendlyAuthErrorMessage(error), variant: "error" });
+            return;
+        }
+
+        /* Supabase no devuelve un error cuando el correo ya existe (para no revelar
+           qué correos están registrados): responde "exitoso" pero sin identidades
+           nuevas. Esa es la única forma de detectar el duplicado desde el frontend. */
+        if (signUpData.user && signUpData.user.identities?.length === 0) {
+            showAlert({
+                title: "Ese correo ya tiene una cuenta",
+                message: "Ya existe una cuenta registrada con este correo. Intenta iniciar sesión o usa '¿Olvidaste tu contraseña?' si no la recuerdas.",
+                variant: "error",
+            });
             return;
         }
 

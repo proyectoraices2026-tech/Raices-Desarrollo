@@ -1,22 +1,46 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
+import { createOrderRequest } from "../services/RequestService";
 
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, subtotal, totalItems, clearCart } = useCart();
   const { showAlert } = useAlert();
+  /* Evita que se pueda mandar el mismo pedido dos veces mientras se espera la respuesta del backend */
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleConfirm = () => {
-    if (items.length === 0) return;
-    showAlert({
-      title: "Tu pedido ha sido solicitado",
-      message: "Se te notificará cuando el producto esté listo.",
-      variant: "success",
-    });
-    clearCart();
-    navigate("/catalog");
+  const handleConfirm = async () => {
+    if (items.length === 0 || submitting) return;
+
+    setSubmitting(true);
+    try {
+      /* El backend de pedidos solo necesita el id de cada producto y la cantidad;
+         el precio y el nombre los vuelve a calcular/guardar él mismo del lado del servidor */
+      await createOrderRequest(
+        items.map((item) => ({ productId: item.id, quantity: item.quantity }))
+      );
+
+      showAlert({
+        title: "Tu pedido ha sido solicitado",
+        message: "Se te notificará cuando el producto esté listo.",
+        variant: "success",
+      });
+      clearCart();
+      navigate("/catalog");
+    } catch (err) {
+      /* Si el backend rechaza el pedido (ej. stock insuficiente, sesión vencida, error de servidor),
+         se le muestra el motivo real al usuario en vez de fingir que salió bien */
+      showAlert({
+        title: "No se pudo enviar el pedido",
+        message: err instanceof Error ? err.message : "Intenta de nuevo en unos minutos.",
+        variant: "error",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -34,7 +58,7 @@ export default function Cart() {
         <div className="w-6" />
       </header>
 
-      
+
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
           <ShoppingCart className="w-12 h-12 text-[#c8dcc2] mb-4" strokeWidth={1.5} />
@@ -42,7 +66,7 @@ export default function Cart() {
           <p className="text-xs text-[#537a63]">Agrega productos desde la tienda</p>
         </div>
       ) : (
-        
+
         <>
         <div className="flex items-center gap-4 md:max-w-2xl md:mx-auto md:w-full">
           <div className="flex-1 p-5 md:px-0 space-y-3 md:space-y-4">
@@ -83,14 +107,14 @@ export default function Cart() {
                         <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    
+
                   </div>
                 </div>
               </div>
             ))}
             </div>
           </div>
-          
+
 
           <div className="bg-white border-t border-[#e8efe4] px-5 py-4 md:max-w-2xl md:mx-auto md:w-full">
             <div className="flex justify-between items-center mb-1">
@@ -105,17 +129,18 @@ export default function Cart() {
                 CLP
               </span>
             </div>
-            
+
             <button
               onClick={handleConfirm}
-              className="w-full h-12 rounded-2xl bg-[#537a63] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"
+              disabled={submitting}
+              className="w-full h-12 rounded-2xl bg-[#537a63] text-white font-semibold text-sm shadow-md hover:opacity-90 transition disabled:opacity-60"
             >
-              Confirmar pedido
+              {submitting ? "Enviando..." : "Confirmar pedido"}
             </button>
           </div>
         </>
       )}
-      
+
     </div>
   );
 }
