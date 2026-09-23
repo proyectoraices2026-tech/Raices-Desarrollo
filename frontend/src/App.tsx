@@ -10,11 +10,13 @@ import UpdateUser from './pages/UpdateUser';
 import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
+import AdminRequests from './pages/AdminRequests';
 
 //Prueba
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
 import Cart from './pages/Cart';
+import MyRequests from './pages/MyRequests';
 import TermsAndConditions from './pages/TermsAndConditions';
 
 /* 
@@ -120,6 +122,12 @@ function App() {
             <AdminProducts/>
           </AdminRoute>
         } />
+        {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
+        <Route path="/admin/requests" element={
+          <AdminRoute>
+            <AdminRequests/>
+          </AdminRoute>
+        } />
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/my-plants" element={
           <PrivateRoute>
@@ -136,7 +144,11 @@ function App() {
             <Cart />
           </PrivateRoute>
         } />
-
+        <Route path="/my-requests" element={
+          <PrivateRoute>
+            <MyRequests />
+          </PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
