@@ -52,7 +52,7 @@ export function RegisterScreen({
 
     /* No deja avanzar sin aceptar los términos y la política de privacidad */
     if (!acceptedTerms) {
-      setError('Debes aceptar los términos y condiciones y la política de privacidad');
+      setError('Debes aceptar los términos y condiciones');
       return;
     }
 

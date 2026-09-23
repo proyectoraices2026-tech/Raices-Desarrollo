@@ -9,10 +9,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
 }
 
-/* Ficha de producto: se abre al tocar la imagen o el nombre de un producto en la tienda.
-   El botón "Agregar" y el contador de cantidad sí son funcionales (agregan al carrito
-   de verdad, vía CartContext), lo único que no toca back es la ficha en sí: los datos
-   que muestra ya vienen de la tabla `products` real. */
+/* Ficha de producto: se abre al tocar la imagen o el nombre de un producto en la tienda. */
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [imageError, setImageError] = useState(false);
@@ -38,7 +35,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
   if (!product) return null;
 
-  const category = (product as any).category || "Planta";
+  const category = product.categories?.name || "Planta";
   const description =
     (product as any).description || "Variedad seleccionada para mantener tus espacios verdes.";
 

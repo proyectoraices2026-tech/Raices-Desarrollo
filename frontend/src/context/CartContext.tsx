@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: product.name,
           price: product.price,
           image_url: product.image_url,
-          category: (product as any).category || "Plantas",
+          category: product.categories?.name || "Plantas",
           quantity,
         },
       ];
