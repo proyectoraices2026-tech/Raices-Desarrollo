@@ -1,252 +1,146 @@
-import { logAuthError, getFriendlyAuthErrorMessage } from './lib/logger';
-import { useState } from 'react';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom';
-import { OnboardingScreen } from './components/OnboardingScreen';
-import { LoginScreen } from './components/LoginScreen';
-import { RegisterScreen } from './components/RegisterScreen';
-import { VerifyAccountScreen } from './components/VerifyAccountScreen';
-import { ForgotPasswordScreen } from './components/ForgotPasswordScreen';
-import { CreateNewPasswordScreen } from './components/CreateNewPasswordScreen';
-import { HomeScreen } from './components/HomeScreen';
-import { EditProfileScreen } from './components/EditProfileScreen';
-import { supabase } from './lib/supabase';
-import { useAuth } from './context/AuthContext';
+import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Onboarding from "./pages/Onboarding";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import MainPage from './pages/MainPage';
+import UpdateUser from './pages/UpdateUser';
+import ResetPassword from './pages/ResetPassword';
+import Catalog from './pages/Catalog';
+import AdminProducts from './pages/AdminProducts';
 
-function Loading() {
-  return (
-    <div className="min-h-screen bg-[#DFE5DC] flex items-center justify-center">
-      Cargando...
-    </div>
-  );
-}
+//Prueba
+import MyPlants from './pages/MyPlants';
+import AboutUs from './pages/AboutUs';
+import Cart from './pages/Cart';
+import TermsAndConditions from './pages/TermsAndConditions';
 
-// Solo accesible si HAY sesión (home, profile)
+/* 
+    Rutas privadas
+
+    Esto se refiere a las rutas dentro de la app que requieren de que el usuario se encuentre autenticado
+    se hace uso del AuthContext mediante useAuth para verificar la validez de la sesión, en caso de que la
+    sesión no exista o haya expirado el intento de acceder a la ruta será "denegado" mandando al usario al login
+*/
+/* children hace referencia al componento encapsulado dentro de <PrivateRoute/> */
 function PrivateRoute({ children }: { children: React.ReactNode }) {
+  /* llamado a los atributos necesarios para validar la sesión mediante useAuth */
   const { user, loading } = useAuth();
-  if (loading) return <Loading />;
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
+
+  /* 
+    Si loading es true, es decir que el llamado a la base de datos por alguna razón 
+    no está respondiendo, por ende para evitar imprevistos se crea un componente que
+    indica que la app está cargando
+  */
+  if (loading) return <div className="flex min-h-screen items-center justify-center">
+    <span className="loading loading-spinner loading-lg" />
+  </div>;
+
+  /* 
+    Aquí se valida si el usuario actual existe (sesión válida), si existe se envía al componente encapsulado, si no
+    se "denienga" el acceso enviando al usuario a login
+  */
+  return user ? <>{children}</> : <Navigate to="/login" />;
 }
 
-// Solo accesible si NO hay sesión (onboarding, login, register, forgot)
-function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  if (loading) return <Loading />;
-  return user ? <Navigate to="/home" replace /> : <>{children}</>;
+/* 
+    Rutas exclusivas para admins
+
+    Esto se refiere a las rutas dentro de la app que requieren de un usuario cuyo rol sea administrador
+    se hace uso del AuthContext mediante useAuth para verificar el rol del usuario, en caso de que este sea
+    administrador, si no posee este rol el intento de acceder a la ruta será "denegado" mandando al usario al HomePage
+*/
+/* children hace referencia al componento encapsulado dentro de <AdminRoute/> */
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  /* llamado a los atributos necesarios para validar la sesión mediante useAuth */
+  const { user, role, loading } = useAuth();
+
+  /* 
+    Si loading es true, es decir que el llamado a la base de datos por alguna razón 
+    no está respondiendo, por ende para evitar imprevistos se crea un componente que
+    indica que la app está cargando
+  */
+  if (loading) return <div className="flex min-h-screen items-center justify-center">
+    <span className="loading loading-spinner loading-lg" />
+  </div>;
+  /* 
+    Aquí se valida si el usuario actual existe (sesión válida), si existe se envía al componente encapsulado, si no
+    se "denienga" el acceso enviando al usuario a login
+  */  
+  if (!user) return <Navigate to="/login" />;
+
+  /* 
+    Por otro lado, si el usuario si se encuentra logueado, pero su rol no es admin, se le 
+    "denienga" el acceso enviando al usuario a HomePage
+  */
+  if (role !== "admin") return <Navigate to="/my-plants" />;
+
+  return <>{children}</>;
 }
 
-function OnboardingRoute() {
-  const navigate = useNavigate();
-  return (
-    <OnboardingScreen
-      onSelectLogin={() => navigate('/login')}
-      onSelectRegister={() => navigate('/register')}
-    />
-  );
-}
+function App() {
 
-function LoginRoute() {
-  const navigate = useNavigate();
-  const [authError, setAuthError] = useState<string | null>(null);
-
-    const handleLoginSubmit = async (data: { email: string; password: string }) => {
-    setAuthError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-    if (error) {
-      logAuthError('login', error);
-      const message = getFriendlyAuthErrorMessage(error);
-      setAuthError(message);
-      alert(message);
-      return;
-    }
-    navigate('/home');
-  };
-
-  return (
-    <>
-      <LoginScreen
-        onLoginSubmit={handleLoginSubmit}
-        onForgotPassword={() => navigate('/forgot')}
-        onBackToOnboarding={() => navigate('/')}
-      />
-      {authError && <p className="text-red-600 text-sm text-center mt-4">{authError}</p>}
-    </>
-  );
-}
-
-function RegisterRoute() {
-  const navigate = useNavigate();
-  const [authError, setAuthError] = useState<string | null>(null);
-
-    const handleRegisterSubmit = async (data: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email: string;
-    password: string;
-  }) => {
-    setAuthError(null);
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: { name: `${data.firstName} ${data.lastName}`.trim(), phone: data.phone },
-      },
-    });
-    if (error) {
-      logAuthError('register', error);
-      const message = getFriendlyAuthErrorMessage(error);
-      setAuthError(message);
-      alert(message);
-      return;
-    }
-    navigate('/verify', { state: { email: data.email } });
-  };
-
-  return (
-    <>
-      <RegisterScreen onRegisterSubmit={handleRegisterSubmit} onBackToOnboarding={() => navigate('/')} />
-      {authError && <p className="text-red-600 text-sm text-center mt-4">{authError}</p>}
-    </>
-  );
-}
-
-function VerifyRoute() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const email = (location.state as { email?: string } | null)?.email ?? '';
-
-  return (
-    <VerifyAccountScreen
-      email={email}
-      onResendCode={async () => {
-        const { error } = await supabase.auth.resend({ type: 'signup', email });
-        if (error) {
-          logAuthError('resend-verification', error);
-          alert(getFriendlyAuthErrorMessage(error));
-          return;
-        }
-        alert('Correo reenviado.');
-      }}
-      onBackToRegister={() => navigate('/register')}
-    />
-  );
-}
-
-function ForgotRoute() {
-  const navigate = useNavigate();
-
-    const handleSendResetInstruction = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) {
-      logAuthError('reset-password-request', error);
-      alert(getFriendlyAuthErrorMessage(error));
-      return;
-    }
-    alert('Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.');
-    navigate('/login');
-  };
-
-  return (
-    <ForgotPasswordScreen
-      onSendResetInstruction={handleSendResetInstruction}
-      onBackToLogin={() => navigate('/login')}
-    />
-  );
-}
-
-// esta ruta NO está protegida por PublicOnlyRoute ni PrivateRoute a propósito.
-// queda libre porque el usuario puede llegar a ella desde un correo de restablecimiento de contraseña, y
-// no necesariamente tiene sesión iniciada.
-
-function ResetPasswordRoute() {
-  const navigate = useNavigate();
-
-    const handleResetPasswordSubmit = async (newPassword: string) => {
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      logAuthError('reset-password-confirm', error);
-      alert(getFriendlyAuthErrorMessage(error));
-      return;
-    }
-    alert('¡Contraseña cambiada! Inicia sesión con la nueva.');
-    await supabase.auth.signOut();
-    navigate('/login', { replace: true });
-  };
-
-  return (
-    <CreateNewPasswordScreen
-      onResetPasswordSubmit={handleResetPasswordSubmit}
-      onBackToVerify={() => navigate('/login')}
-    />
-  );
-}
-
-function HomeRoute() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/', { replace: true });
-  };
-
-  return (
-    <HomeScreen
-      email={user?.email ?? ''}
-      onLogout={handleLogout}
-      onEditProfile={() => navigate('/profile')}
-    />
-  );
-}
-
-function ProfileRoute() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-    const handleSaveProfile = async ({ name, email }: { name: string; email: string }) => {
-    const updatePayload: { email?: string; data?: Record<string, unknown> } = { data: { name } };
-    if (email !== user?.email) updatePayload.email = email;
-    const { error } = await supabase.auth.updateUser(updatePayload);
-    if (error) {
-      logAuthError('update-profile', error);
-      throw new Error(getFriendlyAuthErrorMessage(error));
-    }
-  };
-
-  return (
-    <EditProfileScreen
-      currentName={(user?.user_metadata?.name as string) ?? ''}
-      currentEmail={user?.email ?? ''}
-      onSave={handleSaveProfile}
-      onBack={() => navigate('/home')}
-    />
-  );
-}
-
-export default function App() {
   return (
     <BrowserRouter>
+    {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
-        <Route path="/" element={<PublicOnlyRoute><OnboardingRoute /></PublicOnlyRoute>} />
-        <Route path="/login" element={<PublicOnlyRoute><LoginRoute /></PublicOnlyRoute>} />
-        <Route path="/register" element={<PublicOnlyRoute><RegisterRoute /></PublicOnlyRoute>} />
-        <Route path="/verify" element={<VerifyRoute />} />
-        <Route path="/forgot" element={<PublicOnlyRoute><ForgotRoute /></PublicOnlyRoute>} />
-        <Route path="/reset-password" element={<ResetPasswordRoute />} />
-        <Route path="/home" element={<PrivateRoute><HomeRoute /></PrivateRoute>} />
-        <Route path="/profile" element={<PrivateRoute><ProfileRoute /></PrivateRoute>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<Onboarding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/home" element={
+          <PrivateRoute>
+            <MainPage />
+          </PrivateRoute>
+        } />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/profile" element={
+          <PrivateRoute>
+            <UpdateUser />
+          </PrivateRoute>
+        } />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/catalog" element={
+          <PrivateRoute>
+            <Catalog />
+          </PrivateRoute>
+        } />
+
+        {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
+        <Route path="/admin/products/new" element={
+          <AdminRoute>
+            <AdminProducts/>
+          </AdminRoute>
+        } />
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/my-plants" element={
+          <PrivateRoute>
+            <MyPlants />
+          </PrivateRoute>
+        } />
+        <Route path="/about" element={
+          <PrivateRoute>
+            <AboutUs />
+          </PrivateRoute>
+        } />
+        <Route path="/cart" element={
+          <PrivateRoute>
+            <Cart />
+          </PrivateRoute>
+        } />
+
       </Routes>
     </BrowserRouter>
-  );
+  )
+
 }
+
+export default App
