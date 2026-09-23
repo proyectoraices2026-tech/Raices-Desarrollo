@@ -65,7 +65,7 @@ function ProductCard({
         {/* Información textual */}
         <div className="flex-1 min-w-0 space-y-0.5">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            {(product as any).category || "PLANTAS"}
+            {product.categories?.name || "Plantas"}
           </span>
 
           <h3
@@ -126,10 +126,18 @@ export function ProductList() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const productCat = (product as any).category || "Plantas";
+
+      // El nombre de la categoría viene de la relación con la tabla `categories`
+      // (product.categories.name), igual que en la etiqueta que se muestra en la tarjeta.
+      const productCat = product.categories?.name || "Plantas";
+
+      // En la base de datos las categorías están en singular ("Planta", "Herramienta"),
+      // pero los chips de filtro están en plural ("Plantas", "Herramientas"). Se le quita
+      // la "s" final a ambos lados antes de comparar para que sí coincidan.
+      const normalize = (value: string) => value.toLowerCase().trim().replace(/s$/, "");
       const matchesCategory =
         selectedCategory === "Todo" ||
-        productCat.toLowerCase() === selectedCategory.toLowerCase();
+        normalize(productCat) === normalize(selectedCategory);
 
       return matchesSearch && matchesCategory;
     });
