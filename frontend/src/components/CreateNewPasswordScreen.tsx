@@ -7,65 +7,65 @@ interface CreateNewPasswordScreenProps {
   onBackToVerify: () => void;
 }
 
+/* Pantalla donde el usuario captura y confirma su nueva contraseña */
 export function CreateNewPasswordScreen({
   onResetPasswordSubmit,
   onBackToVerify,
 }: CreateNewPasswordScreenProps) {
+  /* Estados de los campos, visibilidad de contraseñas y mensajes del formulario */
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* Valida la contraseña y envía el valor correcto a la página */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    /* Reutiliza la validación común de contraseñas */
     const passwordResult = validatePassword(password);
-    
-        if (!passwordResult.valid) {
-          setError(passwordResult.message!);
-          return;
-        }
-    
-        if (password !== confirmPassword) {
-          setError("Las contraseñas no coinciden");
-          return;
-        }
+    if (!passwordResult.valid) {
+      setError(passwordResult.message!);
+      return;
+    }
 
+    /* Comprueba que ambos campos tengan exactamente la misma contraseña */
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    /* Solicita a la página que actualice la contraseña en Supabase */
     onResetPasswordSubmit(password);
   };
 
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
-      
-      {/* Botón Superior Back */}
-      <button
-          onClick={onBackToVerify}
-          className="absolute w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
-          title="Back"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
 
-      {/* Contenido Principal */}
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">
-        
+      <button
+        onClick={onBackToVerify}
+        className="absolute w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
+        title="Back"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
+
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6 flex flex-col justify-between min-h-[500px]">
+
         <div>
-          {/* Título y Descripción */}
           <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-3">
-            Create New Password
+            Crear Nueva Contraseña
           </h1>
           <p className="text-center text-xs md:text-sm font-medium text-[#2D4A3E]/80 leading-relaxed max-w-xs mx-auto mb-8">
-            Please enter and confirm your new password. You will need to login after you reset.
+            Por favor, ingrese y confirme su nueva contraseña. Necesitará iniciar sesión después de restablecer.
           </p>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Campo Password */}
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
-                Password
+                Contraseña
               </label>
               <div className="relative">
                 <input
@@ -89,14 +89,13 @@ export function CreateNewPasswordScreen({
                 </button>
               </div>
               <p className="text-[11px] font-medium text-[#4E705B] mt-1">
-                must contain 8 char.
+                Debe contener 8 caracteres + 1 caracter especial
               </p>
             </div>
 
-            {/* Campo Confirm Password */}
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
-                Confirm Password
+                Confirmar Contraseña
               </label>
               <div className="relative">
                 <input
@@ -121,7 +120,6 @@ export function CreateNewPasswordScreen({
               </div>
             </div>
 
-            {/* Mensaje de Error */}
             {error && (
               <p className="text-xs text-red-600 font-semibold text-center pt-1">
                 {error}
@@ -130,12 +128,11 @@ export function CreateNewPasswordScreen({
           </form>
         </div>
 
-        {/* Botón Reset Password */}
         <button
           onClick={handleSubmit}
           className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] shadow-md transition duration-200 mt-8"
         >
-          Reset Password
+          Restablecer Contraseña
         </button>
 
       </div>
