@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { LoginScreen } from "../components/LoginScreen";
 import { logAuthError, getFriendlyAuthErrorMessage } from "../lib/logger";
-
-import { useAuth } from "../context/AuthContext";
 import { useAlert } from "../context/AlertContext";
 
 
@@ -15,30 +13,30 @@ export default function Login() {
 
     /* Envía las credenciales a Supabase y redirige si son correctas */
     const handleLogin = async (data: { email: string; password: string }) => {
-    const { data: signInData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-    });
+        const { data: signInData, error } = await supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password,
+        });
 
-    if (error) {
-        logAuthError("login", error);
-        showAlert({ title: "No se pudo iniciar sesión, cuenta no encontrada o contraseña incorrecta", message: getFriendlyAuthErrorMessage(error), variant: "error" });
-        return;
-    }
+        if (error) {
+            logAuthError("login", error);
+            showAlert({ title: "No se pudo iniciar sesión, cuenta no encontrada o contraseña incorrecta", message: getFriendlyAuthErrorMessage(error), variant: "error" });
+            return;
+        }
 
-    /* Consulta el rol directamente, sin depender de que AuthContext ya lo haya
-       actualizado (fetchRole corre en paralelo vía onAuthStateChange y puede
-       no estar listo todavía en este punto) */
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("role_id, roles(name)")
-        .eq("id", signInData.user.id)
-        .single();
+        /* Consulta el rol directamente, sin depender de que AuthContext ya lo haya
+        actualizado (fetchRole corre en paralelo vía onAuthStateChange y puede
+        no estar listo todavía en este punto) */
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("role_id, roles(name)")
+            .eq("id", signInData.user.id)
+            .single();
 
-    const roleName = (profile?.roles as unknown as { name: string })?.name;
+        const roleName = (profile?.roles as unknown as { name: string })?.name;
 
-    navigate(roleName === "admin" ? "/admin" : "/my-plants");
-};
+        navigate(roleName === "admin" ? "/admin" : "/my-plants");
+    };
 
     return (
         <LoginScreen

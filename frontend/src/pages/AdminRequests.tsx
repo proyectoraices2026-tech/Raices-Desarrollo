@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAlert } from "../context/AlertContext";
 import { getPendingRequests, acceptRequest, rejectRequest } from "../services/RequestService";
@@ -22,7 +21,6 @@ interface RequesterProfile {
    Corresponde a los endpoints /api/requests/pending, /accept y /reject
    del backend dedicado de pedidos (mismo backend que usa MyRequests.tsx). */
 export default function AdminRequests() {
-    const navigate = useNavigate();
     const { showAlert } = useAlert();
 
     const [requests, setRequests] = useState<OrderRequest[]>([]);
