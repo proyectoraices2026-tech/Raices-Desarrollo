@@ -17,6 +17,7 @@ export default function Register() {
         lastName: string;
         phone: string;
         email: string;
+        address: string;
         password: string;
     }) => {
             /* Une el nombre y apellido para guardarlos como un solo dato del perfil */
@@ -26,7 +27,7 @@ export default function Register() {
                 email: data.email,
                 password: data.password,
                 options: {
-                    data: { name, phone: data.phone },
+                    data: { name, phone: data.phone, address: data.address },
                 },
             });
 

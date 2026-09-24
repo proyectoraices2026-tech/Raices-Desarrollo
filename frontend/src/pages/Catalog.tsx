@@ -1,38 +1,23 @@
 import { ProductList } from "../components/ProductList";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import PButton from "../components/PButton";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
 
 /* Página privada que muestra el catálogo y las acciones disponibles para el rol */
 export default function Catalog() {
-    const navigate = useNavigate();
-    const { role } = useAuth();
-    const [loading] = useState(false);
+    
     /* Controla si el panel lateral (menú) está abierto o cerrado */
     const [menuOpen, setMenuOpen] = useState(false);
 
     /* Envía al administrador a la pantalla de gestión de productos (crear, editar, desactivar) */
-    const handleManageProducts = async () => {
-        navigate("/admin/products/new");
-    };
+    
 
     return (
         <div className="min-h-screen bg-[#F4F6F3] pb-28">
 
             <NavBar
                 onMenuClick={() => setMenuOpen(true)}
-                extraActions={
-                    /* El botón de alta solo se muestra a usuarios con rol administrador */
-                    role === "admin" ? (
-                        <PButton onClick={handleManageProducts} disabled={loading} label="Gestionar productos">
-                            {loading ? <span className="loading loading-spinner" /> : "Gestionar productos"}
-                        </PButton>
-                    ) : undefined
-                }
             />
 
             {/* Banner Verdoso */}

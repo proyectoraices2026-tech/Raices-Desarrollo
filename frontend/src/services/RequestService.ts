@@ -148,3 +148,17 @@ export async function rejectRequest(id: string, reason: string): Promise<OrderRe
 
     return parseResponse<OrderRequest>(res);
 }
+
+export async function archiveRequest(id: string): Promise<OrderRequest> {
+    const headers = await getAuthHeader();
+
+    const res = await fetch(`${API_URL}/api/requests/${id}/archive`, {
+        method: "PATCH",
+        headers,
+    });
+
+    return parseResponse<OrderRequest>(res);
+}
+
+
+

@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
+import AdminDashboard from './pages/AdminDashboard'
 
 //aaa
 import MyPlants from './pages/MyPlants';
@@ -70,7 +71,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   /* 
     Aquí se valida si el usuario actual existe (sesión válida), si existe se envía al componente encapsulado, si no
     se "denienga" el acceso enviando al usuario a login
-  */  
+  */
   if (!user) return <Navigate to="/login" />;
 
   /* 
@@ -86,7 +87,7 @@ function App() {
 
   return (
     <BrowserRouter>
-    {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
+      {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
@@ -116,18 +117,25 @@ function App() {
           </PrivateRoute>
         } />
 
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } />
+
         {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
         <Route path="/admin/products/new" element={
           <AdminRoute>
-            <AdminProducts/>
+            <AdminProducts />
           </AdminRoute>
         } />
         {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
         <Route path="/admin/requests" element={
           <AdminRoute>
-            <AdminRequests/>
+            <AdminRequests />
           </AdminRoute>
         } />
+
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/my-plants" element={
           <PrivateRoute>

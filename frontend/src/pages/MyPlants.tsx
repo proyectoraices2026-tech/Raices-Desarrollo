@@ -1,18 +1,38 @@
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
 import RegisterPlantModal from "../components/RegisterPlantModal";
+import { useNavigate } from "react-router-dom";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SideMenu from "../components/SideMenu";
 import { useAlert } from "../context/AlertContext";
+import { useAuth } from "../context/AuthContext";
+import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 
-/* Página de inicio tras iniciar sesión. Todavía no existe un backend de plantas, así que
-   no hay lista real que mostrar (se quitaron las plantas de ejemplo que había antes);
-   en su lugar se ofrece el flujo para registrar la primera planta. */
 export default function MyPlants() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const { showAlert } = useAlert();
+  const { user, role } = useAuth();
+
+  const [plants, setPlants] = useState<UserPlant[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  const loadPlants = () => {
+    if (!user) return;
+    setLoading(true);
+    getUserPlants(user.id)
+      .then(setPlants)
+      .catch(() => setPlants([]))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadPlants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-[#f5f7f2] pb-28">
@@ -20,6 +40,15 @@ export default function MyPlants() {
 
       <div className="md:max-w-5xl md:mx-auto">
         {/* Hero */}
+        {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
+          {role === "admin" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
+            >
+              Volvar al Dashboard de admin
+            </button>
+          )}
         <div className="p-5 md:px-12 md:py-8">
           <span className="inline-block bg-primarioClaro text-primarioOscuro text-xs font-semibold px-3 py-1 rounded-full mb-3">
             Tu jardín interior te espera
@@ -35,7 +64,6 @@ export default function MyPlants() {
 
           {/* Widget de tareas — texto fijo, sin datos reales */}
           <div className="relative bg-textoSecundario rounded-2xl p-5 text-white mb-4 overflow-hidden">
-            {/* Círculo decorativo, recortado por el borde de la tarjeta */}
             <div
               className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-[#FDFEFD]"
               aria-hidden="true"
@@ -61,37 +89,70 @@ export default function MyPlants() {
 
             <button
               onClick={() =>
-              showAlert({
-                title: "Próximamente",
-                message: "Esta función todavía no está disponible.",
-                variant: "info",
-              })
-             }
+                showAlert({
+                  title: "Próximamente",
+                  message: "Esta función todavía no está disponible.",
+                  variant: "info",
+                })
+              }
               className="block ml-auto text-xs font-semibold bg-[#F5F7F2]/15 hover:bg-[#F5F7F2]/25 transition rounded-full px-4 py-2 text-superficie"
-              >Ver calendario completo →
+            >Ver calendario completo →
             </button>
           </div>
         </div>
 
-        {/* Todavía no hay plantas registradas (sin backend de plantas aún) */}
+        {/* Plantas del usuario, o el estado vacío si aún no tiene ninguna */}
         <div className="px-5 md:px-12">
-          <div className="bg-white rounded-2xl border border-dashed border-[#c8dcc2] flex flex-col items-center justify-center gap-2 py-12 px-6 text-center">
-            <p className="text-sm font-semibold text-[#1e2d24]">Todavía no tienes plantas registradas</p>
-            <p className="text-xs text-[#537a63] max-w-xs">
-              Registra tu primera planta para empezar a llevar su seguimiento.
-            </p>
-            <button
-              onClick={() => setRegisterOpen(true)}
-              className="mt-3 inline-flex items-center gap-2 bg-[#645244] text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-[#2B1C1C] transition"
-            >
-              <span className="text-lg leading-none" aria-hidden="true">+</span>
-              Registrar planta
-            </button>
-          </div>
+          {loading ? (
+            <p className="text-sm text-[#537a63] text-center py-8">Cargando tus plantas...</p>
+          ) : plants.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-dashed border-[#c8dcc2] flex flex-col items-center justify-center gap-2 py-12 px-6 text-center">
+              <p className="text-sm font-semibold text-[#1e2d24]">Todavía no tienes plantas registradas</p>
+              <p className="text-xs text-[#537a63] max-w-xs">
+                Registra tu primera planta para empezar a llevar su seguimiento.
+              </p>
+              <button
+                onClick={() => setRegisterOpen(true)}
+                className="mt-3 inline-flex items-center gap-2 bg-[#645244] text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-[#2B1C1C] transition"
+              >
+                <span className="text-lg leading-none" aria-hidden="true">+</span>
+                Registrar planta
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {plants.map((plant) => (
+                <div
+                  key={plant.id}
+                  className="bg-white rounded-2xl overflow-hidden border border-[#e8efe4]"
+                >
+                  <div className="h-24 md:h-32 bg-[#e8efe4]" />
+                  <div className="p-2">
+                    <p className="text-xs font-bold text-[#1e2d24] truncate">{plant.name}</p>
+                    <p className="text-[10px] text-[#537a63] truncate">
+                      {plant.scientific_name || plant.watering_frequency || ""}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={() => setRegisterOpen(true)}
+                className="bg-white rounded-2xl border border-dashed border-[#c8dcc2] flex flex-col items-center justify-center gap-1 py-8 text-[#537a63]"
+              >
+                <span className="text-2xl">+</span>
+                <span className="text-xs font-semibold">Añadir planta</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-        <RegisterPlantModal isOpen={registerOpen} onClose={() => setRegisterOpen(false)} />
+        <RegisterPlantModal
+          isOpen={registerOpen}
+          onClose={() => setRegisterOpen(false)}
+          onPlantAdded={loadPlants}
+        />
         <BottomNav />
       </div>
     </div>

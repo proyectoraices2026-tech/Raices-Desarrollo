@@ -4,10 +4,11 @@ import { ArrowLeft, Package } from "lucide-react";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
-import { getMyRequests } from "../services/RequestService";
+import { getMyRequests, archiveRequest } from "../services/RequestService";
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { useAlert } from "../context/AlertContext"
 
 /* Traduce el estado que guarda el backend a algo que un usuario entienda,
    y a un color de acuerdo a si sigue pendiente, se aceptó o se rechazó */
@@ -34,6 +35,33 @@ export default function MyRequests() {
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { showAlert } = useAlert();
+
+  const loadMyRequests = () => {
+    setLoading(true);
+    setError(null);
+    getMyRequests()
+      .then(setRequests)
+      .catch((err) => setError(err instanceof Error ? err.message : "No se pudieron cargar tus pedidos."))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(loadMyRequests, []);
+
+  const handleArchive = async (id: string) => {
+    try {
+      await archiveRequest(id);
+      // recargar la lista, mismo patrón que loadPendingRequests
+      loadMyRequests();
+    } catch (err) {
+      showAlert({
+        title: "No se pudo eliminar el pedido",
+        variant: "error",
+        message: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
+      });
+    }
+  };
 
   useEffect(() => {
     Promise.all([getMyRequests(), getActiveProducts()])
@@ -73,7 +101,7 @@ export default function MyRequests() {
         {!loading && !error && requests.length === 0 && (
           <div className="bg-white rounded-2xl border border-dashed border-[#c8dcc2] flex flex-col items-center justify-center gap-2 py-12 px-6 text-center">
             <Package className="w-10 h-10 text-[#c8dcc2]" strokeWidth={1.5} />
-            <p className="text-sm font-semibold text-[#1e2d24]">Todavía no has hecho ningún pedido</p>
+            <p className="text-sm font-semibold text-[#1e2d24]">No tienes ningún pedido en circulación</p>
             <p className="text-xs text-[#537a63] max-w-xs">
               Los pedidos que hagas desde el carrito van a aparecer aquí, junto con su estado.
             </p>
@@ -83,6 +111,14 @@ export default function MyRequests() {
         <div className="space-y-4">
           {requests.map((request) => (
             <div key={request.id} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+              {(request.status === "accepted" || request.status === "rejected") && (
+                <button
+                  onClick={() => handleArchive(request.id)}
+                  className="text-xs font-semibold text-red-600 hover:underline"
+                >
+                  Eliminar
+                </button>
+              )}
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs text-[#537a63]">
                   {new Date(request.createdAt).toLocaleDateString("es-CR", {
