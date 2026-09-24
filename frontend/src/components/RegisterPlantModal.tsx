@@ -1,9 +1,12 @@
+import { useAuth } from "../context/AuthContext";
+import { registerPlant } from "../services/UserPlantsService"
 import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
 
 interface RegisterPlantModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPlantAdded?: () => void;
 }
 
 /* 15 espacios seleccionables para el ícono de la planta. Todavía no hay ilustraciones
@@ -20,7 +23,10 @@ const ICON_COUNT = 15;
   Cuando exista el backend de plantas, el "Confirmar registro" de aquí es el punto exacto
   donde se conectaría la llamada a Supabase.
 */
-export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantModalProps) {
+export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: RegisterPlantModalProps) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"form" | "success">("form");
   const [name, setName] = useState("");
   const [scientificName, setScientificName] = useState("");
@@ -54,10 +60,36 @@ export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantMod
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    /* Todavía no hay backend de plantas: solo pasamos a la pantalla de éxito */
-    setStep("success");
+
+    if (!user) {
+      setError("Debes iniciar sesión para registrar una planta.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await registerPlant(
+        {
+          name,
+          scientificName,
+          wateringFrequency: wateringFreq,
+          pruningFrequency: pruningFreq,
+          fertilizingFrequency: fertilizingFreq,
+          iconIndex: selectedIcon,
+        },
+        user.id
+      );
+      setStep("success");
+      onPlantAdded?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo registrar la planta.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass =
@@ -71,6 +103,7 @@ export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantMod
       aria-modal="true"
       aria-labelledby="register-plant-title"
     >
+
       {step === "form" ? (
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-9 relative">
           <button
@@ -88,6 +121,11 @@ export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantMod
             Añade una nueva compañera a tu colección
           </p>
 
+          {error && (
+            <p className="text-xs text-red-600 mb-3" role="alert">
+              {error}
+            </p>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
             <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-4 md:space-y-0">
               <div>
@@ -176,11 +214,10 @@ export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantMod
                       onClick={() => setSelectedIcon(i)}
                       aria-pressed={selected}
                       aria-label={`Espacio de ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                      className={`aspect-square rounded-full border-2 transition ${
-                        selected
-                          ? "bg-[#645244] border-[#645244] ring-2 ring-offset-2 ring-[#645244]"
-                          : "bg-[#ece9e3] border-dashed border-[#c9c4b8] hover:border-[#645244]"
-                      }`}
+                      className={`aspect-square rounded-full border-2 transition ${selected
+                        ? "bg-[#645244] border-[#645244] ring-2 ring-offset-2 ring-[#645244]"
+                        : "bg-[#ece9e3] border-dashed border-[#c9c4b8] hover:border-[#645244]"
+                        }`}
                     />
                   );
                 })}
@@ -189,9 +226,10 @@ export default function RegisterPlantModal({ isOpen, onClose }: RegisterPlantMod
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-full bg-[#645244] text-white font-semibold text-sm hover:bg-[#2B1C1C] transition duration-200"
+              disabled={loading}
+              className="w-full py-3.5 rounded-full bg-[#645244] text-white font-semibold text-sm hover:bg-[#2B1C1C] transition duration-200 disabled:opacity-60"
             >
-              Confirmar registro
+              {loading ? "Guardando..." : "Confirmar registro"}
             </button>
           </form>
         </div>

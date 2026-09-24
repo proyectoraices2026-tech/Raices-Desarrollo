@@ -7,7 +7,7 @@ import { logAuthError } from "../lib/logger";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 
-/* Página privada para editar el nombre y correo del usuario actual */
+/* Página privada para editar el nombre, correo, teléfono y dirección del usuario actual */
 export default function UpdateUser() {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -15,6 +15,8 @@ export default function UpdateUser() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
@@ -25,14 +27,9 @@ export default function UpdateUser() {
         if (user) {
             setEmail(user.email ?? "");
 
-            /* Consulta el nombre guardado en el perfil relacionado.
-               En la base de datos sigue siendo un solo campo ("name"), igual que
-               cuando se registró la cuenta, así que aquí se separa en nombre y
-               apellido solo para mostrarlo en dos campos (todo lo que esté después
-               del primer espacio se toma como apellido). */
             supabase
                 .from("profiles")
-                .select("name")
+                .select("name, phone, address")
                 .eq("id", user.id)
                 .single()
                 .then(({ data }) => {
@@ -40,11 +37,13 @@ export default function UpdateUser() {
                     const [first, ...rest] = fullName.split(" ");
                     setFirstName(first ?? "");
                     setLastName(rest.join(" "));
+                    setPhone(data?.phone ?? "");
+                    setAddress(data?.address ?? "");
                 });
         }
     }, [user]);
 
-    /* Actualiza el correo de autenticación y el nombre del perfil */
+    /* Actualiza el correo de autenticación y los datos del perfil */
     const handleUpdate = async () => {
         setLoading(true);
         setError("");
@@ -57,19 +56,21 @@ export default function UpdateUser() {
                 if (emailError) throw emailError;
             }
 
-            /* Vuelve a unir nombre y apellido en un solo texto para guardarlo,
-               igual que se arma en el registro (RegisterScreen.tsx) */
             const name = `${firstName} ${lastName}`.trim();
 
-            /* Guarda el nombre y la fecha de modificación en el perfil */
+            /* Guarda nombre, teléfono, dirección y la fecha de modificación en el perfil */
             const { error: profileError } = await supabase
                 .from("profiles")
-                .update({ name, updated_at: new Date().toISOString() })
+                .update({
+                    name,
+                    phone,
+                    address,
+                    updated_at: new Date().toISOString(),
+                })
                 .eq("id", user?.id);
 
             if (profileError) throw profileError;
 
-            /* Muestra un mensaje diferente si también se solicitó cambiar el correo */
             setSuccess("Perfil actualizado correctamente.");
 
             if (email !== user?.email) {
@@ -78,11 +79,9 @@ export default function UpdateUser() {
                 );
             }
         } catch (err: any) {
-            /* Registra y muestra cualquier error de autenticación o base de datos */
             logAuthError("update-profile", err);
             setError(err.message);
         } finally {
-            /* Reactiva los controles al finalizar la actualización */
             setLoading(false);
         }
     };
@@ -92,7 +91,7 @@ export default function UpdateUser() {
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
-            <div className="w-full max-w-sm mx-auto my-auto py-8 px-6 md:px-12">
+            <div className="w-full max-w-sm sm:max-w-lg md:max-w-xl mx-auto my-auto py-8 px-6 md:px-12">
                 <button
                     onClick={() => navigate("/my-plants")}
                     className="p-2 -ml-2 mb-4 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
@@ -106,7 +105,7 @@ export default function UpdateUser() {
                 </h1>
 
                 <div className="space-y-5">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-5 md:space-y-0">
                         <div>
                             <label htmlFor="profile-first-name" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
                                 Nombre
@@ -136,16 +135,46 @@ export default function UpdateUser() {
                         </div>
                     </div>
 
+                    <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-5 md:space-y-0">
+                        <div>
+                            <label htmlFor="profile-email" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                                Correo electrónico
+                            </label>
+                            <input
+                                id="profile-email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Tu correo"
+                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="profile-phone" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                                Número de teléfono
+                            </label>
+                            <input
+                                id="profile-phone"
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="8888-8888"
+                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            />
+                        </div>
+                    </div>
+
                     <div>
-                        <label htmlFor="profile-email" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
-                            Correo electrónico
+                        <label htmlFor="profile-address" className="block text-sm font-semibold text-[#2D4A3E] mb-1.5">
+                            Dirección
                         </label>
                         <input
-                            id="profile-email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Tu correo"
+                            id="profile-address"
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            placeholder="Ingresa la dirección en la que reside actualmente"
                             className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                         />
                     </div>

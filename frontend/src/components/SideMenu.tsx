@@ -10,7 +10,7 @@ interface SideMenuProps {
 
 export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user} = useAuth();
   const [showInfo, setShowInfo] = useState(false);
 
   /* Nombre y teléfono guardados en el perfil (tabla `profiles`), NO en el metadata de
@@ -103,16 +103,6 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           >
             Mis pedidos
           </button>
-
-          {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
-          {role === "admin" && (
-            <button
-              onClick={() => go("/admin/requests")}
-              className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
-            >
-              Pedidos pendientes (admin)
-            </button>
-          )}
 
           <button
             onClick={() => go("/about")}

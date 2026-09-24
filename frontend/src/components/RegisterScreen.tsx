@@ -9,6 +9,7 @@ interface RegisterScreenProps {
     lastName: string;
     phone: string;
     email: string;
+    address: string;
     password: string;
   }) => void;
   onBackToOnboarding: () => void;
@@ -24,6 +25,7 @@ export function RegisterScreen({
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -57,24 +59,24 @@ export function RegisterScreen({
     }
 
     /* Envía los datos validados al componente que realiza el registro */
-    onRegisterSubmit({ firstName, lastName, phone, email, password });
+    onRegisterSubmit({ firstName, lastName, phone, email, address, password });
   };
 
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
 
-        <button
-          onClick={onBackToOnboarding}
-          className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
-          title="Back"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-      
+      <button
+        onClick={onBackToOnboarding}
+        className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200"
+        title="Back"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
 
-        <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">        <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
-          Registrar
-        </h1>
+
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">        <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
+        Registrar
+      </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -94,7 +96,7 @@ export function RegisterScreen({
 
             <div>
               <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
-               Apellido
+                Apellido
               </label>
               <input
                 type="text"
@@ -131,6 +133,20 @@ export function RegisterScreen({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="8888-8888"
+              className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#2D4A3E] mb-1">
+              Dirección
+            </label>
+            <input
+              type="text"
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Ingresa la dirección en la que recide actualmente"
               className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
             />
           </div>
@@ -206,7 +222,7 @@ export function RegisterScreen({
               <Link to="/terms" className="font-semibold underline hover:text-[#4E705B]">
                 términos y condiciones
               </Link>{' '}
-                de uso
+              de uso
             </label>
           </div>
 
@@ -224,7 +240,7 @@ export function RegisterScreen({
           </button>
         </form>
 
-        
+
       </div>
 
       <div className="h-4" />

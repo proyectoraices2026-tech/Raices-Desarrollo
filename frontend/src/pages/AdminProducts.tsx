@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Image as ImageIcon, Pencil } from "lucide-react";
+import { Image as ImageIcon, Pencil } from "lucide-react";
 import { ProductForm } from "../components/ProductForm";
 import EditProductModal from "../components/EditProductModal";
 import { getCategories, getAllProducts, setProductActive, getErrorMessage } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { useAlert } from "../context/AlertContext";
+import NavBar from "../components/NavBar";
+import SideMenu from "../components/SideMenu";
+import BottomNav from "../components/BottomNav";
 
 interface Category {
     id: string;
@@ -14,10 +16,10 @@ interface Category {
 
 /* Página administrativa para cargar categorías, crear productos, y editar/dar de baja los que ya existen */
 export default function AdminProducts() {
-    const navigate = useNavigate();
     const { showAlert } = useAlert();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     /* Lista de productos existentes (activos e inactivos), para poder editarlos o darlos de baja */
     const [products, setProducts] = useState<Product[]>([]);
@@ -66,16 +68,8 @@ export default function AdminProducts() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3]">
-            <header className="bg-[#DCE3DB] px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                <button
-                    onClick={() => navigate("/catalog")}
-                    className="p-2 -ml-2 rounded-full hover:bg-white/50 text-[#26623f]"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h1 className="text-lg font-bold text-[#26623f]">Gestionar productos</h1>
-            </header>
+        <div className="min-h-screen bg-[#F4F6F3] pb-28">
+            <NavBar onMenuClick={() => setMenuOpen(true)} />
 
             <main className="p-4 sm:p-6 max-w-lg mx-auto">
                 {/* Evita mostrar el formulario antes de tener las categorías */}
@@ -96,7 +90,7 @@ export default function AdminProducts() {
                                 });
                                 loadProducts();
                             }}
-                             onError={(message) =>
+                            onError={(message) =>
                                 showAlert({
                                     title: "No se pudo guardar el producto",
                                     message,
@@ -149,11 +143,10 @@ export default function AdminProducts() {
                                             <button
                                                 onClick={() => handleToggleActive(product)}
                                                 disabled={togglingId === product.id}
-                                                className={`px-3 py-2 rounded-full text-xs font-semibold flex-shrink-0 transition disabled:opacity-50 ${
-                                                    product.is_active
+                                                className={`px-3 py-2 rounded-full text-xs font-semibold flex-shrink-0 transition disabled:opacity-50 ${product.is_active
                                                         ? "bg-red-50 text-red-600 hover:bg-red-100"
                                                         : "bg-[#e3f3e9] text-[#3E5C4A] hover:bg-[#d4ecdd]"
-                                                }`}
+                                                    }`}
                                             >
                                                 {togglingId === product.id ? "..." : product.is_active ? "Desactivar" : "Reactivar"}
                                             </button>
@@ -181,6 +174,10 @@ export default function AdminProducts() {
                     }
                 />
             )}
+            <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+            <BottomNav />
         </div>
+        
     );
 }

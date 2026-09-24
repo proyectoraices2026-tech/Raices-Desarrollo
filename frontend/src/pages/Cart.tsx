@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
 import { createOrderRequest } from "../services/RequestService";
+import NavBar from "../components/NavBar"; 
+import SideMenu from "../components/SideMenu";
+import BottomNav from "../components/BottomNav";
 
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, subtotal, totalItems, clearCart } = useCart();
   const { showAlert } = useAlert();
+  const [menuOpen, setMenuOpen] = useState(false);
   /* Evita que se pueda mandar el mismo pedido dos veces mientras se espera la respuesta del backend */
   const [submitting, setSubmitting] = useState(false);
 
@@ -44,21 +48,14 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-28 flex flex-col">
-      <header className="bg-[#DCE3DB] px-5 py-4 flex items-center justify-between border-b border-slate-100">
-        <button onClick={() => navigate(-1)} className="p-1 text-[#26623f]">
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <div className="text-center">
-          <h1 className="text-sm font-bold text-[#1e2d24]">Lista de pedidos</h1>
-          <p className="text-[11px] text-[#537a63]">
-            {totalItems} producto{totalItems !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <div className="w-6" />
-      </header>
-
-
+    <div className="min-h-screen bg-white pb-28 flex flex-col pb-28">
+      <NavBar onMenuClick={() => setMenuOpen(true)} />
+      <div className="bg-[#537A63] text-white px-6 py-5">
+                <div className="max-w-2xl mx-auto">
+                    <h1 className="text-xl font-bold">Lista de pedidos</h1>
+                    <p className="text-xs text-white/80 mt-0.5">{totalItems} producto{totalItems !== 1 ? "s" : ""}</p>
+                </div>
+            </div>
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
           <ShoppingCart className="w-12 h-12 text-[#c8dcc2] mb-4" strokeWidth={1.5} />
@@ -141,6 +138,10 @@ export default function Cart() {
         </>
       )}
 
+      <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      <BottomNav />
     </div>
+    
   );
 }

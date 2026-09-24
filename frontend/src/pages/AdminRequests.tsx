@@ -7,6 +7,9 @@ import { getPendingRequests, acceptRequest, rejectRequest } from "../services/Re
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import NavBar from "../components/NavBar";
+import SideMenu from "../components/SideMenu";
+import BottomNav from "../components/BottomNav";
 
 /* Nombre del cliente que hizo el pedido. Solo trae id y name, igual que en
    UpdateUser.tsx, para poder mostrar "quién pidió" en vez de solo el uuid. */
@@ -29,12 +32,16 @@ export default function AdminRequests() {
     const [profilesById, setProfilesById] = useState<Record<string, RequesterProfile>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     /* Evita que se pueda hacer doble clic en aceptar/rechazar del mismo pedido mientras responde el backend */
     const [processingId, setProcessingId] = useState<string | null>(null);
     /* Id del pedido que se está por rechazar; controla si se muestra el cuadro para escribir el motivo */
     const [rejectingId, setRejectingId] = useState<string | null>(null);
     const [rejectReason, setRejectReason] = useState("");
+
+    const [acceptingId, setAcceptingId] = useState<string | null>(null);
+    const [acceptMessage, setAcceptMessage] = useState("");
 
     const loadPendingRequests = () => {
         setLoading(true);
@@ -63,11 +70,15 @@ export default function AdminRequests() {
 
     useEffect(loadPendingRequests, []);
 
-    const handleAccept = async (id: string) => {
-        setProcessingId(id);
+    const handleAccept = async () => {
+        if (!acceptingId) return;
+
+        setProcessingId(acceptingId);
         try {
-            await acceptRequest(id);
-            showAlert({ title: "Pedido aceptado", message: "Se descontó el stock y el cliente ya lo puede ver aprobado.", variant: "success" });
+            await acceptRequest(acceptingId, acceptMessage.trim() || undefined);
+            showAlert({ title: "Pedido aceptado", message: "Se descontó el stock y el cliente ya puede ver tu mensaje.", variant: "success" });
+            setAcceptingId(null);
+            setAcceptMessage("");
             loadPendingRequests();
         } catch (err) {
             showAlert({
@@ -107,16 +118,8 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3]">
-            <header className="bg-[#DCE3DB] px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                <button
-                    onClick={() => navigate("/catalog")}
-                    className="p-2 -ml-2 rounded-full hover:bg-white/50 text-[#26623f]"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h1 className="text-lg font-bold text-[#26623f]">Pedidos pendientes</h1>
-            </header>
+        <div className="min-h-screen bg-[#F4F6F3] pb-28">
+            <NavBar onMenuClick={() => setMenuOpen(true)} />
 
             <main className="p-4 sm:p-6 max-w-2xl mx-auto">
                 {loading && (
@@ -186,11 +189,14 @@ export default function AdminRequests() {
 
                                 <div className="flex gap-3">
                                     <button
-                                        onClick={() => handleAccept(request.id)}
+                                        onClick={() => {
+                                            setAcceptingId(request.id);
+                                            setAcceptMessage("");
+                                        }}
                                         disabled={isProcessing}
                                         className="flex-1 py-2.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition disabled:opacity-50"
                                     >
-                                        {isProcessing ? "Procesando..." : "Aceptar"}
+                                        Aceptar
                                     </button>
                                     <button
                                         onClick={() => {
@@ -249,6 +255,48 @@ export default function AdminRequests() {
                     </div>
                 </div>
             )}
+            {acceptingId && (
+                <div
+                    className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50"
+                    onClick={() => setAcceptingId(null)}
+                >
+                    <div
+                        className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 className="text-base font-bold text-[#1e2d24] mb-1">Mensaje para el cliente</h2>
+                        <p className="text-xs text-[#537a63] mb-4">
+                            El cliente va a ver este mensaje en "Mis pedidos". Cuéntale cuándo puede pasar a recogerlo.
+                        </p>
+                        <textarea
+                            value={acceptMessage}
+                            onChange={(e) => setAcceptMessage(e.target.value)}
+                            rows={3}
+                            placeholder="Ej. Tu pedido estará listo el 25 de agosto para que pases a recogerlo."
+                            className="w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
+                        />
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setAcceptingId(null)}
+                                className="flex-1 py-2.5 rounded-full bg-[#f0f0ec] text-[#1e2d24] font-semibold text-sm hover:bg-[#e4e4dc] transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleAccept}
+                                disabled={processingId === acceptingId}
+                                className="flex-1 py-2.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition disabled:opacity-50"
+                            >
+                                {processingId === acceptingId ? "Aceptando..." : "Confirmar aceptación"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Panel lateral y barra inferior, visibles en toda la pantalla del catálogo */}
+            <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+            <BottomNav />
         </div>
     );
 }
