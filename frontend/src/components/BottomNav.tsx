@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
 
 const TABS = [
-  { key: "calendar", label: "Calendario", icon: "📅", path: null },
-  { key: "my-plants", label: "Mis Plantas", icon: "🪴", path: "/my-plants" },
-  { key: "catalog", label: "Tienda", icon: "🛍️", path: "/catalog" },
-  { key: "chatbot", label: "Chatbot", icon: "💬", path: null },
+  { key: "calendar", label: "Calendario", icon: "/calendar-regular-full.svg", path: null },
+  { key: "my-plants", label: "Mis Plantas", icon: "/seedling-solid-full.svg", path: "/my-plants" },
+  { key: "catalog", label: "Tienda", icon: "/cart-shopping-solid-full.svg", path: "/catalog" },
+  { key: "chatbot", label: "Chatbot", icon: "/robot-solid-full.svg", path: null },
 ];
 
 export default function BottomNav() {
@@ -34,7 +34,11 @@ export default function BottomNav() {
               isActive ? "bg-[#87c6a1] text-[#1e2d24]" : "text-[#537a63]"
             }`}
           >
-            <span className="text-xl leading-none">{tab.icon}</span>
+            <img 
+              src={tab.icon} 
+              alt={tab.label} 
+              className="w-5 h-5 object-contain" 
+            />
             <span className="text-[10px] font-semibold">{tab.label}</span>
           </button>
         );
