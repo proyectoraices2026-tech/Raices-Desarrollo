@@ -9,6 +9,8 @@ import { useAlert } from "../context/AlertContext";
 import { useAuth } from "../context/AuthContext";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 
+import PlantDetailModal from "../components/PlantDetailModal";
+
 export default function MyPlants() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
@@ -17,6 +19,9 @@ export default function MyPlants() {
 
   const [plants, setPlants] = useState<UserPlant[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [selectedPlant, setSelectedPlant] = useState<UserPlant | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -41,14 +46,14 @@ export default function MyPlants() {
       <div className="md:max-w-5xl md:mx-auto">
         {/* Hero */}
         {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
-          {role === "admin" && (
-            <button
-              onClick={() => navigate("/admin")}
-              className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
-            >
-              Volvar al Dashboard de admin
-            </button>
-          )}
+        {role === "admin" && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
+          >
+            Volvar al Dashboard de admin
+          </button>
+        )}
         <div className="p-5 md:px-12 md:py-8">
           <span className="inline-block bg-primarioClaro text-primarioOscuro text-xs font-semibold px-3 py-1 rounded-full mb-3">
             Tu jardín interior te espera
@@ -124,7 +129,11 @@ export default function MyPlants() {
               {plants.map((plant) => (
                 <div
                   key={plant.id}
-                  className="bg-white rounded-2xl overflow-hidden border border-[#e8efe4]"
+                  onClick={() => {
+                    setSelectedPlant(plant);
+                    setDetailOpen(true);
+                  }}
+                  className="bg-white rounded-2xl overflow-hidden border border-[#e8efe4] cursor-pointer hover:border-[#c8dcc2] transition"
                 >
                   <div className="h-24 md:h-32 bg-[#e8efe4]" />
                   <div className="p-2">
@@ -154,6 +163,14 @@ export default function MyPlants() {
           onPlantAdded={loadPlants}
         />
         <BottomNav />
+
+        <PlantDetailModal
+          plant={selectedPlant}
+          userId={user?.id ?? ""}
+          isOpen={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          onChanged={loadPlants}
+        />
       </div>
     </div>
   );
