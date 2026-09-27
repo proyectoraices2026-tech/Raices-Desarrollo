@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAlert } from "../context/AlertContext";
 
 const TABS = [
-  { key: "calendar", label: "Calendario", icon: "/calendar-regular-full.svg", path: null },
+  { key: "calendar", label: "Calendario", icon: "/calendar-regular-full.svg", path: "/calendar" },
   { key: "my-plants", label: "Mis Plantas", icon: "/seedling-solid-full.svg", path: "/my-plants" },
   { key: "catalog", label: "Tienda", icon: "/cart-shopping-solid-full.svg", path: "/catalog" },
   { key: "chatbot", label: "Chatbot", icon: "/robot-solid-full.svg", path: null },

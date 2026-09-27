@@ -139,7 +139,7 @@ export default function MyPlants() {
                   <div className="p-2">
                     <p className="text-xs font-bold text-[#1e2d24] truncate">{plant.name}</p>
                     <p className="text-[10px] text-[#537a63] truncate">
-                      {plant.scientific_name || plant.watering_frequency || ""}
+                      {plant.scientific_name || ""}
                     </p>
                   </div>
                 </div>
