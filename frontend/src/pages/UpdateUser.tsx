@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { logAuthError, getFriendlyAuthErrorMessage } from "../lib/logger";
@@ -120,14 +119,6 @@ export default function UpdateUser() {
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
             <div className="w-full max-w-sm sm:max-w-lg md:max-w-xl mx-auto my-auto py-8 px-6 md:px-12">
-                <button
-                    onClick={() => navigate("/my-plants")}
-                    className="p-2 -ml-2 mb-4 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
-                    aria-label="Volver a Mis Plantas"
-                >
-                    <ArrowLeft className="w-6 h-6" aria-hidden="true" />
-                </button>
-
                 <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
                     Editar perfil
                 </h1>
