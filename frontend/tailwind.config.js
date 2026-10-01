@@ -29,7 +29,11 @@ export default {
       //Tipografías y alertas
       error: "#832D28",
       texto: "#FFFFFF",
-      textoNegro: "#090404"
+      textoNegro: "#090404",
+      //paleta del dashboard (prototipo Figma)
+      verdePastel: "#D4E6CC",
+      tarjeta: "#EFF4ED",
+      dorado: "#C4A557"
       }
     },
   },
@@ -38,4 +42,3 @@ export default {
     themes: ["light", "dark"],
   },
 }
-
