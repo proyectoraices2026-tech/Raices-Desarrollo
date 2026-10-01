@@ -6,14 +6,11 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "luci
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
 import ProductDetailModal from "./ProductDetailModal";
-
-
-const ITEMS_PER_PAGE = 5;
+/* 10 filas de 5 productos cada una */
+const ITEMS_PER_PAGE = 50;
 
 /* Categorías */
 const DEFAULT_CATEGORIES = ["Todo", "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
-
-/* Card Horizontal */
 function ProductCard({
   product,
   onProductClick,
@@ -27,75 +24,68 @@ function ProductCard({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl p-3 sm:p-4  hover:shadow-md transition duration-200 flex items-center justify-between gap-4 relative w-full">
-      
-      {/* Contenedor de Imagen + Info */}
-      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-        
-        {/* Imagen del Producto */}
-        <div
-          onClick={() => onProductClick(product)}
-          className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 cursor-pointer"
-        >
-        
-          {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
-              <ImageIcon className="w-5 h-5 text-slate-400" />
-            </div>
-          )}
+    <div className="bg-white rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
+      <div
+        onClick={() => onProductClick(product)}
+        className="relative w-full aspect-[4/3] bg-slate-100 cursor-pointer flex-shrink-0 overflow-hidden"
+      >
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
+            <ImageIcon className="w-6 h-6 text-slate-400" />
+          </div>
+        )}
 
-          {imageError || !product.image_url ? (
-            <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-              <ImageIcon className="w-6 h-6" />
-            </div>
-          ) : (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              loading="lazy"
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          )}
-        </div>
-
-        {/* Información textual */}
-        <div className="flex-1 min-w-0 space-y-0.5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            {product.categories?.name || "Plantas"}
-          </span>
-
-          <h3
-            onClick={() => onProductClick(product)}
-            className="font-bold text-[#1F2937] text-sm sm:text-base truncate cursor-pointer hover:underline"
-          >
-            {product.name}
-          </h3>
-
-          <p className="text-xs text-slate-500 line-clamp-1 hidden sm:block">
-            {(product as any).description || "Variedad seleccionada para mantener tus espacios verdes."}
-          </p>
-
-        
-
-          <p className="font-extrabold text-[#2D4A3E] text-sm sm:text-base pt-0.5">
-            ${product.price.toLocaleString()}
-          </p>
-        </div>
+        {imageError || !product.image_url ? (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+            <ImageIcon className="w-7 h-7" />
+          </div>
+        ) : (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        )}
       </div>
 
-      {/* Botón Circular con '+' */}
-      <button
-        type="button"
-        onClick={() => onAddToCart(product)}
-        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0"
-        title="Agregar"
-      >
-        <Plus className="w-5 h-5" />
-      </button>
+      {/* Información textual */}
+      <div className="flex flex-col p-2.5 space-y-0.5">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+          {product.categories?.name || "Plantas"}
+        </span>
+
+        <h3
+          onClick={() => onProductClick(product)}
+          className="font-bold text-[#1F2937] text-sm truncate cursor-pointer hover:underline"
+        >
+          {product.name}
+        </h3>
+
+        <p className="text-xs text-slate-500 line-clamp-1">
+          {(product as any).description || "Variedad seleccionada para mantener tus espacios verdes."}
+        </p>
+
+        {/* Precio + botón de agregar */}
+        <div className="flex items-center justify-between pt-1">
+          <p className="font-extrabold text-[#2D4A3E] text-sm">
+            ${product.price.toLocaleString()}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => onAddToCart(product)}
+            className="w-9 h-9 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0"
+            title="Agregar"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -171,7 +161,7 @@ export function ProductList() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-5">
+    <div className="w-full max-w-6xl mx-auto space-y-5">
       
       {/* Buscador */}
       <div className="relative w-full">
@@ -214,9 +204,9 @@ export function ProductList() {
         {filteredProducts.length} productos
       </p>
 
-      {/* Lista Vertical de Tarjetas Horizontales */}
+      {/* Cuadrícula de Tarjetas */}
       {paginatedProducts.length > 0 ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
           {paginatedProducts.map((product) => (
             <ProductCard
               key={product.id}

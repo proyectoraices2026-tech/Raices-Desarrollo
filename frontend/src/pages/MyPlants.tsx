@@ -5,16 +5,15 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import SideMenu from "../components/SideMenu";
-import { useAlert } from "../context/AlertContext";
 import { useAuth } from "../context/AuthContext";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 
 import PlantDetailModal from "../components/PlantDetailModal";
+import { getPlantIconUrl } from "../constants/plantIcons";
 
 export default function MyPlants() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
-  const { showAlert } = useAlert();
   const { user, role } = useAuth();
 
   const [plants, setPlants] = useState<UserPlant[]>([]);
@@ -40,8 +39,11 @@ export default function MyPlants() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2] pb-28">
-      <NavBar onMenuClick={() => setMenuOpen(true)} />
+    <div className="min-h-screen bg-[#f5f7f2]">
+      <div className="sticky top-0 z-40">
+        <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <BottomNav />
+      </div>
 
       <div className="md:max-w-5xl md:mx-auto">
         {/* Hero */}
@@ -93,13 +95,7 @@ export default function MyPlants() {
             </ul>
 
             <button
-              onClick={() =>
-                showAlert({
-                  title: "Próximamente",
-                  message: "Esta función todavía no está disponible.",
-                  variant: "info",
-                })
-              }
+              onClick={() => navigate("/calendar")}
               className="block ml-auto text-xs font-semibold bg-[#F5F7F2]/15 hover:bg-[#F5F7F2]/25 transition rounded-full px-4 py-2 text-superficie"
             >Ver calendario completo →
             </button>
@@ -135,7 +131,11 @@ export default function MyPlants() {
                   }}
                   className="bg-white rounded-2xl overflow-hidden border border-[#e8efe4] cursor-pointer hover:border-[#c8dcc2] transition"
                 >
-                  <div className="h-24 md:h-32 bg-[#e8efe4]" />
+                  <div className="h-24 md:h-32 bg-[#ECEBDA] flex items-center justify-center p-5">
+                    {getPlantIconUrl(plant.icon) && (
+                      <img src={getPlantIconUrl(plant.icon)!} alt="" className="w-full h-full object-contain" />
+                    )}
+                  </div>
                   <div className="p-2">
                     <p className="text-xs font-bold text-[#1e2d24] truncate">{plant.name}</p>
                     <p className="text-[10px] text-[#537a63] truncate">
@@ -162,7 +162,6 @@ export default function MyPlants() {
           onClose={() => setRegisterOpen(false)}
           onPlantAdded={loadPlants}
         />
-        <BottomNav />
 
         <PlantDetailModal
           plant={selectedPlant}

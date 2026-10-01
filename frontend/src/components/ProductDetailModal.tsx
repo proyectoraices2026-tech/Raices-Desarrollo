@@ -39,7 +39,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   const description =
     (product as any).description || "Variedad seleccionada para mantener tus espacios verdes.";
 
+  const outOfStock = product.stock <= 0;
+
   const handleAdd = () => {
+    if (outOfStock) return;
     addToCart(product, quantity);
     showAlert({ title: "Añadido al carrito", message: `${product.name} (x${quantity})`, variant: "success" });
     onClose();
@@ -91,8 +94,12 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             {product.name}
           </h2>
 
-          <p className="font-extrabold text-[#2D4A3E] text-base mt-1 mb-4">
+          <p className="font-extrabold text-[#2D4A3E] text-base mt-1">
             ${product.price.toLocaleString()}
+          </p>
+
+          <p className={`text-xs font-semibold mb-4 ${outOfStock ? "text-red-600" : "text-slate-500"}`}>
+            {outOfStock ? "Sin existencias" : `Disponibles: ${product.stock} u.`}
           </p>
 
           <h3 className="text-sm font-bold text-[#1F2937] mb-1.5">Descripción</h3>
@@ -104,18 +111,21 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#2D4A3E] hover:bg-slate-100 transition"
+                disabled={outOfStock}
+                className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#2D4A3E] hover:bg-slate-100 transition disabled:opacity-40"
                 aria-label="Disminuir cantidad"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
               <span className="w-6 text-center text-sm font-semibold text-[#1F2937]" aria-live="polite">
-                {quantity}
+                {outOfStock ? 0 : quantity}
               </span>
               <button
                 type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#2D4A3E] hover:bg-slate-100 transition"
+                /* No deja subir más allá del stock disponible */
+                onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                disabled={outOfStock || quantity >= product.stock}
+                className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#2D4A3E] hover:bg-slate-100 transition disabled:opacity-40"
                 aria-label="Aumentar cantidad"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -125,9 +135,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
           <button
             onClick={handleAdd}
-            className="w-full md:w-auto md:px-10 py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3A5A40] transition"
+            disabled={outOfStock}
+            className="w-full md:w-auto md:px-10 py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3A5A40] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Agregar
+            {outOfStock ? "Sin existencias" : "Agregar"}
           </button>
         </div>
       </div>

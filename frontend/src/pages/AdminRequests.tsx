@@ -17,9 +17,7 @@ interface RequesterProfile {
     name: string | null;
 }
 
-/* Página administrativa para aprobar o rechazar los pedidos pendientes.
-   Corresponde a los endpoints /api/requests/pending, /accept y /reject
-   del backend dedicado de pedidos (mismo backend que usa MyRequests.tsx). */
+/* Página administrativa para aprobar o rechazar los pedidos pendientes. */
 export default function AdminRequests() {
     const { showAlert } = useAlert();
 
@@ -116,8 +114,9 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3] pb-28">
+        <div className="min-h-screen bg-[#F4F6F3]">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
+            <BottomNav />
 
             <main className="p-4 sm:p-6 max-w-2xl mx-auto">
                 {loading && (
@@ -213,8 +212,6 @@ export default function AdminRequests() {
                 </div>
             </main>
 
-            {/* Cuadro para escribir el motivo de rechazo, antes de mandarlo al backend
-                (el backend lo exige, así que se pide aquí mismo en vez de rechazar sin motivo) */}
             {rejectingId && (
                 <div
                     className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50"
@@ -292,9 +289,8 @@ export default function AdminRequests() {
                 </div>
             )}
 
-            {/* Panel lateral y barra inferior, visibles en toda la pantalla del catálogo */}
+            {/* Panel lateral, visible en toda la pantalla */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-            <BottomNav />
         </div>
     );
 }

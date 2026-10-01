@@ -68,8 +68,11 @@ export default function AdminProducts() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3] pb-28">
-            <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <div className="min-h-screen bg-[#F4F6F3]">
+            <div className="sticky top-0 z-40">
+                <NavBar onMenuClick={() => setMenuOpen(true)} />
+                <BottomNav />
+            </div>
 
             <main className="p-4 sm:p-6 max-w-lg mx-auto">
                 {/* Evita mostrar el formulario antes de tener las categorías */}
@@ -175,8 +178,6 @@ export default function AdminProducts() {
                 />
             )}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-
-            <BottomNav />
         </div>
         
     );

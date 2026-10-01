@@ -74,8 +74,11 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2] pb-28">
-      <NavBar onMenuClick={() => setMenuOpen(true)} />
+    <div className="min-h-screen bg-[#f5f7f2]">
+      <div className="sticky top-0 z-40">
+        <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <BottomNav />
+      </div>
 
       <div className="md:max-w-3xl md:mx-auto px-5 py-6 md:px-0">
         <button
@@ -167,7 +170,7 @@ export default function MyRequests() {
       </div>
 
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-      <BottomNav />
     </div>
   );
 }
+

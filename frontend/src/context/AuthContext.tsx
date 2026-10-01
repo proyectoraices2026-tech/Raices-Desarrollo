@@ -49,10 +49,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (window.location.hash && !window.location.hash.includes('access_token')) {
             window.history.replaceState(null, '', window.location.pathname);
         }
-        /* Recupera la sesión guardada al iniciar la aplicación */
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        /* Recupera la sesión guardada al iniciar la aplicación.
+          Antes esto ponía loading=false de inmediato sin esperar el rol, que se
+           consultaba aparte (más abajo, en onAuthStateChange) de forma asíncrona. Eso
+           dejaba una ventana donde loading ya era false pero role todavía era null, y
+           AdminRoute interpretaba eso como "no es admin" y mandaba al usuario a
+           /my-plants antes de que el rol llegara. Por eso ahora se espera fetchRole aquí
+           también antes de bajar loading. */
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             setSession(session);
             setUser(session?.user ?? null);
+
+            if (session?.user) {
+                await fetchRole(session.user.id);
+            } else {
+                setRole(null);
+            }
             setLoading(false);
         });
 

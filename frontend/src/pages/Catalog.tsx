@@ -14,18 +14,13 @@ export default function Catalog() {
     
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3] pb-28">
+        <div className="min-h-screen bg-[#F4F6F3]">
 
-            <NavBar
-                onMenuClick={() => setMenuOpen(true)}
-            />
-
-            {/* Banner Verdoso */}
-            <div className="bg-[#537A63] text-white px-6 py-5">
-                <div className="max-w-2xl mx-auto">
-                    <h1 className="text-xl font-bold">Todo para tus plantas</h1>
-                    <p className="text-xs text-white/80 mt-0.5">Envío gratis en pedidos +$25.000</p>
-                </div>
+            <div className="sticky top-0 z-40">
+                <NavBar
+                    onMenuClick={() => setMenuOpen(true)}
+                />
+                <BottomNav />
             </div>
 
             {/* Contenido Principal */}
@@ -33,9 +28,8 @@ export default function Catalog() {
                 <ProductList />
             </main>
 
-            {/* Panel lateral y barra inferior, visibles en toda la pantalla del catálogo */}
+            {/* Panel lateral, visible en toda la pantalla del catálogo */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-            <BottomNav />
         </div>
     );
 }

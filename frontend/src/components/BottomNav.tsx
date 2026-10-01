@@ -1,18 +1,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAlert } from "../context/AlertContext";
-
-const TABS = [
-  { key: "calendar", label: "Calendario", icon: "/calendar-regular-full.svg", path: "/calendar" },
-  { key: "my-plants", label: "Mis Plantas", icon: "/seedling-solid-full.svg", path: "/my-plants" },
-  { key: "catalog", label: "Tienda", icon: "/cart-shopping-solid-full.svg", path: "/catalog" },
-  { key: "chatbot", label: "Chatbot", icon: "/robot-solid-full.svg", path: null },
-];
+import { useAuth } from "../context/AuthContext";
 
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { showAlert } = useAlert();
+  const { role } = useAuth();
+
+  const TABS = [
+    { key: "calendar", label: "Calendario", path: "/calendar" },
+    ...(role === "admin"
+      ? [{ key: "dashboard", label: "Dashboard", path: "/admin" }]
+      : [{ key: "my-plants", label: "Mis plantas", path: "/my-plants" }]),
+    { key: "catalog", label: "Catálogo", path: "/catalog" },
+    { key: "chatbot", label: "Chatbot", path: null as string | null },
+  ];
 
   const handleClick = (path: string | null) => {
     if (!path) {
@@ -23,23 +27,18 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#dce3db]/95 backdrop-blur-md border-t border-[#e8efe4] flex justify-around items-center py-2 z-50">
+    <nav className="bg-verdePastel border-b border-extra/40 flex flex-nowrap items-center gap-2 px-3 py-3 overflow-x-auto touch-pan-x overscroll-x-contain md:justify-center md:gap-3">
       {TABS.map((tab) => {
         const isActive = tab.path === location.pathname;
         return (
           <button
             key={tab.key}
             onClick={() => handleClick(tab.path)}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition ${
-              isActive ? "bg-[#87c6a1] text-[#1e2d24]" : "text-[#537a63]"
+            className={`flex-shrink-0 px-5 py-2.5 rounded-2xl text-sm font-semibold transition ${
+              isActive ? "bg-white text-textoSecundario shadow" : "bg-verdePastel text-primarioBase hover:bg-white/60"
             }`}
           >
-            <img 
-              src={tab.icon} 
-              alt={tab.label} 
-              className="w-5 h-5 object-contain" 
-            />
-            <span className="text-[10px] font-semibold">{tab.label}</span>
+            {tab.label}
           </button>
         );
       })}
