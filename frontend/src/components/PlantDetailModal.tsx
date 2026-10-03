@@ -1,9 +1,8 @@
-// src/components/PlantDetailModal.tsx
-
 import { useEffect, useState } from "react";
 import { useAlert } from "../context/AlertContext";
 import TaskFrequencyField, { type TaskUnit } from "./TaskFrequencyField";
 import { deletePlant, updatePlant, type UpdatePlantInput, type UserPlant } from "../services/UserPlantsService";
+import { PLANT_ICONS } from "../constants/plantIcons";
 
 interface FrequencyState {
     enabled: boolean;
@@ -28,6 +27,7 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
     const [watering, setWatering] = useState<FrequencyState>(emptyFrequency);
     const [pruning, setPruning] = useState<FrequencyState>(emptyFrequency);
     const [fertilizing, setFertilizing] = useState<FrequencyState>(emptyFrequency);
+    const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
     const [saving, setSaving] = useState(false);
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -39,6 +39,7 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
             setWatering({ enabled: plant.watering_enabled, interval: plant.watering_interval ?? 1, unit: plant.watering_unit ?? "day" });
             setPruning({ enabled: plant.pruning_enabled, interval: plant.pruning_interval ?? 1, unit: plant.pruning_unit ?? "month" });
             setFertilizing({ enabled: plant.fertilizer_enabled, interval: plant.fertilizer_interval ?? 1, unit: plant.fertilizer_unit ?? "month" });
+            setSelectedIcon(plant.icon !== null && plant.icon !== undefined ? Number(plant.icon) : null);
             setConfirmingDelete(false);
             setError(null);
         }
@@ -49,6 +50,21 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
     const validate = (freq: FrequencyState) => !freq.enabled || (freq.interval !== "" && freq.interval > 0);
 
     const handleSave = async () => {
+        if (!name.trim()) {
+            setError("El nombre de la planta es obligatorio.");
+            return;
+        }
+
+        if (!watering.enabled && !pruning.enabled && !fertilizing.enabled) {
+            setError("Marca al menos una tarea de cuidado (regar, podar o abonar).");
+            return;
+        }
+
+        if (selectedIcon === null) {
+            setError("Selecciona un ícono para tu planta.");
+            return;
+        }
+
         if (!validate(watering) || !validate(pruning) || !validate(fertilizing)) {
             setError("Completa el intervalo de cada tarea activada.");
             return;
@@ -60,7 +76,7 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
         const input: UpdatePlantInput = {
             name,
             scientificName,
-            iconIndex: plant.icon !== null ? Number(plant.icon) : null,
+            iconIndex: selectedIcon,
             watering: { enabled: watering.enabled, interval: watering.enabled ? Number(watering.interval) : null, unit: watering.enabled ? watering.unit : null },
             pruning: { enabled: pruning.enabled, interval: pruning.enabled ? Number(pruning.interval) : null, unit: pruning.enabled ? pruning.unit : null },
             fertilizing: { enabled: fertilizing.enabled, interval: fertilizing.enabled ? Number(fertilizing.interval) : null, unit: fertilizing.enabled ? fertilizing.unit : null },
@@ -138,6 +154,29 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
                                 onIntervalChange={(interval) => setFertilizing((s) => ({ ...s, interval }))}
                                 onUnitChange={(unit) => setFertilizing((s) => ({ ...s, unit }))}
                             />
+
+                            <fieldset>
+                                <legend className="text-xs font-semibold text-[#537a63] mb-1.5">Ícono</legend>
+                                <div className="grid grid-cols-6 gap-2 max-w-xs">
+                                    {PLANT_ICONS.map((icon, i) => {
+                                        const selected = selectedIcon === i;
+                                        return (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                onClick={() => setSelectedIcon(i)}
+                                                aria-pressed={selected}
+                                                aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
+                                                className={`aspect-square rounded-full border-2 p-1 transition ${
+                                                    selected ? "bg-[#ECEBDA] border-[#645244] ring-2 ring-offset-1 ring-[#645244]" : "bg-[#f5f3ee] border-transparent hover:border-[#c9c4b8]"
+                                                }`}
+                                            >
+                                                <img src={icon} alt="" className="w-full h-full object-contain" />
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </fieldset>
                         </div>
 
                         <div className="flex justify-between items-center mt-5">

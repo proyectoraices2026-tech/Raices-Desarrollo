@@ -5,14 +5,13 @@ import { registerPlant } from "../services/UserPlantsService";
 import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
 import TaskFrequencyField, { type TaskUnit } from "./TaskFrequencyField";
+import { PLANT_ICONS } from "../constants/plantIcons";
 
 interface RegisterPlantModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPlantAdded?: () => void;
 }
-
-const ICON_COUNT = 15;
 
 interface FrequencyState {
   enabled: boolean;
@@ -69,6 +68,23 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
       return;
     }
 
+    /* El nombre científico es el único campo de texto opcional; todo lo demás
+       (nombre, al menos una tarea de cuidado, e ícono) es obligatorio */
+    if (!name.trim()) {
+      setError("El nombre de la planta es obligatorio.");
+      return;
+    }
+
+    if (!watering.enabled && !pruning.enabled && !fertilizing.enabled) {
+      setError("Marca al menos una tarea de cuidado (regar, podar o abonar).");
+      return;
+    }
+
+    if (selectedIcon === null) {
+      setError("Selecciona un ícono para tu planta.");
+      return;
+    }
+
     if (!validate(watering) || !validate(pruning) || !validate(fertilizing)) {
       setError("Completa el intervalo de cada tarea activada.");
       return;
@@ -119,10 +135,10 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
             <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-4 md:space-y-0">
               <div>
                 <label htmlFor="plant-name" className={labelClass}>Nombre</label>
-                <input id="plant-name" type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+                <input id="plant-name" type="text" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label htmlFor="plant-scientific-name" className={labelClass}>Nombre científico</label>
+                <label htmlFor="plant-scientific-name" className={labelClass}>Nombre científico (opcional)</label>
                 <input id="plant-scientific-name" type="text" value={scientificName} onChange={(e) => setScientificName(e.target.value)} className={inputClass} />
               </div>
             </div>
@@ -159,9 +175,9 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
 
             <fieldset>
               <legend className={labelClass}>Ícono</legend>
-              <p className="text-[11px] text-[#8a8a82] -mt-1 mb-3">Espacio reservado para las ilustraciones (pendientes de diseño)</p>
-              <div className="grid grid-cols-5 md:grid-cols-8 gap-3 max-w-xs md:max-w-none">
-                {Array.from({ length: ICON_COUNT }).map((_, i) => {
+              <p className="text-[11px] text-[#8a8a82] -mt-1 mb-3">Elige el ícono que mejor represente a tu planta</p>
+              <div className="grid grid-cols-6 gap-3 max-w-xs md:max-w-sm">
+                {PLANT_ICONS.map((icon, i) => {
                   const selected = selectedIcon === i;
                   return (
                     <button
@@ -169,11 +185,13 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
                       type="button"
                       onClick={() => setSelectedIcon(i)}
                       aria-pressed={selected}
-                      aria-label={`Espacio de ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                      className={`aspect-square rounded-full border-2 transition ${
-                        selected ? "bg-[#645244] border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "bg-[#ece9e3] border-dashed border-[#c9c4b8] hover:border-[#645244]"
+                      aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
+                      className={`aspect-square rounded-full border-2 p-1 transition ${
+                        selected ? "bg-[#ece9e3] border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "bg-[#f5f3ee] border-transparent hover:border-[#c9c4b8]"
                       }`}
-                    />
+                    >
+                      <img src={icon} alt="" className="w-full h-full object-contain" />
+                    </button>
                   );
                 })}
               </div>
@@ -194,7 +212,11 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           <p className="text-xs text-[#537a63] mt-1 mb-5">Aparecerá entre tus plantas.</p>
 
           <div className="bg-[#f5f7f2] border border-[#e8efe4] rounded-xl p-3 flex items-center gap-3 mb-6 text-left">
-            <div className="w-10 h-10 rounded-lg bg-[#ece9e3] border-2 border-dashed border-[#c9c4b8] flex-shrink-0" aria-hidden="true" />
+            <div className="w-10 h-10 rounded-lg bg-[#ece9e3] flex-shrink-0 p-1.5" aria-hidden="true">
+              {selectedIcon !== null && (
+                <img src={PLANT_ICONS[selectedIcon]} alt="" className="w-full h-full object-contain" />
+              )}
+            </div>
             <div>
               <p className="text-xs font-bold text-[#1e2d24] uppercase tracking-wide">{name || "Nombre común"}</p>
               <p className="text-xs text-[#537a63] italic">{scientificName || "Nombre científico"}</p>

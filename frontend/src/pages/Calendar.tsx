@@ -1,4 +1,3 @@
-// src/pages/Calendar.tsx
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, startOfMonth, startOfWeek, subMonths } from "date-fns";
@@ -101,8 +100,11 @@ export default function Calendar() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f5f7f2] pb-28">
-            <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <div className="min-h-screen bg-[#f5f7f2]">
+            <div className="sticky top-0 z-40">
+                <NavBar onMenuClick={() => setMenuOpen(true)} />
+                <BottomNav />
+            </div>
 
             <div className="md:max-w-4xl md:mx-auto p-5 md:px-12 md:py-8">
                 <div className="flex items-center justify-between mb-5">
@@ -201,7 +203,6 @@ export default function Calendar() {
                 editingTask={editingTask}
                 onTaskAdded={loadTasks}
             />
-            <BottomNav />
         </div>
     );
 }
