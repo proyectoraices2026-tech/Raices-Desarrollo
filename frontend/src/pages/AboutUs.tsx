@@ -9,7 +9,7 @@ export default function AboutUs() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2]">
+    <div className="min-h-screen bg-white">
       <NavBar onMenuClick={() => setMenuOpen(true)} />
 
       <div className="p-6 md:max-w-5xl md:mx-auto">

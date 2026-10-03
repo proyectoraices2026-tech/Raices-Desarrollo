@@ -68,7 +68,7 @@ export default function AdminProducts() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3]">
+        <div className="min-h-screen bg-white">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
@@ -113,7 +113,7 @@ export default function AdminProducts() {
                                     {products.map((product) => (
                                         <div
                                             key={product.id}
-                                            className={`bg-white rounded-2xl p-3 flex items-center gap-3 shadow-sm ${!product.is_active ? "opacity-60" : ""}`}
+                                            className={`bg-white border border-[#e8efe4] rounded-2xl p-3 flex items-center gap-3 shadow-sm ${!product.is_active ? "opacity-60" : ""}`}
                                         >
                                             <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
                                                 {product.image_url ? (

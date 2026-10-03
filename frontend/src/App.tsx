@@ -12,6 +12,7 @@ import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
 import AdminDashboard from './pages/AdminDashboard'
+import AdminStats from './pages/AdminStats'
 
 //aaa
 import MyPlants from './pages/MyPlants';
@@ -128,6 +129,13 @@ function App() {
         <Route path="/admin" element={
           <AdminRoute>
             <AdminDashboard />
+          </AdminRoute>
+        } />
+
+        {/*Ruta de admin: página aparte de estadísticas*/}
+        <Route path="/admin/stats" element={
+          <AdminRoute>
+            <AdminStats />
           </AdminRoute>
         } />
 

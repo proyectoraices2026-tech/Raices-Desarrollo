@@ -100,7 +100,7 @@ export default function Calendar() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f5f7f2]">
+        <div className="min-h-screen bg-white">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
