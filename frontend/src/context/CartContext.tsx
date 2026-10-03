@@ -9,6 +9,9 @@ export interface CartItem {
   image_url: string | null;
   category: string;
   quantity: number;
+  /* Stock  al momento de agregarlo, para no dejar subir la cantidad en el
+     carrito más allá de lo que realmente hay */
+  stock: number;
 }
 
 interface CartContextType {
@@ -30,8 +33,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id);
       if (existing) {
+        /* Nunca deja que la suma pase del stock real, aunque ya hubiera algo en el carrito
+           de una visita anterior a la ficha del producto */
         return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: i.quantity + quantity } : i
+          i.id === product.id
+            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock), stock: product.stock }
+            : i
         );
       }
       return [
@@ -42,7 +49,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           price: product.price,
           image_url: product.image_url,
           category: product.categories?.name || "Plantas",
-          quantity,
+          quantity: Math.min(quantity, product.stock),
+          stock: product.stock,
         },
       ];
     });
@@ -57,7 +65,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart(id);
       return;
     }
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)));
+    /* Mismo tope de stock aquí, que es lo que usan los botones +/- del carrito */
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, quantity: Math.min(quantity, i.stock) } : i))
+    );
   };
 
   const clearCart = () => setItems([]);

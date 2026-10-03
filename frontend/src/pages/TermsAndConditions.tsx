@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 
 export default function TermsAndConditions() {
   const navigate = useNavigate();
@@ -7,15 +6,6 @@ export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-[#DFE5DC] flex items-center justify-center p-6">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-sm p-8 text-left relative">
-        
-        {/* Botón con Flecha para regresar */}
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 -ml-2 mb-2 text-[#3E5C4A] rounded-full hover:bg-[#DFE5DC]/50 transition duration-150 inline-flex items-center justify-center"
-          aria-label="Volver a la página anterior"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
 
         {/* Encabezado */}
         <h1 className="text-2xl font-bold text-[#2D4A3E] mb-2">

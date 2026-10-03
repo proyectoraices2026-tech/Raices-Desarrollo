@@ -6,6 +6,7 @@ import { getPendingRequests, acceptRequest, rejectRequest } from "../services/Re
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { formatPrice } from "../utils/formatPrice";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
@@ -17,9 +18,7 @@ interface RequesterProfile {
     name: string | null;
 }
 
-/* Página administrativa para aprobar o rechazar los pedidos pendientes.
-   Corresponde a los endpoints /api/requests/pending, /accept y /reject
-   del backend dedicado de pedidos (mismo backend que usa MyRequests.tsx). */
+/* Página administrativa para aprobar o rechazar los pedidos pendientes. */
 export default function AdminRequests() {
     const { showAlert } = useAlert();
 
@@ -116,8 +115,9 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3] pb-28">
+        <div className="min-h-screen bg-[#F4F6F3]">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
+            <BottomNav />
 
             <main className="p-4 sm:p-6 max-w-2xl mx-auto">
                 {loading && (
@@ -171,7 +171,7 @@ export default function AdminRequests() {
                                                     {product?.name ?? "Producto ya no disponible"} × {item.quantity}
                                                 </span>
                                                 <span className="text-[#537a63] font-medium flex-shrink-0">
-                                                    ${(Number(item.price) * item.quantity).toLocaleString()}
+                                                    ₡{formatPrice(Number(item.price) * item.quantity)}
                                                 </span>
                                             </li>
                                         );
@@ -181,7 +181,7 @@ export default function AdminRequests() {
                                 <div className="flex justify-between items-center pt-2 pb-3 border-t border-[#e8efe4]">
                                     <p className="text-xs font-medium text-[#537a63]">Total</p>
                                     <p className="text-sm font-bold text-[#1e2d24]">
-                                        ${Number(request.totalAmount).toLocaleString()}
+                                        ₡{formatPrice(Number(request.totalAmount))}
                                     </p>
                                 </div>
 
@@ -213,8 +213,6 @@ export default function AdminRequests() {
                 </div>
             </main>
 
-            {/* Cuadro para escribir el motivo de rechazo, antes de mandarlo al backend
-                (el backend lo exige, así que se pide aquí mismo en vez de rechazar sin motivo) */}
             {rejectingId && (
                 <div
                     className="fixed inset-0 bg-black/40 flex items-center justify-center p-6 z-50"
@@ -292,9 +290,8 @@ export default function AdminRequests() {
                 </div>
             )}
 
-            {/* Panel lateral y barra inferior, visibles en toda la pantalla del catálogo */}
+            {/* Panel lateral, visible en toda la pantalla */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-            <BottomNav />
         </div>
     );
 }

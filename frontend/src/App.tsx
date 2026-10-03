@@ -19,6 +19,7 @@ import AboutUs from './pages/AboutUs';
 import Cart from './pages/Cart';
 import MyRequests from './pages/MyRequests';
 import TermsAndConditions from './pages/TermsAndConditions';
+import Calendar from './pages/Calendar';
 
 /* 
     Rutas privadas
@@ -114,6 +115,13 @@ function App() {
         <Route path="/catalog" element={
           <PrivateRoute>
             <Catalog />
+          </PrivateRoute>
+        } />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/calendar" element={
+          <PrivateRoute>
+            <Calendar />
           </PrivateRoute>
         } />
 
