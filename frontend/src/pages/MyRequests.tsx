@@ -8,6 +8,7 @@ import { getMyRequests, archiveRequest } from "../services/RequestService";
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { formatPrice } from "../utils/formatPrice";
 import { useAlert } from "../context/AlertContext"
 
 /* Traduce el estado que guarda el backend a algo que un usuario entienda,
@@ -119,7 +120,7 @@ export default function MyRequests() {
                   onClick={() => handleArchive(request.id)}
                   className="text-xs font-semibold text-red-600 hover:underline"
                 >
-                  Eliminar
+                  Ocultar pedidos
                 </button>
               )}
               <div className="flex items-center justify-between mb-3">
@@ -144,7 +145,7 @@ export default function MyRequests() {
                         {product?.name ?? "Producto ya no disponible"} × {item.quantity}
                       </span>
                       <span className="text-[#537a63] font-medium flex-shrink-0">
-                        ${(Number(item.price) * item.quantity).toLocaleString()}
+                        ₡{formatPrice(Number(item.price) * item.quantity)}
                       </span>
                     </li>
                   );
@@ -154,7 +155,7 @@ export default function MyRequests() {
               <div className="flex justify-between items-center pt-2 border-t border-[#e8efe4]">
                 <p className="text-xs font-medium text-[#537a63]">Total</p>
                 <p className="text-sm font-bold text-[#1e2d24]">
-                  ${Number(request.totalAmount).toLocaleString()}
+                  ₡{formatPrice(Number(request.totalAmount))}
                 </p>
               </div>
 
@@ -173,4 +174,3 @@ export default function MyRequests() {
     </div>
   );
 }
-

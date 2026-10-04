@@ -3,6 +3,7 @@ import { Image as ImageIcon, Minus, Plus, X } from "lucide-react";
 import type { Product } from "../services/ProductService";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
+import { formatPrice } from "../utils/formatPrice";
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -95,7 +96,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           </h2>
 
           <p className="font-extrabold text-[#2D4A3E] text-base mt-1">
-            ${product.price.toLocaleString()}
+            ₡{formatPrice(product.price)}
           </p>
 
           <p className={`text-xs font-semibold mb-4 ${outOfStock ? "text-red-600" : "text-slate-500"}`}>

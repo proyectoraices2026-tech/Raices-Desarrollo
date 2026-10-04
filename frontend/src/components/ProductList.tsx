@@ -4,8 +4,9 @@ import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
 import ProductDetailModal from "./ProductDetailModal";
-
-const ITEMS_PER_PAGE = 25;
+import { formatPrice } from "../utils/formatPrice";
+/* 10 filas de 5 productos cada una */
+const ITEMS_PER_PAGE = 50;
 
 /* Categorías */
 const DEFAULT_CATEGORIES = ["Todo", "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
@@ -71,7 +72,7 @@ function ProductCard({
         {/* Precio + botón de agregar */}
         <div className="flex items-center justify-between pt-1">
           <p className="font-extrabold text-[#2D4A3E] text-sm">
-            ${product.price.toLocaleString()}
+            ₡{formatPrice(product.price)}
           </p>
 
           <button

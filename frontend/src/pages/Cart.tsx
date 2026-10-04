@@ -4,6 +4,7 @@ import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
 import { createOrderRequest } from "../services/RequestService";
+import { formatPrice } from "../utils/formatPrice";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 export default function Cart() {
@@ -120,7 +121,7 @@ export default function Cart() {
                     </p>
                     <p className="text-sm font-bold text-[#1e2d24] truncate">{item.name}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-sm font-bold text-primarioBase">${item.price.toLocaleString()}</p>
+                      <p className="text-sm font-bold text-primarioBase">₡{formatPrice(item.price)}</p>
 
                       <div className="flex items-center gap-1.5">
                         <button
@@ -157,7 +158,7 @@ export default function Cart() {
               </p>
             </div>
             <div className="flex justify-between items-center pt-1 pb-4">
-              <p className="text-xl text-[#1e2d24]">${subtotal.toLocaleString()}</p>
+              <p className="text-xl text-[#1e2d24]">₡{formatPrice(subtotal)}</p>
             </div>
 
             <button

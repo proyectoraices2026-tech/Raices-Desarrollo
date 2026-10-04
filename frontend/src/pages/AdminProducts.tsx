@@ -4,6 +4,7 @@ import { ProductForm } from "../components/ProductForm";
 import EditProductModal from "../components/EditProductModal";
 import { getCategories, getAllProducts, setProductActive, getErrorMessage } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { formatPrice } from "../utils/formatPrice";
 import { useAlert } from "../context/AlertContext";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
@@ -128,7 +129,7 @@ export default function AdminProducts() {
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-[#1F2937] truncate">{product.name}</p>
                                                 <p className="text-xs text-slate-500">
-                                                    {product.categories?.name ?? "Sin categoría"} · ${product.price.toLocaleString()} · Stock: {product.stock}
+                                                    {product.categories?.name ?? "Sin categoría"} · ₡{formatPrice(product.price)} · Stock: {product.stock}
                                                 </p>
                                                 {!product.is_active && (
                                                     <span className="text-[10px] font-semibold text-red-600">Desactivado</span>

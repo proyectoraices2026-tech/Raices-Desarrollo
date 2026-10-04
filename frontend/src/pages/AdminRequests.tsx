@@ -6,6 +6,7 @@ import { getPendingRequests, acceptRequest, rejectRequest } from "../services/Re
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { formatPrice } from "../utils/formatPrice";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
@@ -170,7 +171,7 @@ export default function AdminRequests() {
                                                     {product?.name ?? "Producto ya no disponible"} × {item.quantity}
                                                 </span>
                                                 <span className="text-[#537a63] font-medium flex-shrink-0">
-                                                    ${(Number(item.price) * item.quantity).toLocaleString()}
+                                                    ₡{formatPrice(Number(item.price) * item.quantity)}
                                                 </span>
                                             </li>
                                         );
@@ -180,7 +181,7 @@ export default function AdminRequests() {
                                 <div className="flex justify-between items-center pt-2 pb-3 border-t border-[#e8efe4]">
                                     <p className="text-xs font-medium text-[#537a63]">Total</p>
                                     <p className="text-sm font-bold text-[#1e2d24]">
-                                        ${Number(request.totalAmount).toLocaleString()}
+                                        ₡{formatPrice(Number(request.totalAmount))}
                                     </p>
                                 </div>
 

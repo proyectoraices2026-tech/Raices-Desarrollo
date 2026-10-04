@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import { getAllProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { formatPrice } from "../utils/formatPrice";
 
 const CHART_COLORS = ["#645244", "#537a63", "#c4a557", "#1c2b18", "#5a7a54", "#929487"];
 
@@ -202,7 +203,7 @@ export default function AdminStats() {
                                 <div
                                     className="w-full max-w-[32px] bg-primarioBase rounded-t-[10px]"
                                     style={{ height: `${(d.value / earningsMax) * 100}%` }}
-                                    title={`₡${d.value.toLocaleString()}`}
+                                    title={`₡${formatPrice(d.value)}`}
                                 />
                                 <p className="text-[10px] font-semibold text-textoSecundario mt-2 text-center">{d.day.slice(0, 3)}</p>
                             </div>
