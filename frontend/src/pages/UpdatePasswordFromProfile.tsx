@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { CreateNewPasswordScreen } from "../components/CreateNewPasswordScreen";
+import { ProfilePasswordScreen } from "../components/ProfilePasswordScreen";
 import { logAuthError, getFriendlyAuthErrorMessage } from "../lib/logger";
 
 
 import { useAlert } from "../context/AlertContext";
 
 /* Página que actualiza la contraseña después de validar el enlace recibido */
-export default function ResetPassword() {
+export default function UpdatePasswordFromProfile() {
     const navigate = useNavigate();
     const { showAlert } = useAlert();
 
@@ -22,15 +22,15 @@ export default function ResetPassword() {
             showAlert({ title: "No se pudo cambiar la contraseña", message: getFriendlyAuthErrorMessage(error), variant: "error" });
             return;
         }
-            showAlert({ title: "Contraseña actualizada", message: "Ya puedes iniciar sesión con tu nueva contraseña.", variant: "success" });
-            navigate("/login");
+            showAlert({ title: "Contraseña actualizada", message: "Ya puedes utilizar tu nueva contraseña.", variant: "success" });
+            navigate("/profile");
         
     };
 
     return (
-        <CreateNewPasswordScreen
+        <ProfilePasswordScreen
             onResetPasswordSubmit={handleReset}
-            onBackToVerify={() => navigate("/login")}
+            onBackToVerify={() => navigate("/profile")}
         />
     );
 }

@@ -14,7 +14,7 @@ export default function Catalog() {
     
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pb-28">
 
             <div className="sticky top-0 z-40">
                 <NavBar

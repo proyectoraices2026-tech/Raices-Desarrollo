@@ -75,7 +75,7 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-28">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />

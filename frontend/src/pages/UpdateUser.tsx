@@ -2,15 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { logAuthError, getFriendlyAuthErrorMessage } from "../lib/logger";
+import { logAuthError} from "../lib/logger";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
-import { useAlert } from "../context/AlertContext";
+
 
 /* Página privada para editar el nombre, correo, teléfono y dirección del usuario actual */
 export default function UpdateUser() {
     const { user } = useAuth();
-    const { showAlert } = useAlert();
     const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState("");
@@ -89,28 +88,8 @@ export default function UpdateUser() {
         }
     };
 
-    const handleChangePassword = async () => {
-        if (!user?.email) return;
-
-        const PASSWORD_RESET_ORIGIN_TTL_MS = 60 * 60 * 1000;
-
-        /* Marca el origen para que ResetPassword.tsx sepa que debe volver a "Editar perfil" */
-        localStorage.setItem(
-            "passwordResetOrigin",
-            JSON.stringify({ origin: "profile", expiresAt: Date.now() + PASSWORD_RESET_ORIGIN_TTL_MS })
-        );
-
-        const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-            redirectTo: `${window.location.origin}/reset-password`,
-        });
-
-        if (error) {
-            logAuthError("reset-password-request", error);
-            showAlert({ title: "No se pudo enviar el correo", message: getFriendlyAuthErrorMessage(error), variant: "error" });
-            return;
-        }
-
-        showAlert({ title: "Correo enviado", message: "Te enviamos un enlace para restablecer tu contraseña.", variant: "success" });
+    const handleChangePassword = () => {
+        navigate("/profile-password")
     };
 
     return (
