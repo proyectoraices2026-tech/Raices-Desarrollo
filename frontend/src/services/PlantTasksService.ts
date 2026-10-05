@@ -14,6 +14,7 @@ export interface PlantTask {
     label: string | null;
     due_date: string; // "yyyy-MM-dd"
     completed: boolean;
+    notes?:string
 }
 
 export interface ManualTaskInput {
