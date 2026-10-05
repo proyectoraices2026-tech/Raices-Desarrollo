@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import MainPage from './pages/MainPage';
 import UpdateUser from './pages/UpdateUser';
+import UpdatePasswordFromProfile from './pages/UpdatePasswordFromProfile';
 import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
@@ -109,6 +110,13 @@ function App() {
         <Route path="/profile" element={
           <PrivateRoute>
             <UpdateUser />
+          </PrivateRoute>
+        } />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/profile-password" element={
+          <PrivateRoute>
+            <UpdatePasswordFromProfile />
           </PrivateRoute>
         } />
 

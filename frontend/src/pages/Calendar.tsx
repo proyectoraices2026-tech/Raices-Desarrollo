@@ -160,15 +160,15 @@ export default function Calendar() {
   const selectedPlantObj = plants.find((p) => p.id === selectedPlantId);
 
   return (
-    <div className="min-h-screen bg-[#fffff]">
+    <div className="min-h-screen bg-[#ffffff] pb-28">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
       <main className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">
-       
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
         
           <div className="lg:col-span-3 space-y-6">
