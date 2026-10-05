@@ -11,7 +11,7 @@ export function OnboardingScreen({
   onSelectLogin,
 }: OnboardingScreenProps) {
   return (
-    <div className="min-h-screen bg-[#DCE3DB] flex flex-col items-center justify-between p-8 md:p-12">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-between p-8 md:p-12">
 
       {/* Contenido Central: Logo */}
       <div className="flex-1 flex flex-col items-center justify-center my-auto">

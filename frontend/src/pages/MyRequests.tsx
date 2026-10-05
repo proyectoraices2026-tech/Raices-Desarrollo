@@ -75,7 +75,7 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2]">
+    <div className="min-h-screen bg-white">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
@@ -114,7 +114,7 @@ export default function MyRequests() {
 
         <div className="space-y-4">
           {requests.map((request) => (
-            <div key={request.id} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+            <div key={request.id} className="bg-white border border-[#e8efe4] rounded-2xl p-4 md:p-5 shadow-sm">
               {(request.status === "accepted" || request.status === "rejected") && (
                 <button
                   onClick={() => handleArchive(request.id)}

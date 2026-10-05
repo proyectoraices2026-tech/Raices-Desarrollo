@@ -114,7 +114,7 @@ export default function UpdateUser() {
     };
 
     return (
-        <div className="min-h-screen bg-[#DFE5DC] flex flex-col relative">
+        <div className="min-h-screen bg-white flex flex-col relative">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
@@ -135,7 +135,7 @@ export default function UpdateUser() {
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 placeholder="Tu nombre"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
 
@@ -149,7 +149,7 @@ export default function UpdateUser() {
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 placeholder="Tu apellido"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
                     </div>
@@ -165,7 +165,7 @@ export default function UpdateUser() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Tu correo"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
 
@@ -179,7 +179,7 @@ export default function UpdateUser() {
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 placeholder="8888-8888"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
                     </div>
@@ -194,7 +194,7 @@ export default function UpdateUser() {
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             placeholder="Ingresa la dirección en la que reside actualmente"
-                            className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                         />
                     </div>
 

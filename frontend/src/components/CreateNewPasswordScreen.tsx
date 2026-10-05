@@ -42,11 +42,11 @@ export function CreateNewPasswordScreen({
   };
 
   return (
-    <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
+    <div className="min-h-screen bg-white flex flex-col justify-between p-6 md:p-12 relative">
 
       <button
         onClick={onBackToVerify}
-        className="absolute w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
+        className="absolute w-10 h-10 bg-white/80 hover:bg-white border border-[#dcdcd4] rounded-full flex items-center justify-center text-[#2D4A3E] shadow-sm transition duration-200"
         title="Back"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -74,7 +74,7 @@ export function CreateNewPasswordScreen({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-4 pr-11 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm shadow-sm transition"
+                  className="w-full pl-4 pr-11 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm shadow-sm transition"
                 />
                 <button
                   type="button"
@@ -104,7 +104,7 @@ export function CreateNewPasswordScreen({
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-4 pr-11 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm shadow-sm transition"
+                  className="w-full pl-4 pr-11 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm shadow-sm transition"
                 />
                 <button
                   type="button"

@@ -1,5 +1,3 @@
-// src/components/RegisterPlantModal.tsx
-
 import { useAuth } from "../context/AuthContext";
 import { registerPlant } from "../services/UserPlantsService";
 import { useEffect, useState } from "react";
@@ -121,7 +119,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" role="dialog" aria-modal="true" aria-labelledby="register-plant-title">
       {step === "form" ? (
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-9 relative">
+        <div className="bg-verdePastel rounded-2xl shadow-xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-9 relative">
           <button onClick={resetAndClose} className="absolute top-5 right-5 md:top-6 md:right-6 text-slate-400 hover:text-slate-600" aria-label="Cerrar formulario de registro de planta">
             <X className="w-5 h-5" />
           </button>
@@ -132,7 +130,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           {error && <p className="text-xs text-red-600 mb-3" role="alert">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
-            <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-4 md:space-y-0">
+            <div className="space-y-4">
               <div>
                 <label htmlFor="plant-name" className={labelClass}>Nombre</label>
                 <input id="plant-name" type="text" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
@@ -143,7 +141,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <TaskFrequencyField
                 label="Regar"
                 enabled={watering.enabled}
@@ -203,7 +201,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           </form>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
+        <div className="bg-verdePastel rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
           <div className="w-14 h-14 rounded-full bg-[#DCE3DB] flex items-center justify-center mx-auto mb-4" aria-hidden="true">
             <Check className="w-7 h-7 text-[#3E5C4A]" />
           </div>

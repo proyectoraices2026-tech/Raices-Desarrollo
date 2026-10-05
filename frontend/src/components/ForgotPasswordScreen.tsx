@@ -24,7 +24,7 @@ export function ForgotPasswordScreen({
   };
 
   return (
-    <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
+    <div className="min-h-screen bg-white flex flex-col justify-between p-6 md:p-12 relative">
       
       {/* Botón Superior Back */}
       <button
@@ -59,7 +59,7 @@ export function ForgotPasswordScreen({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Ingresa tu correo electrónico"
-                className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
               />
             </div>
           </form>

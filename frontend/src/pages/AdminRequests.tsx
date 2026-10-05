@@ -115,7 +115,7 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3]">
+        <div className="min-h-screen bg-white">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <BottomNav />
 
@@ -143,7 +143,7 @@ export default function AdminRequests() {
                         const isProcessing = processingId === request.id;
 
                         return (
-                            <div key={request.id} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+                            <div key={request.id} className="bg-white border border-[#e8efe4] rounded-2xl p-4 md:p-5 shadow-sm">
                                 <div className="flex items-center justify-between mb-3">
                                     <div>
                                         <p className="text-sm font-semibold text-[#1e2d24]">

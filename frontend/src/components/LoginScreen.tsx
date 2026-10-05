@@ -25,7 +25,7 @@ export function LoginScreen({
   };
 
   return (
-    <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
+    <div className="min-h-screen bg-white flex flex-col justify-between p-6 md:p-12 relative">
 
       <button
         onClick={onBackToOnboarding} className="absolute p-2 text-[#3E5C4A] hover:bg-[#4E705B]/10 rounded-full transition duration-200" title="Volver" >
@@ -48,7 +48,7 @@ export function LoginScreen({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Ingresa tu correo electrónico"
-              className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FFFFFF] text-sm  transition"
+              className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FFFFFF] text-sm  transition"
             />
           </div>
 
@@ -63,7 +63,7 @@ export function LoginScreen({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Ingresa tu contraseña"
-                className="w-full pl-4 pr-11 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+                className="w-full pl-4 pr-11 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
               />
               <button
                 type="button"

@@ -4,8 +4,8 @@ export default function TermsAndConditions() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#DFE5DC] flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-sm p-8 text-left relative">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl bg-white border border-[#e8efe4] rounded-2xl shadow-sm p-8 text-left relative">
 
         {/* Encabezado */}
         <h1 className="text-2xl font-bold text-[#2D4A3E] mb-2">

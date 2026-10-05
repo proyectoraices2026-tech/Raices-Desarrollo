@@ -98,10 +98,24 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           </button>
 
           <button
-            onClick={() => go("/admin/products/new")}
+            onClick={() => go("/my-plants")}
             className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
           >
-            Administrar productos
+            Mis plantas
+          </button>
+
+          <button
+            onClick={() => go("/calendar")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Calendario
+          </button>
+
+          <button
+            onClick={() => go("/catalog")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Catálogo
           </button>
 
           <button

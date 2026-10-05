@@ -1,5 +1,3 @@
-// src/services/PlantTasksService.ts
-
 import { supabase } from "../lib/supabase";
 import { addDays, addMonths, addWeeks, endOfMonth, format, startOfMonth } from "date-fns";
 import type { TaskUnit } from "./UserPlantsService";
@@ -16,6 +14,7 @@ export interface PlantTask {
     label: string | null;
     due_date: string; // "yyyy-MM-dd"
     completed: boolean;
+    notes?:string
 }
 
 export interface ManualTaskInput {
@@ -36,12 +35,11 @@ function addInterval(date: Date, interval: number, unit: TaskUnit): Date {
     }
 }
 
-/* Tareas (automáticas y manuales) del usuario cuya fecha cae dentro del mes visible,
-   solo de plantas activas */
-export async function getPlantTasksForMonth(userId: string, monthReference: Date): Promise<PlantTask[]> {
-    const from = format(startOfMonth(monthReference), "yyyy-MM-dd");
-    const to = format(endOfMonth(monthReference), "yyyy-MM-dd");
-
+/* Tareas (automáticas y manuales) del usuario cuya fecha cae entre "from" y "to"
+   (ambas "yyyy-MM-dd", inclusive), solo de plantas activas. Es la consulta base:
+   getPlantTasksForMonth y las secciones "Hoy"/"Próximas" de Mis Plantas la reusan
+   cada una con su propio rango de fechas. */
+export async function getPlantTasksInRange(userId: string, from: string, to: string): Promise<PlantTask[]> {
     const { data, error } = await supabase
         .from("plant_tasks")
         .select("id, plant_id, task_type, is_automatic, label, due_date, completed, plants!inner(name, is_active)")
@@ -49,6 +47,39 @@ export async function getPlantTasksForMonth(userId: string, monthReference: Date
         .eq("plants.is_active", true)
         .gte("due_date", from)
         .lte("due_date", to);
+
+    if (error) throw error;
+
+    return (data ?? []).map((row: any) => ({
+        id: row.id,
+        plant_id: row.plant_id,
+        plant_name: row.plants?.name ?? "",
+        task_type: row.task_type,
+        is_automatic: row.is_automatic,
+        label: row.label,
+        due_date: row.due_date,
+        completed: row.completed,
+    }));
+}
+
+/* Tareas (automáticas y manuales) del usuario cuya fecha cae dentro del mes visible,
+   solo de plantas activas */
+export async function getPlantTasksForMonth(userId: string, monthReference: Date): Promise<PlantTask[]> {
+    const from = format(startOfMonth(monthReference), "yyyy-MM-dd");
+    const to = format(endOfMonth(monthReference), "yyyy-MM-dd");
+    return getPlantTasksInRange(userId, from, to);
+}
+
+/* Tareas personalizadas (creadas desde el Calendario) de una planta en particular,
+   para mostrarlas en su ficha de detalle. Incluye completadas y pendientes. */
+export async function getCustomTasksForPlant(userId: string, plantId: string): Promise<PlantTask[]> {
+    const { data, error } = await supabase
+        .from("plant_tasks")
+        .select("id, plant_id, task_type, is_automatic, label, due_date, completed, plants!inner(name, is_active)")
+        .eq("user_id", userId)
+        .eq("plant_id", plantId)
+        .eq("task_type", "custom")
+        .order("due_date", { ascending: true });
 
     if (error) throw error;
 

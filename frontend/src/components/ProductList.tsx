@@ -3,10 +3,8 @@ import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
-import { formatPrice } from "../utils/formatPrice";
-import { useCart } from "../context/CartContext";
-import { useAlert } from "../context/AlertContext";
 import ProductDetailModal from "./ProductDetailModal";
+import { formatPrice } from "../utils/formatPrice";
 /* 10 filas de 5 productos cada una */
 const ITEMS_PER_PAGE = 50;
 
@@ -100,9 +98,6 @@ export function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState("Todo");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const { addToCart } = useCart();
-  const { showAlert } = useAlert();
 
   useEffect(() => {
     getActiveProducts()
@@ -213,10 +208,10 @@ export function ProductList() {
               key={product.id}
               product={product}
               onProductClick={(p) => setSelectedProduct(p)}
-              onAddToCart={(p) => {
-                addToCart(p);
-                showAlert({ title: "Añadido al carrito", message: p.name, variant: "success" });
-              }}            />
+              /* El "+" ya no agrega directo al carrito: abre la ficha del producto,
+                 igual que si se tocara la imagen o el nombre */
+              onAddToCart={(p) => setSelectedProduct(p)}
+            />
           ))}
         </div>
       ) : (

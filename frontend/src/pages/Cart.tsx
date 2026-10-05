@@ -53,7 +53,7 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-verdePastel flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
       </div>
@@ -108,7 +108,7 @@ export default function Cart() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl p-3 md:p-4 flex gap-3 md:gap-4 items-start shadow-sm"
+                  className="bg-white border border-[#e8efe4] rounded-2xl p-3 md:p-4 flex gap-3 md:gap-4 items-start shadow-sm"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-[#e8efe4] overflow-hidden flex-shrink-0">
                     {item.image_url && (
