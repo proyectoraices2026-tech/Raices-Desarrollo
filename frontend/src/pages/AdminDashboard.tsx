@@ -17,9 +17,6 @@ const DASHBOARD_CARDS = [
 
 export default function AdminDashboard() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [openPanel, setOpenPanel] = useState<PanelKey>(null);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     return (

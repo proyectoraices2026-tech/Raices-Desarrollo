@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
 import { createOrderRequest } from "../services/RequestService";
 import { formatPrice } from "../utils/formatPrice";
+import { useAuth } from "../context/AuthContext";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 export default function Cart() {
@@ -16,6 +17,7 @@ export default function Cart() {
   const [submitting, setSubmitting] = useState(false);
   /* Pide confirmación antes de vaciar, para que un clic accidental no borre todo el carrito*/
   const [confirmingClear, setConfirmingClear] = useState(false);
+  const {user} = useAuth();
 
   const handleClearCart = () => {
     clearCart();
@@ -23,12 +25,15 @@ export default function Cart() {
     showAlert({ title: "Carrito vacío", message: "Se quitaron todos los productos.", variant: "success" });
   };
 
-  const handleClose = () => navigate("/catalog");
+  const handleClose = () => navigate("/");
 
   const handleConfirm = async () => {
     if (items.length === 0 || submitting) return;
 
-    setSubmitting(true);
+    if (!user){
+      navigate("/login");
+    } else{
+      setSubmitting(true);
     try {
       await createOrderRequest(
         items.map((item) => ({ productId: item.id, quantity: item.quantity }))
@@ -40,7 +45,7 @@ export default function Cart() {
         variant: "success",
       });
       clearCart();
-      navigate("/catalog");
+      navigate("/");
     } catch (err) {
       showAlert({
         title: "No se pudo enviar el pedido",
@@ -49,6 +54,7 @@ export default function Cart() {
       });
     } finally {
       setSubmitting(false);
+    }
     }
   };
 

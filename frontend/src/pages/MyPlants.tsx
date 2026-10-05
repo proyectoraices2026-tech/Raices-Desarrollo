@@ -184,7 +184,7 @@ export default function MyPlants() {
             onClick={() => navigate("/admin")}
             className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
           >
-            Volvar al Dashboard de admin
+            Volver al Dashboard de admin
           </button>
         )}
         <div className="p-5 md:px-12 md:py-8">

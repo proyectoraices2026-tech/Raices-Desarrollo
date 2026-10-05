@@ -4,7 +4,7 @@ import { formatPrice } from "../utils/formatPrice";
 import type { Product } from "../services/ProductService";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
-import { formatPrice } from "../utils/formatPrice";
+
 
 interface ProductDetailModalProps {
   product: Product | null;

@@ -1,8 +1,9 @@
 import { ShoppingCart, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import logoIcon from "../assets/iconoraicesblanco.png";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 interface NavBarProps {
   /* Abre el panel lateral (SideMenu); cada página sigue siendo dueña de ese estado */
@@ -26,6 +27,11 @@ export default function NavBar({
 }: NavBarProps) {
   const navigate = useNavigate();
   const { totalItems } = useCart();
+  const { user } = useAuth();
+
+  const handleLogin = () => {navigate ("/login")}
+      
+  
 
   return (
     <header className="bg-primarioBase px-6 md:px-10 py-3 md:py-4 border-b border-primarioOscuro/20 flex justify-between items-center">
@@ -42,7 +48,7 @@ export default function NavBar({
         )}
 
         <button
-          onClick={() => navigate("/my-plants")}
+          onClick={() => navigate("/")}
           className="flex items-center gap-1.5"
           aria-label="Ir al inicio, Mis Plantas"
         >
@@ -52,6 +58,18 @@ export default function NavBar({
       </div>
 
       <div className="flex items-center gap-4">
+
+        {!user && <>
+          <button className="
+        btn btn-primary
+        bg-white border-0 text-textoNegro
+        hover:bg-fondoGlobal hover:border-0
+        transition-all duration-300" onClick={handleLogin}>
+            Iniciar Sesión
+          </button>
+        </>}
+
+
         {extraActions}
 
         {!hideCart && (
@@ -76,19 +94,21 @@ export default function NavBar({
             )}
           </button>
         )}
+        {user && <>
+          <button
+            onClick={onMenuClick}
+            className="p-1"
+            title="Menú"
+            aria-label="Abrir menú"
+          >
+            <div className="flex flex-col gap-[3px]" aria-hidden="true">
+              <span className="block w-6 h-[2.5px] bg-white" />
+              <span className="block w-6 h-[2.5px] bg-white" />
+              <span className="block w-6 h-[2.5px] bg-white" />
+            </div>
+          </button>
+        </>}
 
-        <button
-          onClick={onMenuClick}
-          className="p-1"
-          title="Menú"
-          aria-label="Abrir menú"
-        >
-          <div className="flex flex-col gap-[3px]" aria-hidden="true">
-            <span className="block w-6 h-[2.5px] bg-white" />
-            <span className="block w-6 h-[2.5px] bg-white" />
-            <span className="block w-6 h-[2.5px] bg-white" />
-          </div>
-        </button>
       </div>
     </header>
   );

@@ -120,7 +120,7 @@ export default function MyRequests() {
                   onClick={() => handleArchive(request.id)}
                   className="text-xs font-semibold text-red-600 hover:underline"
                 >
-                  Ocultar pedidos
+                  Ocultar pedido
                 </button>
               )}
               <div className="flex items-center justify-between mb-3">

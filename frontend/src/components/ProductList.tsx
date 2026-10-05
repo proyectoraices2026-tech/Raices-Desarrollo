@@ -166,7 +166,7 @@ export function ProductList() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Buscar productos..."
-          className="w-full pl-4 pr-10 py-2.5 bg-white rounded-full text-xs sm:text-sm  focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-slate-700 placeholder-slate-400"
+          className="w-full pl-4 pr-10 py-2.5 bg-white rounded-full text-xs sm:text-sm outline-none ring-2 ring-[#4E705B] text-slate-700 placeholder-slate-400"
         />
         <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginScreenProps {
   onLoginSubmit: (data: { email: string; password: string }) => void;
@@ -17,6 +18,11 @@ export function LoginScreen({
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate ();
+
+  const handleGoToRegister = () => {
+    navigate ("/register");
+  }
 
   /* Detiene el envío del navegador y entrega las credenciales a la página */
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,6 +42,10 @@ export function LoginScreen({
         <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
           Inicio
         </h1>
+        <div className="flex justify-center">
+          <button className="text-s font-semibold text-[#2D4A3E] hover:underline pb-4" onClick={handleGoToRegister}>¿No tienes una cuenta? Regístrate</button>
+        </div>
+        
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

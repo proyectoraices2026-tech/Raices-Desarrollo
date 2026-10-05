@@ -15,22 +15,26 @@ interface NavTab {
   path: string | null;
 }
 
-function useNavTabs(): NavTab[] {
-  const { role } = useAuth();
-
-  return [
-    { key: "calendar", label: "Calendario", icon: calendarIcon, path: "/calendar" },
-    ...(role === "admin"
-      ? [{ key: "dashboard", label: "Dashboard", icon: calendarIcon, path: "/admin" }]
-      : [{ key: "my-plants", label: "Mis plantas", icon: plantsIcon, path: "/my-plants" }]),
-    { key: "catalog", label: "Catálogo", icon: catalogIcon, path: "/catalog" },
-    { key: "chatbot", label: "Chatbot", icon: chatIcon, path: null as string | null },
-  ];
-}
 
 /* Nav para escritorio, footer para mobile */
 
 export default function BottomNav() {
+
+  const { role } = useAuth();
+  function useNavTabs(): NavTab[] {
+
+    return [
+    
+    { key: "calendar", label: "Calendario", icon: calendarIcon, path: "/calendar" },
+    ...(role === "admin"
+      ? [{ key: "dashboard", label: "Dashboard", icon: calendarIcon, path: "/admin" }]
+      : [{ key: "my-plants", label: "Mis plantas", icon: plantsIcon, path: "/my-plants" }]),
+    { key: "catalog", label: "Catálogo", icon: catalogIcon, path: "/" },
+    { key: "chatbot", label: "Chatbot", icon: chatIcon, path: null as string | null },
+    ];
+  
+  }
+
   const location = useLocation(); 
   const navigate = useNavigate();
   const { showAlert } = useAlert();
@@ -45,8 +49,13 @@ export default function BottomNav() {
   };
 
   return (
+    
     <>
-      {/* Escritorio: franja de píldoras, oculta antes de md */}
+    {role &&
+      <>
+        {/* Escritorio: franja de píldoras, oculta antes de md */}
+      
+      
       <nav className="hidden md:flex flex-nowrap items-center justify-center gap-3 px-3 py-3 bg-verdePastel border-b border-extra/40">
         {TABS.map((tab) => {
           const isActive = tab.path === location.pathname;
@@ -86,6 +95,9 @@ export default function BottomNav() {
           );
         })}
       </nav>
+      </>
+    }
+      
     </>
   );
 }

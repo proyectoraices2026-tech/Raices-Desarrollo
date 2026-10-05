@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { validatePassword } from '../utils/ValidatePassword';
+import { useNavigate } from 'react-router-dom';
 
 interface RegisterScreenProps {
   onRegisterSubmit: (data: {
@@ -33,6 +34,11 @@ export function RegisterScreen({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleGoToLogin = () => {
+    navigate ("/login");
+  }
 
   /* Valida los datos y entrega la información de registro a la página */
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,6 +83,10 @@ export function RegisterScreen({
       <div className="w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-auto py-6">        <h1 className="text-3xl md:text-4xl font-bold text-[#2D4A3E] text-center mb-8">
         Registrar
       </h1>
+
+      <div className="flex justify-center">
+        <button className="text-s font-semibold text-[#2D4A3E] hover:underline pb-4" onClick={handleGoToLogin}>¿Ya tienes una cuenta? Inicia sesión</button>
+      </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
