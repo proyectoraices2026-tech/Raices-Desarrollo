@@ -12,7 +12,7 @@ import {
   subMonths,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, CheckCircle, Trash2, Edit3, Moon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, CheckCircle, Trash2, Edit3 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
