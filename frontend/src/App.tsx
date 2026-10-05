@@ -1,7 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -91,12 +90,13 @@ function App() {
     <BrowserRouter>
       {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
-        <Route path="/" element={<Onboarding />} />
+        <Route path="/" element={<Catalog />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/cart" element={<Cart />}/>
 
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/home" element={
@@ -109,13 +109,6 @@ function App() {
         <Route path="/profile" element={
           <PrivateRoute>
             <UpdateUser />
-          </PrivateRoute>
-        } />
-
-        {/*Ruta privada, requiere autenticación por parte del usuario*/}
-        <Route path="/catalog" element={
-          <PrivateRoute>
-            <Catalog />
           </PrivateRoute>
         } />
 
@@ -161,11 +154,6 @@ function App() {
         <Route path="/about" element={
           <PrivateRoute>
             <AboutUs />
-          </PrivateRoute>
-        } />
-        <Route path="/cart" element={
-          <PrivateRoute>
-            <Cart />
           </PrivateRoute>
         } />
         <Route path="/my-requests" element={

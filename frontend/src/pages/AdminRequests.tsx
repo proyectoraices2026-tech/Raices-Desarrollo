@@ -231,7 +231,7 @@ export default function AdminRequests() {
                             onChange={(e) => setRejectReason(e.target.value)}
                             rows={3}
                             placeholder="Ej. No hay suficiente stock de una de las plantas."
-                            className="w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
+                            className="bg-white w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
                         />
                         <div className="flex gap-3">
                             <button
@@ -269,7 +269,7 @@ export default function AdminRequests() {
                             onChange={(e) => setAcceptMessage(e.target.value)}
                             rows={3}
                             placeholder="Ej. Tu pedido estará listo el 25 de agosto para que pases a recogerlo."
-                            className="w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
+                            className="bg-white w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
                         />
                         <div className="flex gap-3">
                             <button

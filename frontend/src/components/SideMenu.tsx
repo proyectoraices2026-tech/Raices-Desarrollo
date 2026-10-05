@@ -38,7 +38,7 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     onClose();
-    navigate("/login");
+    navigate("/");
   };
 
   const go = (path: string) => {
@@ -112,7 +112,7 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           </button>
 
           <button
-            onClick={() => go("/catalog")}
+            onClick={() => go("/")}
             className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
           >
             Catálogo
