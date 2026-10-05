@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Image as ImageIcon, Minus, Plus, X } from "lucide-react";
+import { formatPrice } from "../utils/formatPrice";
 import type { Product } from "../services/ProductService";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
