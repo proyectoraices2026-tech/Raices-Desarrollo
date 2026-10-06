@@ -61,7 +61,7 @@ export default function NavBar({
 
         {!user && <>
           <button className="
-        btn btn-primary
+        btn btn-Secondary btn-sm md:btn-md
         bg-white border-0 text-textoNegro
         hover:bg-fondoGlobal hover:border-0
         transition-all duration-300" onClick={handleLogin}>
