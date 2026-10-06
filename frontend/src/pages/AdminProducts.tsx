@@ -23,6 +23,7 @@ export default function AdminProducts() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [registerOpen, setRegisterOpen] = useState(false);
 
     /* Lista de productos existentes (activos e inactivos), para poder editarlos o darlos de baja */
     const [products, setProducts] = useState<Product[]>([]);
@@ -85,7 +86,7 @@ export default function AdminProducts() {
     }, [products.length]);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pb-48">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
@@ -99,27 +100,14 @@ export default function AdminProducts() {
                 {loading ? (
                     <p className="text-sm text-[#537a63] text-center py-10">Cargando...</p>
                 ) : (
-                    <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
-                        <div className="w-full lg:w-1/2">
-                            <ProductForm
-                                categories={categories}
-                                onSuccess={() => {
-                                    showAlert({
-                                        title: "Producto añadido",
-                                        message: "El producto ya está disponible en el catálogo.",
-                                        variant: "success",
-                                    });
-                                    loadProducts();
-                                }}
-                                onError={(message) =>
-                                    showAlert({
-                                        title: "No se pudo guardar el producto",
-                                        message,
-                                        variant: "error",
-                                    })
-                                }
-                            />
-                        </div>
+                    <div className="flex lg:gap-10">
+                        <button className="
+                            btn btn-Secondary btn-sm md:btn-md
+                            bg-white border-0 text-textoNegro
+                            hover:bg-fondoGlobal hover:border-0
+                            transition-all duration-300" onClick={() => setRegisterOpen(true)}>
+                            Añadir producto
+                        </button>
 
                         {/* Lista de productos ya creados, para poder editarlos o darlos de baja */}
                         <div className="w-full lg:w-1/2">
@@ -167,8 +155,8 @@ export default function AdminProducts() {
                                                     onClick={() => handleToggleActive(product)}
                                                     disabled={togglingId === product.id}
                                                     className={`px-3 py-2 rounded-full text-xs font-semibold flex-shrink-0 transition disabled:opacity-50 ${product.is_active
-                                                            ? "bg-red-50 text-red-600 hover:bg-red-100"
-                                                            : "bg-[#e3f3e9] text-[#3E5C4A] hover:bg-[#d4ecdd]"
+                                                        ? "bg-red-50 text-red-600 hover:bg-red-100"
+                                                        : "bg-[#e3f3e9] text-[#3E5C4A] hover:bg-[#d4ecdd]"
                                                         }`}
                                                 >
                                                     {togglingId === product.id ? "..." : product.is_active ? "Desactivar" : "Reactivar"}
@@ -198,11 +186,10 @@ export default function AdminProducts() {
                                                                 key={page}
                                                                 type="button"
                                                                 onClick={() => setCurrentPage(page)}
-                                                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition ${
-                                                                    isCurrent
+                                                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition ${isCurrent
                                                                         ? "bg-[#4E705B] text-white"
                                                                         : "bg-white text-[#2D4A3E] hover:bg-slate-50"
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 {page}
                                                             </button>
@@ -232,6 +219,26 @@ export default function AdminProducts() {
                 )}
             </main>
 
+            <ProductForm
+                isOpen={registerOpen}
+                onClose={() => setRegisterOpen(false)}
+                categories={categories}
+                onSuccess={() => {
+                    showAlert({
+                        title: "Producto añadido",
+                        message: "El producto ya está disponible en el catálogo.",
+                        variant: "success",
+                    });
+                    loadProducts();
+                }}
+                onError={(message) =>
+                    showAlert({
+                        title: "No se pudo guardar el producto",
+                        message,
+                        variant: "error",
+                    })
+                }
+            />
             {productToEdit && (
                 <EditProductModal
                     product={productToEdit}
@@ -249,6 +256,6 @@ export default function AdminProducts() {
             )}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
         </div>
-        
+
     );
 }

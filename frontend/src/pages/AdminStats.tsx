@@ -43,7 +43,7 @@ export default function AdminStats() {
     );
 
     const SAMPLE_TOP_SELLERS = [
-        { name: "Cactus", value: 32 },
+        { name: "Cactus", value: 50 },
         { name: "Monstera", value: 24 },
         { name: "Macetero", value: 18 },
         { name: "Tomate", value: 12 },
@@ -81,7 +81,7 @@ export default function AdminStats() {
         }`;
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pb-48">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
