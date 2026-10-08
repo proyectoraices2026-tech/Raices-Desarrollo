@@ -73,3 +73,8 @@ Se revisó Authentication > Logs, Supabase sí registra automáticamente, con se
   inválidos o expirados (`403: Email link is invalid or has expired`)
 - Recuperación de contraseña (`/recover`)
 - Consultas de usuario (`/user`)
+
+## Overposting
+
+**pendiente de backend de pedidos**
+Cuando se construya el backend dedicado de pedidos, el servidor debe recalcular el precio de cada producto consultando la tabla products por su id, y nunca debe aceptar el precio o el subtotal que mande el cliente directamente desde el front.
