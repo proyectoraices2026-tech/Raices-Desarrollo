@@ -257,9 +257,9 @@ export default function MyPlants() {
                   }}
                   className="bg-white rounded-2xl border border-[#e8efe4] flex items-center gap-4 p-4 cursor-pointer hover:border-[#c8dcc2] transition"
                 >
-                  <div className="w-16 h-16 rounded-full bg-[#ECEBDA] flex items-center justify-center p-2.5 flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
                     {getPlantIconUrl(plant.icon) && (
-                      <img src={getPlantIconUrl(plant.icon)!} alt="" className="w-full h-full object-contain" />
+                      <img src={getPlantIconUrl(plant.icon)!} alt="" className="w-full h-full object-cover" />
                     )}
                   </div>
 
@@ -347,3 +347,4 @@ export default function MyPlants() {
     </div>
   );
 }
+

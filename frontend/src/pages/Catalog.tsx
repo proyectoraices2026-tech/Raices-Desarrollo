@@ -33,11 +33,16 @@ export default function Catalog() {
                 pagination={{ clickable: true }}
                 loop
             >
-                <SwiperSlide><img src="/Banner 1.png" className="w-full h-full object-cover min-h-24 object-center"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 2.png" className="w-full h-full object-cover min-h-24 object-center"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 3.png" className="w-full h-full object-cover min-h-24 object-center"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 4.png" className="w-full h-full object-cover min-h-24 object-left"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 5.png" className="w-full h-full object-cover min-h-24 object-left"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 1.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 2.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 3.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 4.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 5.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 6.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 7.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 8.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 9.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 10.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
             </Swiper>
 
             {/* Contenido Principal */}

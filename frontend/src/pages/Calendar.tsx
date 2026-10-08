@@ -208,9 +208,9 @@ export default function Calendar() {
                           : "bg-white border-[#e8efe4] hover:bg-[#f8faf7] text-[#33463a]"
                       }`}
                     >
-                      <div className="w-9 h-9 rounded-full bg-[#ECEBDA] flex items-center justify-center flex-shrink-0 p-1.5">
+                      <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
                         {getPlantIconUrl(plant.icon) ? (
-                          <img src={getPlantIconUrl(plant.icon)!} alt="" className="w-full h-full object-contain" />
+                          <img src={getPlantIconUrl(plant.icon)!} alt="" className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-xs"></span>
                         )}

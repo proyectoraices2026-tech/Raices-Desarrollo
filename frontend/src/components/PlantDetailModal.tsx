@@ -158,8 +158,8 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
                 {mode === "view" ? (
                     <>
                         <div className="flex flex-col items-center text-center mb-4 pr-6">
-                            <div className="w-20 h-20 rounded-full bg-[#ECEBDA] flex items-center justify-center p-3 mb-3" aria-hidden="true">
-                                {iconUrl && <img src={iconUrl} alt="" className="w-full h-full object-contain" />}
+                            <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center mb-3" aria-hidden="true">
+                                {iconUrl && <img src={iconUrl} alt="" className="w-full h-full object-cover" />}
                             </div>
                             <h2 id="plant-detail-title" className="text-lg font-bold text-[#1e2d24]">{plant.name}</h2>
                             {plant.scientific_name && (
@@ -275,7 +275,7 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
                                     <fieldset>
                                         <legend className={labelClass}>Ícono</legend>
                                         <p className="text-[11px] text-[#8a8a82] -mt-1 mb-3">Elige el ícono que mejor represente a tu planta</p>
-                                        <div className="grid grid-cols-6 gap-3 max-w-xs md:max-w-sm">
+                                        <div className="grid grid-cols-5 gap-3 max-w-xs md:max-w-sm">
                                             {PLANT_ICONS.map((icon, i) => {
                                                 const selected = selectedIcon === i;
                                                 return (
@@ -285,11 +285,11 @@ export default function PlantDetailModal({ plant, userId, isOpen, onClose, onCha
                                                         onClick={() => setSelectedIcon(i)}
                                                         aria-pressed={selected}
                                                         aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                                                        className={`aspect-square rounded-full border-2 p-1 transition ${
-                                                            selected ? "bg-[#ece9e3] border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "bg-[#f5f3ee] border-transparent hover:border-[#c9c4b8]"
+                                                        className={`aspect-square rounded-full border-2 overflow-hidden transition ${
+                                                            selected ? "border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "border-transparent hover:border-[#c9c4b8]"
                                                         }`}
                                                     >
-                                                        <img src={icon} alt="" className="w-full h-full object-contain" />
+                                                        <img src={icon} alt="" className="w-full h-full object-cover rounded-full" />
                                                     </button>
                                                 );
                                             })}
