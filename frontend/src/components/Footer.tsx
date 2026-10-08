@@ -107,9 +107,7 @@ export default function Footer() {
         </section>
       </div>
 
-      {/* Derechos de autor */}
-      <div className="border-t border-white/15">
-        <p className="max-w-6xl mx-auto px-6 pt-5 pb-24 md:pb-5 text-center text-xs text-emerald-100/70">
+            {/* Derechos de autor */}
       <div className="border-t border-white/15">
         <p className="max-w-5xl mx-auto px-6 pt-5 pb-24 md:pb-5 text-center text-xs text-verdePastel">
           © {years} Raíces Team. Todos los derechos reservados.
