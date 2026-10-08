@@ -3,6 +3,7 @@ import { useState } from "react";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -18,7 +19,7 @@ export default function Catalog() {
 
 
     return (
-        <div className="min-h-screen bg-white pb-28">
+        <div className="min-h-screen bg-white flex flex-col">
 
             <div className="sticky top-0 z-40">
                 <NavBar
@@ -27,7 +28,9 @@ export default function Catalog() {
                 <BottomNav />
             </div>
 
+            {/* w-full + min-w-0: dentro de un contenedor flex, Swiper sin esto calcula un ancho gigante */}
             <Swiper
+                className="w-full min-w-0"
                 modules={[Autoplay, Pagination]}
                 autoplay={{ delay: 4000 }}
                 pagination={{ clickable: true }}
@@ -46,9 +49,12 @@ export default function Catalog() {
             </Swiper>
 
             {/* Contenido Principal */}
-            <main className="p-4 sm:p-6">
+            <main className="p-4 sm:p-6 flex-1">
                 <ProductList />
             </main>
+
+            {/* Footer con información, contacto y ubicación */}
+            <Footer />
 
             {/* Panel lateral, visible en toda la pantalla del catálogo */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />

@@ -159,11 +159,7 @@ function App() {
             <MyPlants />
           </PrivateRoute>
         } />
-        <Route path="/about" element={
-          <PrivateRoute>
-            <AboutUs />
-          </PrivateRoute>
-        } />
+        <Route path="/about" element={<AboutUs />} />
         <Route path="/my-requests" element={
           <PrivateRoute>
             <MyRequests />
