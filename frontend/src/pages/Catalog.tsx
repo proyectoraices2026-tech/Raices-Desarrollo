@@ -3,7 +3,7 @@ import { useState } from "react";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer"; 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -14,9 +14,6 @@ export default function Catalog() {
 
     /* Controla si el panel lateral (menú) está abierto o cerrado */
     const [menuOpen, setMenuOpen] = useState(false);
-
-    /* Envía al administrador a la pantalla de gestión de productos (crear, editar, desactivar) */
-
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
