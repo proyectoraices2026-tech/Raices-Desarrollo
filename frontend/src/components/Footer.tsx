@@ -1,57 +1,119 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import iconoRaices from '../assets/iconoraicesblanco.png';
+import { Link } from "react-router-dom";
+import { Mail, MapPin, Phone } from "lucide-react";
+import iconoRaices from "../assets/iconoraicesblanco.png";
 
-const Footer: React.FC = () => {
+/* Datos de contacto */
+const CONTACT_EMAIL = "proyectoraices2026@gmail.com";
+const CONTACT_PHONE_DISPLAY = "+506 0000-0000";
+const CONTACT_PHONE_HREF = "+50600000000";
+const INSTAGRAM_URL = "https://www.instagram.com/raices_palmares?stkn=MTNoZjh4Mzg0OWxueg%3D%3D&utm_source=qr";
+const INSTAGRAM_HANDLE = "@raices_palmares";
+const LOCATION = "Palmares, Alajuela, Costa Rica.";
+const START_YEAR = 2026;
+
+function InstagramIcon({ className }: { className?: string }) {
   return (
-    <footer className="bg-[#4a6b53] text-white py-6 border-t border-[#3e5a45]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          
-          {/* Logo y Nombre */}
-          <div className="flex items-center gap-1.5">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+const headingClass = "font-poppins text-base font-bold text-white mb-4";
+const linkClass =
+  "inline-flex items-center gap-2 text-sm text-emerald-100 hover:text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded transition-colors";
+
+export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  const lastYear = Math.max(currentYear, START_YEAR);
+  const years = lastYear === START_YEAR ? `${START_YEAR}` : `${START_YEAR}-${lastYear}`;
+
+  return (
+    <footer className="bg-[#4a6b53] text-white border-t border-[#3e5a45]" aria-label="Información del sitio">
+      <div className="max-w-6xl mx-auto px-6 pt-10 pb-8 grid grid-cols-1 gap-8 md:grid-cols-4 md:gap-8">
+        
+        {/* Marca y Logo */}
+        <div className="flex flex-col items-start gap-2">
+          <div className="flex items-center gap-2">
             <img 
               src={iconoRaices} 
               alt="Raíces Logo" 
-              className="h-7 w-auto object-contain" 
+              className="h-8 w-auto object-contain" 
             />
-            <span className="text-2xl font-semibold text-white">Raíces</span>
+            <span className="text-2xl font-bold tracking-wide text-white">Raíces</span>
           </div>
-
-          {/* Enlaces de interés / Redes sociales */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-emerald-50">
-            <Link to="/about" className="hover:underline transition-all">
-              Sobre Nosotros / Contáctanos
-            </Link>
-            <Link to="/terms" className="hover:underline transition-all">
-              Términos y Condiciones
-            </Link>
-            <a 
-              href="https://www.instagram.com/raices_palmares?stkn=MTNoZjh4Mzg0OWxueg%3D%3D&utm_source=qr" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm hover:opacity-90 transition-opacity"
-            >
-              {/* Icono de Instagram */}
-              <svg 
-                className="w-4 h-4 fill-current" 
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-              </svg>
-              <span>Instagram</span>
-            </a>
-          </div>
-
+          <p className="text-xs text-emerald-100/80 mt-1">
+            Conectando la naturaleza con tu hogar.
+          </p>
         </div>
 
-        {/* Derechos de autor */}
-        <div className="mt-6 pt-4 border-t border-white/10 text-center text-xs text-emerald-100/70">
-          <p>© {new Date().getFullYear()} Raíces - Todos los derechos reservados.</p>
-        </div>
+        {/* Sección 1: Información */}
+        <nav aria-labelledby="footer-info">
+          <h2 id="footer-info" className={headingClass}>Información</h2>
+          <ul className="space-y-3">
+            <li>
+              <Link to="/about" className={linkClass}>Sobre nosotros</Link>
+            </li>
+            <li>
+              <Link to="/terms" className={linkClass}>Términos y condiciones</Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Sección 2: Contáctenos */}
+        <section aria-labelledby="footer-contact">
+          <h2 id="footer-contact" className={headingClass}>Contáctenos</h2>
+          <ul className="space-y-3">
+            <li>
+              <a href={`mailto:${CONTACT_EMAIL}`} className={`${linkClass} break-all`}>
+                <Mail className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                {CONTACT_EMAIL}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${CONTACT_PHONE_HREF}`} className={linkClass}>
+                <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                {CONTACT_PHONE_DISPLAY}
+              </a>
+            </li>
+            <li>
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                <InstagramIcon className="w-4 h-4 flex-shrink-0" />
+                Instagram {INSTAGRAM_HANDLE}
+                <span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        {/* Sección 3: Ubicación */}
+        <section aria-labelledby="footer-location">
+          <h2 id="footer-location" className={headingClass}>Ubicación</h2>
+          <p className="flex items-start gap-2 text-sm text-emerald-100">
+            <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            {LOCATION}
+          </p>
+        </section>
+      </div>
+
+      {/* Derechos de autor */}
+      <div className="border-t border-white/15">
+        <p className="max-w-6xl mx-auto px-6 pt-5 pb-24 md:pb-5 text-center text-xs text-emerald-100/70">
+          © {years} Raíces Team. Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
