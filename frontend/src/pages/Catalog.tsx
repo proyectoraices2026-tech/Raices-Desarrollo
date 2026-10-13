@@ -6,6 +6,7 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer"; 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
+import BestSellers from "../components/BestSellers";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -33,20 +34,22 @@ export default function Catalog() {
                 pagination={{ clickable: true }}
                 loop
             >
-                <SwiperSlide><img src="/Banner 1.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 2.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 3.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 4.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 5.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 6.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 7.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 8.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 9.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 10.png" alt="" className="block w-full aspect-[1506/275] object-cover"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 1.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 2.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 3.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 4.png" alt="" className="block w-full aspect-[1506/275] object-cover object-left min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 5.png" alt="" className="block w-full aspect-[1506/275] object-cover object-left min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 6.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 7.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 8.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 9.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
+                <SwiperSlide><img src="/Banner 10.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
             </Swiper>
 
+            <BestSellers />
+
             {/* Contenido Principal */}
-            <main className="p-4 sm:p-6 flex-1">
+            <main id="catalogo" className="p-4 sm:p-6 flex-1 scroll-mt-20">
                 <ProductList />
             </main>
 
