@@ -271,3 +271,54 @@ export async function setProductActive(id: string, isActive: boolean): Promise<v
 
     if (error) throw error;
 }
+
+/*
+    Obtener los productos más vendidos
+
+    El ranking lo calcula la función de Postgres get_best_sellers (suma las cantidades de
+    las solicitudes aprobadas). Desde el cliente no se puede calcular directamente porque
+    la RLS de request_items solo deja ver las solicitudes propias. Si hay menos productos
+    con ventas que el límite pedido, se completa con los más recientes.
+*/
+export async function getBestSellers(limit = 10): Promise<Product[]> {
+    const { data: ranking, error: rankingError } = await supabase.rpc("get_best_sellers", {
+        limit_count: limit,
+    });
+    if (rankingError) throw rankingError;
+
+    const ids: string[] = (ranking ?? []).map((row: { product_id: string }) => row.product_id);
+
+    let bestSellers: Product[] = [];
+    if (ids.length > 0) {
+        const { data, error } = await supabase
+            .from("products")
+            .select("*, categories(name)")
+            .in("id", ids)
+            .eq("is_active", true);
+        if (error) throw error;
+
+        /* .in() no garantiza el orden, así que se reordena según el ranking */
+        const byId = new Map<string, Product>(
+            (data ?? []).map((p: Product) => [p.id, p] as [string, Product])
+        );
+        bestSellers = ids
+            .map((id) => byId.get(id))
+            .filter((p): p is Product => p !== undefined);
+    }
+
+    if (bestSellers.length >= limit) return bestSellers;
+
+    /* Relleno: productos más recientes que todavía no estén en la lista */
+    const { data: recent, error: recentError } = await supabase
+        .from("products")
+        .select("*, categories(name)")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+    if (recentError) throw recentError;
+
+    const alreadyIncluded = new Set(bestSellers.map((p) => p.id));
+    const filler = (recent ?? []).filter((p: Product) => !alreadyIncluded.has(p.id));
+
+    return [...bestSellers, ...filler].slice(0, limit);
+}

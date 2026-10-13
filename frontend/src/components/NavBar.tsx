@@ -4,6 +4,7 @@ import { type ReactNode } from "react";
 import logoIcon from "../assets/iconoraicesblanco.png";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import DesktopNavLinks from "./DesktopNavLinks";
 
 interface NavBarProps {
   /* Abre el panel lateral (SideMenu); cada página sigue siendo dueña de ese estado */
@@ -34,7 +35,7 @@ export default function NavBar({
   
 
   return (
-    <header className="bg-primarioBase px-6 md:px-10 py-3 md:py-4 border-b border-primarioOscuro/20 flex justify-between items-center">
+    <header className="bg-primarioBase px-6 md:px-10 py-3 md:py-4 border-b border-primarioOscuro/20 flex justify-between items-center md:grid-cols-[1fr_auto_1fr]">
       <div className="flex items-center gap-2">
         {showBack && (
           <button
@@ -57,6 +58,8 @@ export default function NavBar({
         </button>
       </div>
 
+      {!showBack && <DesktopNavLinks />}
+ 
       <div className="flex items-center gap-4">
 
         {!user && <>

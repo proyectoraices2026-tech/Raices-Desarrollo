@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 50;
 
 /* Categorías */
 const DEFAULT_CATEGORIES = ["Todo", "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
-function ProductCard({
+export function ProductCard({
   product,
   onProductClick,
   onAddToCart,
