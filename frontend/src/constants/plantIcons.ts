@@ -1,11 +1,32 @@
-import icon1 from "../assets/1.svg";
-import icon2 from "../assets/2.svg";
-import icon3 from "../assets/3.svg";
-import icon4 from "../assets/4.svg";
-import icon5 from "../assets/5.svg";
-import icon6 from "../assets/6.svg";
+import icon_anturio_rojo from "../assets/plants/anturio-rojo.png";
+import icon_apio from "../assets/plants/apio.png";
+import icon_cebolla from "../assets/plants/cebolla.png";
+import icon_cebollin from "../assets/plants/cebollin.png";
+import icon_chile_dulce from "../assets/plants/chile-dulce.png";
+import icon_corona_de_cristo from "../assets/plants/corona-de-cristo.png";
+import icon_culantro_castilla from "../assets/plants/culantro-castilla.png";
+import icon_espinaca from "../assets/plants/espinaca.png";
+import icon_guineas from "../assets/plants/guineas.png";
+import icon_ixora from "../assets/plants/ixora.png";
+import icon_lechuga from "../assets/plants/lechuga.png";
+import icon_orquidea_phalaenopsis from "../assets/plants/orquidea-phalaenopsis.png";
+import icon_rosa_del_desierto from "../assets/plants/rosa-del-desierto.png";
 
-export const PLANT_ICONS = [icon1, icon2, icon3, icon4, icon5, icon6];
+export const PLANT_ICONS = [
+  icon_anturio_rojo,
+  icon_apio,
+  icon_cebolla,
+  icon_cebollin,
+  icon_chile_dulce,
+  icon_corona_de_cristo,
+  icon_culantro_castilla,
+  icon_espinaca,
+  icon_guineas,
+  icon_ixora,
+  icon_lechuga,
+  icon_orquidea_phalaenopsis,
+  icon_rosa_del_desierto,
+];
 
 export function getPlantIconUrl(
   iconIndex: string | number | null | undefined,

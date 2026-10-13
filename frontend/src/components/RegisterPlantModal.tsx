@@ -174,7 +174,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
             <fieldset>
               <legend className={labelClass}>Ícono</legend>
               <p className="text-[11px] text-[#8a8a82] -mt-1 mb-3">Elige el ícono que mejor represente a tu planta</p>
-              <div className="grid grid-cols-6 gap-3 max-w-xs md:max-w-sm">
+              <div className="grid grid-cols-5 gap-3 max-w-xs md:max-w-sm">
                 {PLANT_ICONS.map((icon, i) => {
                   const selected = selectedIcon === i;
                   return (
@@ -184,11 +184,11 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
                       onClick={() => setSelectedIcon(i)}
                       aria-pressed={selected}
                       aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                      className={`aspect-square rounded-full border-2 p-1 transition ${
-                        selected ? "bg-[#ece9e3] border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "bg-[#f5f3ee] border-transparent hover:border-[#c9c4b8]"
+                      className={`aspect-square rounded-full border-2 overflow-hidden transition ${
+                        selected ? "border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "border-transparent hover:border-[#c9c4b8]"
                       }`}
                     >
-                      <img src={icon} alt="" className="w-full h-full object-contain" />
+                      <img src={icon} alt="" className="w-full h-full object-cover rounded-full" />
                     </button>
                   );
                 })}
@@ -210,9 +210,9 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           <p className="text-xs text-[#537a63] mt-1 mb-5">Aparecerá entre tus plantas.</p>
 
           <div className="bg-[#f5f7f2] border border-[#e8efe4] rounded-xl p-3 flex items-center gap-3 mb-6 text-left">
-            <div className="w-10 h-10 rounded-lg bg-[#ece9e3] flex-shrink-0 p-1.5" aria-hidden="true">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0" aria-hidden="true">
               {selectedIcon !== null && (
-                <img src={PLANT_ICONS[selectedIcon]} alt="" className="w-full h-full object-contain" />
+                <img src={PLANT_ICONS[selectedIcon]} alt="" className="w-full h-full object-cover" />
               )}
             </div>
             <div>

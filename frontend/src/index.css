@@ -19,3 +19,8 @@ html, body {
     padding-bottom: 4.5rem;
   }
 }
+
+/* Cambia el color de la bolita activa del carrusel Swiper al verde institucional */
+.swiper-pagination-bullet-active {
+  background-color: #4a6b53 !important;
+}
