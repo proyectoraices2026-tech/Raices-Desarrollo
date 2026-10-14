@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Image as ImageIcon, Minus, Plus, X } from "lucide-react";
+import { Image as ImageIcon, Minus, Plus, X, ZoomIn } from "lucide-react";
 import { formatPrice } from "../utils/formatPrice";
 import type { Product } from "../services/ProductService";
 import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
+import ImageLightbox from "./ImageLightbox";
 
 
 interface ProductDetailModalProps {
@@ -15,6 +16,8 @@ interface ProductDetailModalProps {
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [imageError, setImageError] = useState(false);
+  /* Visor de la imagen a pantalla completa, con zoom */
+  const [zoomOpen, setZoomOpen] = useState(false);
   const { addToCart } = useCart();
   const { showAlert } = useAlert();
 
@@ -33,6 +36,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   useEffect(() => {
     setQuantity(1);
     setImageError(false);
+    setZoomOpen(false);
   }, [product]);
 
   if (!product) return null;
@@ -71,18 +75,30 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
         </button>
 
         {/* Imagen */}
-        <div className="w-full h-48 md:h-auto md:w-64 md:flex-shrink-0 rounded-xl overflow-hidden bg-slate-100 mb-5 md:mb-0">
+        {/* Foto completa (object-contain) sobre fondo blanco: nunca se recorta.
+            Celular: ancho completo con proporción 4:3. Escritorio: cuadro fijo de 256 x 256. */}
+        <div className="w-full aspect-[4/3] md:aspect-auto md:w-64 md:h-64 md:flex-shrink-0 md:self-start rounded-xl overflow-hidden bg-white border border-[#e8efe4] mb-5 md:mb-0">
           {imageError || !product.image_url ? (
             <div className="w-full h-full flex items-center justify-center text-slate-400">
               <ImageIcon className="w-10 h-10" />
             </div>
           ) : (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              onError={() => setImageError(true)}
-              className="w-full h-full object-cover"
-            />
+            <button
+              type="button"
+              onClick={() => setZoomOpen(true)}
+              className="relative w-full h-full cursor-zoom-in"
+              aria-label={`Ampliar imagen de ${product.name}`}
+            >
+              <img
+                src={product.image_url}
+                alt={product.name}
+                onError={() => setImageError(true)}
+                className="w-full h-full object-contain"
+              />
+              <span className="absolute bottom-2 right-2 rounded-full bg-black/55 text-white p-1.5 pointer-events-none" aria-hidden="true">
+                <ZoomIn className="w-4 h-4" />
+              </span>
+            </button>
           )}
         </div>
 
@@ -143,6 +159,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             {outOfStock ? "Sin existencias" : "Agregar"}
           </button>
         </div>
+        {zoomOpen && product.image_url && (
+          <ImageLightbox src={product.image_url} alt={product.name} onClose={() => setZoomOpen(false)} />
+        )}
       </div>
     </div>
   );
