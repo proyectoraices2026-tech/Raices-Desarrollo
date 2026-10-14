@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { logAuthError} from "../lib/logger";
+import { logAuthError } from "../lib/logger";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
-
+import BottomNav from "../components/BottomNav";
 
 /* Página privada para editar el nombre, correo, teléfono y dirección del usuario actual */
 export default function UpdateUser() {
@@ -93,8 +93,13 @@ export default function UpdateUser() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col relative">
-            <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <div className="min-h-screen bg-white flex flex-col relative pb-28 ">
+            <div className="sticky top-0 z-40">
+                <NavBar
+                    onMenuClick={() => setMenuOpen(true)}
+                />
+                <BottomNav />
+            </div>
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
             <div className="w-full max-w-sm sm:max-w-lg md:max-w-xl mx-auto my-auto py-8 px-6 md:px-12">
