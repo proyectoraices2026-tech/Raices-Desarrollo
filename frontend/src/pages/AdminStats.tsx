@@ -6,8 +6,16 @@ import SideMenu from "../components/SideMenu";
 import { getAllProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { formatPrice } from "../utils/formatPrice";
+import FinancialSummaryCard from "../components/FinancialSummaryCard";
+import type { StatsRange } from "../services/StatsService";
 
 const CHART_COLORS = ["#645244", "#537a63", "#c4a557", "#1c2b18", "#5a7a54", "#929487"];
+
+const RANGE_OPTIONS: { key: StatsRange; label: string }[] = [
+    { key: "week", label: "Semanal" },
+    { key: "month", label: "Mensual" },
+    { key: "year", label: "Anual" },
+];
 
 type PanelKey = "vendidos" | "agotarse" | "agotados" | null;
 
@@ -21,6 +29,7 @@ export default function AdminStats() {
     const [openPanel, setOpenPanel] = useState<PanelKey>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [range, setRange] = useState<StatsRange>("month");
 
     useEffect(() => {
         getAllProducts()
@@ -76,8 +85,7 @@ export default function AdminStats() {
     const togglePanel = (key: PanelKey) => setOpenPanel((current) => (current === key ? null : key));
 
     const pillClass = (active: boolean) =>
-        `flex-1 flex items-center justify-between gap-2 px-5 py-3 rounded-2xl text-sm font-semibold border transition ${
-            active ? "bg-tarjeta border-primarioClaro text-primarioBase" : "bg-white border-primarioClaro text-primarioBase hover:bg-tarjeta"
+        `flex-1 flex items-center justify-between gap-2 px-5 py-3 rounded-2xl text-sm font-semibold border transition ${active ? "bg-tarjeta border-primarioClaro text-primarioBase" : "bg-white border-primarioClaro text-primarioBase hover:bg-tarjeta"
         }`;
 
     return (
@@ -89,9 +97,32 @@ export default function AdminStats() {
 
             <div className="md:max-w-5xl md:mx-auto p-5 md:px-12 md:py-8">
                 <h1 className="font-poppins text-3xl md:text-4xl leading-tight font-bold text-primarioOscuro mb-1">
-                    Estadísticas
+                    Dashboard de estadísticas
                 </h1>
-                <p className="text-sm text-primarioBase mb-6">Resumen del estado del vivero.</p>
+                <p className="text-sm text-primarioBase mb-4">Resumen del estado del vivero.</p>
+
+                {/* Selector de período: vive a nivel de página para que las tarjetas que lo necesiten
+    reciban `range`. Hoy solo lo usa el resumen financiero. */}
+                <div
+                    className="inline-flex bg-white border border-primarioClaro rounded-full p-1 mb-4"
+                    role="group"
+                    aria-label="Período de las estadísticas"
+                >
+                    {RANGE_OPTIONS.map((option) => (
+                        <button
+                            key={option.key}
+                            type="button"
+                            onClick={() => setRange(option.key)}
+                            aria-pressed={range === option.key}
+                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${range === option.key ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
+                                }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+
+                <FinancialSummaryCard range={range} />
 
                 {/* Fila de filtros desplegables, igual que en el prototipo */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-2 relative">

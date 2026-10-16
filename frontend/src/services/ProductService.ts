@@ -161,14 +161,23 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
             description: input.description ?? null,
             image_url: publicUrl,
             price: input.price,
-            stock: input.stock,
+            stock: 0,
             min_stock: input.min_stock,
         })
         .select()
         .single();
 
     // Si ocurrió un error se imprime el mensaje
+    // Si ocurrió un error se imprime el mensaje
     if (error) throw error;
+
+    /* El stock inicial se registra como una compra (movimiento restock), para que cuente
+       como inversión; add_stock es quien suma las unidades al producto */
+    if (input.stock > 0) {
+        await addStock(data.id, input.stock, null, "Stock inicial");
+        return { ...data, stock: input.stock };
+    }
+
     // Devolver datos
     return data;
 }
@@ -200,7 +209,6 @@ export interface UpdateProductInput {
     name?: string;
     description?: string;
     price?: number;
-    stock?: number;
     min_stock?: number;
     imageFile?: File;
 }
@@ -321,4 +329,59 @@ export async function getBestSellers(limit = 10): Promise<Product[]> {
     const filler = (recent ?? []).filter((p: Product) => !alreadyIncluded.has(p.id));
 
     return [...bestSellers, ...filler].slice(0, limit);
+}
+
+/*
+    Costo unitario guardado para un producto (tabla product_costs, solo visible para admin).
+    null significa que no hay uno guardado y se usa el 50% del precio como valor provisional.
+*/
+export async function getProductCostOverride(productId: string): Promise<number | null> {
+    const { data, error } = await supabase
+        .from("product_costs")
+        .select("cost_price")
+        .eq("product_id", productId)
+        .maybeSingle();
+
+    if (error) throw error;
+    return data ? Number(data.cost_price) : null;
+}
+
+/*
+    Registra una compra de mercancía y suma las unidades al stock, todo en una sola operación
+    en la base de datos. Si unitCost es null, se usa el costo guardado del producto o, si no
+    hay, el 50% del precio. saveAsProductCost guarda unitCost como costo habitual del producto.
+*/
+export async function addStock(
+    productId: string,
+    quantity: number,
+    unitCost: number | null = null,
+    note: string | null = null,
+    saveAsProductCost = false
+): Promise<number> {
+    const { data, error } = await supabase.rpc("add_stock", {
+        p_product_id: productId,
+        p_quantity: quantity,
+        p_unit_cost: unitCost,
+        p_note: note,
+        p_set_as_product_cost: saveAsProductCost,
+    });
+
+    if (error) throw error;
+    return data as number;
+}
+
+/* Corrección o merma: delta positivo suma, negativo resta. No cuenta como inversión. */
+export async function adjustStock(
+    productId: string,
+    delta: number,
+    note: string | null = null
+): Promise<number> {
+    const { data, error } = await supabase.rpc("adjust_stock", {
+        p_product_id: productId,
+        p_delta: delta,
+        p_note: note,
+    });
+
+    if (error) throw error;
+    return data as number;
 }
