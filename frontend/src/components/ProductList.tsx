@@ -23,10 +23,10 @@ export function ProductCard({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
+    <div className="bg-white border border-[#e8efe4] rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
       <div
         onClick={() => onProductClick(product)}
-        className="relative w-full aspect-[4/3] bg-slate-100 cursor-pointer flex-shrink-0 overflow-hidden"
+        className="relative w-full aspect-[4/3] bg-white cursor-pointer flex-shrink-0 overflow-hidden"
       >
         {!imageLoaded && !imageError && (
           <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
@@ -45,7 +45,7 @@ export function ProductCard({
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
+            className={`w-full h-full object-contain transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
           />
