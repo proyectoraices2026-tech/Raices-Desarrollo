@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { endOfWeek, format, startOfWeek } from "date-fns";
 import { es } from "date-fns/locale";
-import { getFinancialSummary, sumFinancialBuckets } from "../services/StatsService";
-import type { FinancialTotals, StatsRange } from "../services/StatsService";
-import { getErrorMessage } from "../services/ProductService";
+import { sumFinancialBuckets } from "../services/StatsService";
+import type { FinancialBucket, StatsRange } from "../services/StatsService";
 import { formatPrice } from "../utils/formatPrice";
 
 interface FinancialSummaryCardProps {
     range: StatsRange;
+    buckets: FinancialBucket[];
+    loading: boolean;
+    error: string | null;
 }
 
 /* Colones sin decimales y con el signo adelante si es negativo */
@@ -25,32 +27,8 @@ function Metric({ label, value, hint, negative }: { label: string; value: string
 }
 
 /* Tarjeta numérica: inversión, ventas y beneficio neto del período que recibe por prop */
-export default function FinancialSummaryCard({ range }: FinancialSummaryCardProps) {
-    const [totals, setTotals] = useState<FinancialTotals | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        /* Evita que una respuesta lenta pise a la del período que se eligió después */
-        let cancelled = false;
-        setLoading(true);
-        setError(null);
-
-        getFinancialSummary(range)
-            .then((buckets) => {
-                if (!cancelled) setTotals(sumFinancialBuckets(buckets));
-            })
-            .catch((err) => {
-                if (!cancelled) setError(getErrorMessage(err, "No se pudo cargar el resumen financiero."));
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [range]);
+export default function FinancialSummaryCard({ range, buckets, loading, error }: FinancialSummaryCardProps) {
+    const totals = useMemo(() => sumFinancialBuckets(buckets), [buckets]);
 
     const periodLabel = useMemo(() => {
         const now = new Date();
@@ -65,9 +43,9 @@ export default function FinancialSummaryCard({ range }: FinancialSummaryCardProp
 
     /* Beneficio neto = ventas menos el costo de lo vendido.
        Alternativa (balance de caja): totals.sales - totals.investment */
-    const netProfit = totals?.netProfit ?? 0;
+    const netProfit = totals.netProfit;
 
-    const show = (value: number) => (loading || !totals ? "…" : money(value));
+    const show = (value: number) => (loading ? "…" : money(value));
 
     return (
         <div className="bg-tarjeta rounded-2xl p-5 mb-4">
@@ -82,16 +60,8 @@ export default function FinancialSummaryCard({ range }: FinancialSummaryCardProp
                 </p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Metric
-                        label="Inversión"
-                        value={show(totals?.investment ?? 0)}
-                        hint="Compras de stock del período"
-                    />
-                    <Metric
-                        label="Ventas"
-                        value={show(totals?.sales ?? 0)}
-                        hint="Pedidos aceptados del período"
-                    />
+                    <Metric label="Inversión" value={show(totals.investment)} hint="Compras de stock del período" />
+                    <Metric label="Ventas" value={show(totals.sales)} hint="Pedidos aceptados del período" />
                     <Metric
                         label="Beneficio neto"
                         value={show(netProfit)}

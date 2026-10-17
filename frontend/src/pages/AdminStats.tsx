@@ -5,9 +5,11 @@ import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import { getAllProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
-import { formatPrice } from "../utils/formatPrice";
+//import { formatPrice } from "../utils/formatPrice";
 import FinancialSummaryCard from "../components/FinancialSummaryCard";
 import type { StatsRange } from "../services/StatsService";
+import EarningsChart from "../components/EarningChart";
+import { useFinancialSummary } from "../hooks/UseFinancialSummary";
 
 const CHART_COLORS = ["#645244", "#537a63", "#c4a557", "#1c2b18", "#5a7a54", "#929487"];
 
@@ -30,6 +32,7 @@ export default function AdminStats() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [range, setRange] = useState<StatsRange>("month");
+    const { buckets, loading: summaryLoading, error: summaryError } = useFinancialSummary(range);
 
     useEffect(() => {
         getAllProducts()
@@ -59,16 +62,6 @@ export default function AdminStats() {
         { name: "Abono", value: 9 },
         { name: "Azada", value: 5 },
     ];
-    const SAMPLE_EARNINGS = [
-        { day: "Lunes", value: 14000 },
-        { day: "Martes", value: 8000 },
-        { day: "Miércoles", value: 3000 },
-        { day: "Jueves", value: 14000 },
-        { day: "Viernes", value: 16000 },
-        { day: "Sábado", value: 15000 },
-        { day: "Domingo", value: 15000 },
-    ];
-    const earningsMax = Math.max(...SAMPLE_EARNINGS.map((d) => d.value));
     const topSellersTotal = SAMPLE_TOP_SELLERS.reduce((sum, s) => sum + s.value, 0);
 
     const donutGradient = useMemo(() => {
@@ -101,28 +94,7 @@ export default function AdminStats() {
                 </h1>
                 <p className="text-sm text-primarioBase mb-4">Resumen del estado del vivero.</p>
 
-                {/* Selector de período: vive a nivel de página para que las tarjetas que lo necesiten
-    reciban `range`. Hoy solo lo usa el resumen financiero. */}
-                <div
-                    className="inline-flex bg-white border border-primarioClaro rounded-full p-1 mb-4"
-                    role="group"
-                    aria-label="Período de las estadísticas"
-                >
-                    {RANGE_OPTIONS.map((option) => (
-                        <button
-                            key={option.key}
-                            type="button"
-                            onClick={() => setRange(option.key)}
-                            aria-pressed={range === option.key}
-                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${range === option.key ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
-                                }`}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </div>
-
-                <FinancialSummaryCard range={range} />
+                
 
                 {/* Fila de filtros desplegables, igual que en el prototipo */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-2 relative">
@@ -190,6 +162,29 @@ export default function AdminStats() {
                     </div>
                 </div>
 
+                {/* Selector de período: vive a nivel de página para que las tarjetas que lo necesiten
+    reciban `range`. Hoy solo lo usa el resumen financiero. */}
+                <div
+                    className="inline-flex bg-white border border-primarioClaro rounded-full p-1 mb-4"
+                    role="group"
+                    aria-label="Período de las estadísticas"
+                >
+                    {RANGE_OPTIONS.map((option) => (
+                        <button
+                            key={option.key}
+                            type="button"
+                            onClick={() => setRange(option.key)}
+                            aria-pressed={range === option.key}
+                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${range === option.key ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
+                                }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+
+                <FinancialSummaryCard range={range} buckets={buckets} loading={summaryLoading} error={summaryError} />
+
                 {/* Aviso visible de que estas dos tarjetas todavía usan datos de ejemplo */}
                 <p className="text-[11px] text-primarioBase/70 italic mb-4">
                     * "Más vendidos" y "Ganancias" muestran datos de ejemplo por ahora — falta un endpoint del backend de pedidos para calcularlos con datos reales.
@@ -220,27 +215,8 @@ export default function AdminStats() {
                     </div>
                 </div>
 
-                {/* Tarjeta "Ganancias": barras semanales */}
-                <div className="bg-tarjeta rounded-2xl p-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <p className="text-lg font-semibold text-primarioBase">Ganancias</p>
-                        <span className="text-xs font-semibold text-primarioBase border border-primarioBase rounded-full px-3 py-1.5">
-                            Mensuales
-                        </span>
-                    </div>
-                    <div className="flex items-end gap-2 sm:gap-4 h-40">
-                        {SAMPLE_EARNINGS.map((d) => (
-                            <div key={d.day} className="flex-1 flex flex-col items-center justify-end h-full">
-                                <div
-                                    className="w-full max-w-[32px] bg-primarioBase rounded-t-[10px]"
-                                    style={{ height: `${(d.value / earningsMax) * 100}%` }}
-                                    title={`₡${formatPrice(d.value)}`}
-                                />
-                                <p className="text-[10px] font-semibold text-textoSecundario mt-2 text-center">{d.day.slice(0, 3)}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {/* Tarjeta "Ganancias": datos reales, responde al selector de período */}
+                <EarningsChart range={range} buckets={buckets} loading={summaryLoading} error={summaryError} />
 
                 <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
             </div>
