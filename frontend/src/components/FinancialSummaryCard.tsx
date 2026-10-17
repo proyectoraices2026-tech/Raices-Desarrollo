@@ -48,7 +48,7 @@ export default function FinancialSummaryCard({ range, buckets, loading, error }:
     const show = (value: number) => (loading ? "…" : money(value));
 
     return (
-        <div className="bg-tarjeta rounded-2xl p-5 mb-4">
+        <div className="bg-tarjeta rounded-2xl p-5 h-full">
             <div className="flex items-baseline justify-between gap-3 mb-4">
                 <p className="text-lg font-semibold text-primarioBase">Resumen financiero</p>
                 <span className="text-xs font-semibold text-primarioBase capitalize">{periodLabel}</span>
@@ -59,7 +59,7 @@ export default function FinancialSummaryCard({ range, buckets, loading, error }:
                     {error}
                 </p>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                     <Metric label="Inversión" value={show(totals.investment)} hint="Compras de stock del período" />
                     <Metric label="Ventas" value={show(totals.sales)} hint="Pedidos aceptados del período" />
                     <Metric

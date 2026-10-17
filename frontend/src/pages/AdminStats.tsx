@@ -147,7 +147,7 @@ export default function AdminStats() {
                     ))}
                 </div>
 
-                <FinancialSummaryCard range={range} buckets={buckets} loading={summaryLoading} error={summaryError} />
+                
 
                 {/* Fila de filtros desplegables: cada panel flota debajo de su botón */}
                 <div ref={panelsRef} className="flex flex-col sm:flex-row gap-3 mb-4 relative">
@@ -239,45 +239,50 @@ export default function AdminStats() {
                     </div>
                 </div>
 
-                {/* Tarjeta "Más vendidos": dona + leyenda */}
-                <div className="bg-tarjeta rounded-2xl p-5 mb-4">
-                    <p className="text-lg font-semibold text-primarioBase mb-4">Más vendidos</p>
+                         {/* Resumen financiero y dona de más vendidos: lado a lado desde md, una sobre otra en mobile */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <FinancialSummaryCard range={range} buckets={buckets} loading={summaryLoading} error={summaryError} />
 
-                    {sellersError ? (
-                        <p role="alert" className="text-xs font-semibold text-error">{sellersError}</p>
-                    ) : !topSellersReady ? (
-                        <p className="text-xs text-primarioBase text-center py-10">Cargando...</p>
-                    ) : topSellers.length === 0 ? (
-                        <p className="text-xs text-primarioBase text-center py-10">Sin ventas aceptadas en este período.</p>
-                    ) : (
-                        <div className="flex flex-col sm:flex-row items-center gap-6">
-                            <div
-                                className="w-40 h-40 rounded-full flex-shrink-0"
-                                style={{
-                                    background: donutGradient,
-                                    WebkitMask: "radial-gradient(farthest-side, transparent 62%, black 63%)",
-                                    mask: "radial-gradient(farthest-side, transparent 62%, black 63%)",
-                                }}
-                                role="img"
-                                aria-label="Gráfico de dona de productos más vendidos"
-                            />
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 w-full">
-                                {topSellers.map((s, i) => (
-                                    <div
-                                        key={`${s.name}-${i}`}
-                                        className="flex items-center gap-2 text-xs font-semibold"
-                                        style={{ color: CHART_COLORS[i % CHART_COLORS.length] }}
-                                    >
-                                        <span
-                                            className="w-3 h-3 rounded-[4px] flex-shrink-0"
-                                            style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-                                        />
-                                        {s.name}
-                                    </div>
-                                ))}
+                    {/* Tarjeta "Más vendidos": dona + leyenda */}
+                    <div className="bg-tarjeta rounded-2xl p-5 h-full">
+                        <p className="text-lg font-semibold text-primarioBase mb-4">Más vendidos</p>
+
+                        {sellersError ? (
+                            <p role="alert" className="text-xs font-semibold text-error">{sellersError}</p>
+                        ) : !topSellersReady ? (
+                            <p className="text-xs text-primarioBase text-center py-10">Cargando...</p>
+                        ) : topSellers.length === 0 ? (
+                            <p className="text-xs text-primarioBase text-center py-10">Sin ventas aceptadas en este período.</p>
+                        ) : (
+                            <div className="flex flex-col items-center gap-6">
+                                <div
+                                    className="w-40 h-40 rounded-full flex-shrink-0"
+                                    style={{
+                                        background: donutGradient,
+                                        WebkitMask: "radial-gradient(farthest-side, transparent 62%, black 63%)",
+                                        mask: "radial-gradient(farthest-side, transparent 62%, black 63%)",
+                                    }}
+                                    role="img"
+                                    aria-label="Gráfico de dona de productos más vendidos"
+                                />
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full">
+                                    {topSellers.map((s, i) => (
+                                        <div
+                                            key={`${s.name}-${i}`}
+                                            className="flex items-center gap-2 text-xs font-semibold"
+                                            style={{ color: CHART_COLORS[i % CHART_COLORS.length] }}
+                                        >
+                                            <span
+                                                className="w-3 h-3 rounded-[4px] flex-shrink-0"
+                                                style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                                            />
+                                            {s.name}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* Tarjeta "Ganancias": datos reales, responde al selector de período */}
