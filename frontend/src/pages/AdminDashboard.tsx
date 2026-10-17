@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
 import statsIcon from "../assets/dashboard/stats.svg";
 import shopIcon from "../assets/dashboard/shop.svg";
 import requestsIcon from "../assets/dashboard/requests.svg";
 
-/* Los 3 accesos del dashboard de admin. Las estadísticas (dona + ganancias)
-   se movieron a su propia página, /admin/stats. */
 const DASHBOARD_CARDS = [
     { key: "stats", label: "Estadísticas", icon: statsIcon, path: "/admin/stats" },
     { key: "catalog", label: "Gestionar catálogo", icon: shopIcon, path: "/admin/products/new" },
@@ -20,13 +19,13 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-white pb-48">
+        <div className="min-h-screen bg-white flex flex-col">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
             </div>
 
-            <div className="md:max-w-5xl md:mx-auto p-5 md:px-12 md:py-8">
+            <div className="w-full flex-1 md:max-w-5xl md:mx-auto p-5 md:px-12 md:py-8">
                 <h1 className="font-poppins text-3xl md:text-4xl leading-tight font-bold text-primarioOscuro mb-1">
                     Dashboard de administrador
                 </h1>
@@ -47,6 +46,8 @@ export default function AdminDashboard() {
 
                 <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
             </div>
+
+            <Footer />
         </div>
     );
 }

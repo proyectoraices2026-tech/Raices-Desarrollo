@@ -1,10 +1,28 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import NavBar from "../components/NavBar";
+import BottomNav from "../components/BottomNav";
+import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 export default function TermsAndConditions() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { role } = useAuth();
+  /* Con sesión iniciada se ve la barra inferior fija (celular), igual que en "Sobre nosotros".
+     Sin sesión no hay barra inferior: max-md:-mb-[4.5rem] cancela el espacio que index.css le agrega
+     al final del body y que dejaría una franja blanca bajo el footer */
+  const hasBottomNav = !!role;
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className={`min-h-screen bg-white flex flex-col ${hasBottomNav ? "" : "max-md:-mb-[4.5rem]"}`}>
+      <div className="sticky top-0 z-40">
+        <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <BottomNav />
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-6">
       <div className="w-full max-w-2xl bg-white border border-[#e8efe4] rounded-2xl shadow-sm p-8 text-left relative">
 
         {/* Encabezado */}
@@ -53,6 +71,10 @@ export default function TermsAndConditions() {
         </div>
 
       </div>
+      </div>
+
+      <Footer reserveBottomNav={hasBottomNav} />
+      <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }

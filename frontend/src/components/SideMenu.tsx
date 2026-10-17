@@ -95,21 +95,6 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
             Mis pedidos
           </button>
 
-          <button
-            onClick={() => go("/about")}
-            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
-          >
-            Sobre nosotros / Contáctenos
-          </button>
-
-          {/* Opción de Términos y Condiciones */}
-          <button
-            onClick={() => go("/terms")}
-            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
-          >
-            Términos y Condiciones
-          </button>
-
           <hr className="my-3 border-[#e8efe4]" />
 
           <button

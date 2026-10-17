@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight, Plus, CheckCircle, Trash2, Edit3 } from "luc
 import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
 import ManualTaskModal from "../components/ManualTaskModal";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -160,13 +161,13 @@ export default function Calendar() {
   const selectedPlantObj = plants.find((p) => p.id === selectedPlantId);
 
   return (
-    <div className="min-h-screen bg-[#ffffff] pb-28">
+    <div className="min-h-screen bg-[#ffffff] flex flex-col">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
-      <main className="p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">
+      <main className="w-full flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">
       
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
@@ -478,6 +479,8 @@ export default function Calendar() {
 
         </div>
       </main>
+
+      <Footer />
 
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <ManualTaskModal
