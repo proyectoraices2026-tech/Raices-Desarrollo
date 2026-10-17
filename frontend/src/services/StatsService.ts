@@ -45,3 +45,24 @@ export function sumFinancialBuckets(buckets: FinancialBucket[]): FinancialTotals
         { sales: 0, costOfGoods: 0, investment: 0, netProfit: 0 }
     );
 }
+
+export interface TopSeller {
+    productId: string;
+    totalSold: number;
+}
+
+/* Productos más vendidos del período (pedidos aceptados), con las unidades vendidas.
+   Usa la misma función de la base de datos que la landing, pero con rango. */
+export async function getTopSellers(range: StatsRange, limit = 6): Promise<TopSeller[]> {
+    const { data, error } = await supabase.rpc("get_best_sellers", {
+        limit_count: limit,
+        p_range: range,
+    });
+
+    if (error) throw error;
+
+    return (data ?? []).map((row: { product_id: string; total_sold: number | string }) => ({
+        productId: row.product_id,
+        totalSold: Number(row.total_sold),
+    }));
+}
