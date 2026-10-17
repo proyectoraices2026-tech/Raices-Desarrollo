@@ -5,6 +5,7 @@ import EarningsChart from "../components/EarningChart";
 import FinancialSummaryCard from "../components/FinancialSummaryCard";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer"; 
 import { useFinancialSummary } from "../hooks/UseFinancialSummary";
 import { useTopSellers } from "../hooks/UseTopSellers";
 import { getAllProducts } from "../services/ProductService";
@@ -114,7 +115,7 @@ export default function AdminStats() {
         "absolute left-0 right-0 top-full mt-2 z-30 max-h-64 overflow-y-auto bg-verdePastel border border-primarioClaro rounded-2xl p-3 space-y-2 shadow-lg";
 
     return (
-        <div className="min-h-screen bg-white pb-48">
+        <div className="min-h-screen bg-white">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
@@ -288,8 +289,13 @@ export default function AdminStats() {
                 {/* Tarjeta "Ganancias": datos reales, responde al selector de período */}
                 <EarningsChart range={range} buckets={buckets} loading={summaryLoading} error={summaryError} />
 
+                
+
                 <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
             </div>
+            <Footer/>
+
         </div>
+        
     );
 }

@@ -182,7 +182,7 @@ export default function MyPlants() {
         {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
         {role === "admin" && (
           <button
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/admin/stats")}
             className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
           >
             Volver al Dashboard de admin

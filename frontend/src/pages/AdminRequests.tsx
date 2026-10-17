@@ -10,6 +10,7 @@ import { formatPrice } from "../utils/formatPrice";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
+import Footer from "../components/Footer";
 
 /* Nombre del cliente que hizo el pedido. Solo trae id y name, igual que en
    UpdateUser.tsx, para poder mostrar "quién pidió" en vez de solo el uuid. */
@@ -115,11 +116,11 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-white pb-48">
+        <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <BottomNav />
 
-            <main className="p-4 sm:p-6 max-w-2xl mx-auto">
+            <main className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
                 {loading && (
                     <p className="text-sm text-[#537a63] text-center py-10 animate-pulse">Cargando pedidos...</p>
                 )}
@@ -289,9 +290,10 @@ export default function AdminRequests() {
                     </div>
                 </div>
             )}
-
+            
             {/* Panel lateral, visible en toda la pantalla */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+                <Footer/>
         </div>
     );
 }

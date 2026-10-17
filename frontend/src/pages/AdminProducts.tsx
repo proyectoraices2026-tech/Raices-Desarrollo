@@ -9,6 +9,7 @@ import { useAlert } from "../context/AlertContext";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
+import Footer from "../components/Footer";
 
 interface Category {
     id: string;
@@ -130,7 +131,7 @@ export default function AdminProducts() {
     }, [totalPages, currentPage]);
 
     return (
-        <div className="min-h-screen bg-white pb-48">
+        <div className="min-h-screen bg-white">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
@@ -150,7 +151,7 @@ export default function AdminProducts() {
                                     bg-white border border-[#e8efe4] text-textoNegro
                                     hover:bg-fondoGlobal hover:border-[#d7e3d0]
                                     transition-all duration-300
-                                     lg:shadow-none"
+                                    lg:shadow-none"
                                 onClick={() => setRegisterOpen(true)}
                             >
                                 Añadir producto
@@ -180,33 +181,30 @@ export default function AdminProducts() {
                                     <button
                                         type="button"
                                         onClick={() => setStatusFilter("all")}
-                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${
-                                            statusFilter === "all"
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${statusFilter === "all"
                                                 ? "bg-[#4E705B] text-white "
                                                 : "bg-white text-[#2D4A3E] border border-[#e8efe4] hover:bg-slate-50"
-                                        }`}
+                                            }`}
                                     >
                                         Todas ({products.length})
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setStatusFilter("active")}
-                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${
-                                            statusFilter === "active"
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${statusFilter === "active"
                                                 ? "bg-[#4E705B] text-white "
                                                 : "bg-white text-[#2D4A3E] border border-[#e8efe4] hover:bg-slate-50"
-                                        }`}
+                                            }`}
                                     >
                                         Activas ({products.filter((p) => p.is_active).length})
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setStatusFilter("inactive")}
-                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${
-                                            statusFilter === "inactive"
+                                        className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition ${statusFilter === "inactive"
                                                 ? "bg-[#4E705B] text-white shadow-sm"
                                                 : "bg-white text-[#2D4A3E] border border-[#e8efe4] hover:bg-slate-50"
-                                        }`}
+                                            }`}
                                     >
                                         Desactivadas ({products.filter((p) => !p.is_active).length})
                                     </button>
@@ -225,9 +223,8 @@ export default function AdminProducts() {
                                         {paginatedProducts.map((product) => (
                                             <div
                                                 key={product.id}
-                                                className={`bg-white border border-[#e8efe4] rounded-2xl p-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-sm ${
-                                                    !product.is_active ? "opacity-60" : ""
-                                                }`}
+                                                className={`bg-white border border-[#e8efe4] rounded-2xl p-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-sm ${!product.is_active ? "opacity-60" : ""
+                                                    }`}
                                             >
                                                 <div className="w-full h-40 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
                                                     {product.image_url ? (
@@ -270,17 +267,16 @@ export default function AdminProducts() {
                                                     <button
                                                         onClick={() => handleToggleActive(product)}
                                                         disabled={togglingId === product.id}
-                                                        className={`px-3 py-2 rounded-full text-xs font-semibold flex-shrink-0 transition disabled:opacity-50 ${
-                                                            product.is_active
+                                                        className={`px-3 py-2 rounded-full text-xs font-semibold flex-shrink-0 transition disabled:opacity-50 ${product.is_active
                                                                 ? "bg-red-50 text-red-600 hover:bg-red-100"
                                                                 : "bg-[#e3f3e9] text-[#3E5C4A] hover:bg-[#d4ecdd]"
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {togglingId === product.id
                                                             ? "..."
                                                             : product.is_active
-                                                            ? "Desactivar"
-                                                            : "Reactivar"}
+                                                                ? "Desactivar"
+                                                                : "Reactivar"}
                                                     </button>
                                                 </div>
                                             </div>
@@ -309,11 +305,10 @@ export default function AdminProducts() {
                                                                 key={page}
                                                                 type="button"
                                                                 onClick={() => setCurrentPage(page)}
-                                                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition ${
-                                                                    isCurrent
+                                                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition ${isCurrent
                                                                         ? "bg-[#4E705B] text-white"
                                                                         : "bg-white text-[#2D4A3E] hover:bg-slate-50"
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 {page}
                                                             </button>
@@ -388,6 +383,7 @@ export default function AdminProducts() {
                 />
             )}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+            <Footer />
         </div>
     );
 }
