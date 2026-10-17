@@ -17,6 +17,12 @@ html, body {
   html {
     zoom: 90%;
   }
+
+  /* Con zoom 90%, "min-h-screen" (100vh) se queda un 10% más corto que la pantalla y deja una franja
+     blanca debajo del footer en las páginas cortas. 100 / 0.9 = 111.12vh compensa el zoom. */
+  .min-h-screen {
+    min-height: 111.12vh;
+  }
 }
 
 @media (max-width: 767px) {

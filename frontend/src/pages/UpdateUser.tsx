@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { logAuthError } from "../lib/logger";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
 import BottomNav from "../components/BottomNav";
 
 /* Página privada para editar el nombre, correo, teléfono y dirección del usuario actual */
@@ -93,7 +94,7 @@ export default function UpdateUser() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col relative pb-28 ">
+        <div className="min-h-screen bg-white flex flex-col relative">
             <div className="sticky top-0 z-40">
                 <NavBar
                     onMenuClick={() => setMenuOpen(true)}
@@ -219,6 +220,8 @@ export default function UpdateUser() {
             </div>
 
             <div className="h-6"></div>
+
+            <Footer />
         </div>
     );
 }

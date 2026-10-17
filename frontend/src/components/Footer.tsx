@@ -2,13 +2,12 @@ import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 import iconoRaices from "../assets/iconoraicesblanco.png";
 
-/* Datos de contacto */
 const CONTACT_EMAIL = "proyectoraices2026@gmail.com";
 const CONTACT_PHONE_DISPLAY = "+506 0000-0000";
 const CONTACT_PHONE_HREF = "+50600000000";
 const INSTAGRAM_URL = "https://www.instagram.com/raices_palmares?stkn=MTNoZjh4Mzg0OWxueg%3D%3D&utm_source=qr";
 const INSTAGRAM_HANDLE = "@raices_palmares";
-const LOCATION = "Palmares, Alajuela, Costa Rica.";
+const LOCATION_TEXT = "Palmares, Alajuela, Costa Rica";
 const START_YEAR = 2026;
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -35,7 +34,10 @@ const headingClass = "font-poppins text-base font-bold text-white mb-4";
 const linkClass =
   "inline-flex items-center gap-2 text-sm text-emerald-100 hover:text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded transition-colors";
 
-export default function Footer() {
+/* reserveBottomNav: en celular las páginas con barra de navegación inferior fija necesitan
+   espacio extra al final para que la barra no tape el contenido. Páginas sin esa barra
+   (como Términos y condiciones) lo desactivan */
+export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?: boolean }) {
   const currentYear = new Date().getFullYear();
   const lastYear = Math.max(currentYear, START_YEAR);
   const years = lastYear === START_YEAR ? `${START_YEAR}` : `${START_YEAR}-${lastYear}`;
@@ -102,14 +104,14 @@ export default function Footer() {
           <h2 id="footer-location" className={headingClass}>Ubicación</h2>
           <p className="flex items-start gap-2 text-sm text-emerald-100">
             <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
-            {LOCATION}
+            {LOCATION_TEXT}.
           </p>
         </section>
       </div>
 
             {/* Derechos de autor */}
       <div className="border-t border-white/15">
-        <p className="max-w-5xl mx-auto px-6 pt-5 pb-24 md:pb-5 text-center text-xs text-verdePastel">
+        <p className={`max-w-5xl mx-auto px-6 pt-5 ${reserveBottomNav ? "pb-24" : "pb-5"} md:pb-5 text-center text-xs text-verdePastel`}>
           © {years} Raíces Team. Todos los derechos reservados.
         </p>
       </div>

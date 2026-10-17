@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { addDays, format, isTomorrow } from "date-fns";
 import { es } from "date-fns/locale";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 import { getPlantTasksInRange, toggleTaskCompletion, type PlantTask } from "../services/PlantTasksService";
@@ -171,13 +172,13 @@ export default function MyPlants() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-white pb-28">
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
-      <div className="md:max-w-5xl md:mx-auto">
+      <div className="w-full flex-1 md:max-w-5xl md:mx-auto">
         {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
         {role === "admin" && (
           <button
@@ -344,6 +345,8 @@ export default function MyPlants() {
           onTaskClick={(task) => openTaskAction(task, proximaSubtitle(task))}
         />
       </div>
+
+      <Footer />
     </div>
   );
 }
