@@ -35,7 +35,7 @@ export default function Login() {
 
         const roleName = (profile?.roles as unknown as { name: string })?.name;
 
-        navigate(roleName === "admin" ? "/admin" : "/my-plants");
+        navigate(roleName === "admin" ? "/admin/stats" : "/my-plants");
     };
 
     return (
