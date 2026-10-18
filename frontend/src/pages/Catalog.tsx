@@ -10,6 +10,19 @@ import BestSellers from "../components/BestSellers";
 import "swiper/css";
 import "swiper/css/pagination";
 
+const BANNERS = [
+    { src: "/Banner 1.png", position: "object-center" },
+    { src: "/Banner 2.png", position: "object-center" },
+    { src: "/Banner 3.png", position: "object-center" },
+    { src: "/Banner 4.png", position: "object-left" },
+    { src: "/Banner 5.png", position: "object-left" },
+    { src: "/Banner 6.png", position: "object-[75%_center]" },
+    { src: "/Banner 7.png", position: "object-right" },
+    { src: "/Banner 8.png", position: "object-[75%_center]" },
+    { src: "/Banner 9.png", position: "object-right" },
+    { src: "/Banner 10.png", position: "object-center" },
+];
+
 /* Página privada que muestra el catálogo y las acciones disponibles para el rol */
 export default function Catalog() {
 
@@ -34,16 +47,15 @@ export default function Catalog() {
                 pagination={{ clickable: true }}
                 loop
             >
-                <SwiperSlide><img src="/Banner 1.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 2.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 3.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 4.png" alt="" className="block w-full aspect-[1506/275] object-cover object-left min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 5.png" alt="" className="block w-full aspect-[1506/275] object-cover object-left min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 6.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 7.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 8.png" alt="" className="block w-full aspect-[1506/275] object-cover object-right min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 9.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
-                <SwiperSlide><img src="/Banner 10.png" alt="" className="block w-full aspect-[1506/275] object-cover min-h-24"/></SwiperSlide>
+                {BANNERS.map((banner) => (
+                    <SwiperSlide key={banner.src}>
+                        <img
+                            src={banner.src}
+                            alt=""
+                            className={`block w-full h-36 sm:h-44 md:h-auto md:aspect-[1506/275] object-cover ${banner.position}`}
+                        />
+                    </SwiperSlide>
+                ))}
             </Swiper>
 
             <BestSellers />
