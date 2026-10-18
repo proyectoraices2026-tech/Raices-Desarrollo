@@ -10,6 +10,7 @@ import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 interface Category {
     id: string;
@@ -38,6 +39,11 @@ export default function AdminProducts() {
     /* Filtros */
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+
+     /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const loadProducts = () => {
         getAllProducts()
@@ -137,7 +143,7 @@ export default function AdminProducts() {
                 <BottomNav />
             </div>
 
-            <main className="p-4 sm:p-6 max-w-6xl mx-auto">
+            <main id="first" className="p-4 sm:p-6 max-w-6xl mx-auto">
                 {loading ? (
                     <p className="text-sm text-[#537a63] text-center py-10">Cargando...</p>
                 ) : (
@@ -383,6 +389,8 @@ export default function AdminProducts() {
                 />
             )}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+            <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
             <Footer />
         </div>
     );

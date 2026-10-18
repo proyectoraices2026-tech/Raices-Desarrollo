@@ -8,6 +8,9 @@ import { formatPrice } from "../utils/formatPrice";
 import { useAuth } from "../context/AuthContext";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, subtotal, totalItems, clearCart } = useCart();
@@ -25,6 +28,11 @@ export default function Cart() {
     showAlert({ title: "Carrito vacío", message: "Se quitaron todos los productos.", variant: "success" });
   };
 
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
+
   const handleClose = () => navigate("/");
 
   const handleConfirm = async () => {
@@ -38,6 +46,9 @@ export default function Cart() {
       await createOrderRequest(
         items.map((item) => ({ productId: item.id, quantity: item.quantity }))
       );
+
+    
+
 
       showAlert({
         title: "Tu pedido ha sido solicitado",
@@ -64,7 +75,7 @@ export default function Cart() {
         <NavBar onMenuClick={() => setMenuOpen(true)} />
       </div>
 
-      <div className="bg-white border-b border-[#e8efe4] px-5 py-4">
+      <div id="first" className="bg-white border-b border-[#e8efe4] px-5 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-bold text-[#1e2d24]">Lista de pedidos</h1>
@@ -167,17 +178,22 @@ export default function Cart() {
               <p className="text-xl text-[#1e2d24]">₡{formatPrice(subtotal)}</p>
             </div>
 
-            <button
+          
+              <button
               onClick={handleConfirm}
               disabled={submitting}
               className="w-full h-12 rounded-2xl bg-primarioBase text-white font-semibold text-sm shadow-md hover:opacity-90 transition disabled:opacity-60"
             >
               {submitting ? "Enviando..." : "Confirmar pedido"}
             </button>
+          
+            
           </div>
         </>
       )}
 
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
+      <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );

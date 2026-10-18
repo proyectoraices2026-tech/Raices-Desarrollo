@@ -5,6 +5,7 @@ import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
 import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 const CONTACT_EMAIL = "proyectoraices2026@gmail.com";
 const CONTACT_PHONE_DISPLAY = "+506 0000-0000";
@@ -27,6 +28,11 @@ export default function AboutUs() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="sticky top-0 z-40">
@@ -34,7 +40,7 @@ export default function AboutUs() {
         <BottomNav />
       </div>
 
-      <main className="w-full flex-1 max-w-[1680px] mx-auto px-5 py-6 md:px-12 md:py-12 xl:px-[120px] flex flex-col gap-8 md:gap-10">
+      <main id="first" className="w-full flex-1 max-w-[1680px] mx-auto px-5 py-6 md:px-12 md:py-12 xl:px-[120px] flex flex-col gap-8 md:gap-10">
         <div className="flex items-center gap-4 md:gap-6">
           <button
             type="button"
@@ -118,6 +124,7 @@ export default function AboutUs() {
         </div>
       </main>
 
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
       <Footer />
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>

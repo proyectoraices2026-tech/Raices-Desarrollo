@@ -10,6 +10,8 @@ import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { formatPrice } from "../utils/formatPrice";
 import { useAlert } from "../context/AlertContext"
+import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 /* Traduce el estado que guarda el backend a algo que un usuario entienda,
    y a un color de acuerdo a si sigue pendiente, se aceptó o se rechazó */
@@ -36,6 +38,11 @@ export default function MyRequests() {
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
   const { showAlert } = useAlert();
 
@@ -75,13 +82,13 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white pb-28">
+    <div className="min-h-screen bg-white">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
-      <div className="md:max-w-3xl md:mx-auto px-5 py-6 md:px-0">
+      <div id="first" className="md:max-w-3xl md:mx-auto px-5 py-6 md:px-0">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 mb-2 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
@@ -169,7 +176,9 @@ export default function MyRequests() {
           ))}
         </div>
       </div>
-
+      
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
+      <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );

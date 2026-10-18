@@ -3,9 +3,10 @@ import { useState } from "react";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
-import Footer from "../components/Footer"; 
+import Footer from "../components/Footer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 import BestSellers from "../components/BestSellers";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -29,6 +30,11 @@ export default function Catalog() {
     /* Controla si el panel lateral (menú) está abierto o cerrado */
     const [menuOpen, setMenuOpen] = useState(false);
 
+    /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
+
     return (
         <div className="min-h-screen bg-white flex flex-col">
 
@@ -41,6 +47,7 @@ export default function Catalog() {
 
             {/* w-full + min-w-0: dentro de un contenedor flex, Swiper sin esto calcula un ancho gigante */}
             <Swiper
+                id="first"
                 className="w-full min-w-0"
                 modules={[Autoplay, Pagination]}
                 autoplay={{ delay: 4000 }}
@@ -64,6 +71,8 @@ export default function Catalog() {
             <main id="catalogo" className="p-4 sm:p-6 flex-1 scroll-mt-20">
                 <ProductList />
             </main>
+
+            <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
 
             {/* Footer con información, contacto y ubicación */}
             <Footer />

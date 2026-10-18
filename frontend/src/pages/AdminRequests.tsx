@@ -11,6 +11,7 @@ import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 /* Nombre del cliente que hizo el pedido. Solo trae id y name, igual que en
    UpdateUser.tsx, para poder mostrar "quién pidió" en vez de solo el uuid. */
@@ -40,6 +41,11 @@ export default function AdminRequests() {
 
     const [acceptingId, setAcceptingId] = useState<string | null>(null);
     const [acceptMessage, setAcceptMessage] = useState("");
+
+    /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const loadPendingRequests = () => {
         setLoading(true);
@@ -120,7 +126,7 @@ export default function AdminRequests() {
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <BottomNav />
 
-            <main className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
+            <main id="first" className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
                 {loading && (
                     <p className="text-sm text-[#537a63] text-center py-10 animate-pulse">Cargando pedidos...</p>
                 )}
@@ -293,6 +299,8 @@ export default function AdminRequests() {
             
             {/* Panel lateral, visible en toda la pantalla */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+                <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
                 <Footer/>
         </div>
     );

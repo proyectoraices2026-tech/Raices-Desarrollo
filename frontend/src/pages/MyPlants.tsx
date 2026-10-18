@@ -1,7 +1,7 @@
 import BottomNav from "../components/BottomNav";
 import NavBar from "../components/NavBar";
 import RegisterPlantModal from "../components/RegisterPlantModal";
-import { useNavigate } from "react-router-dom";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 import { useEffect, useMemo, useState } from "react";
 import { addDays, format, isTomorrow } from "date-fns";
@@ -28,7 +28,7 @@ const FAR_PAST_DATE = "2000-01-01";
 export default function MyPlants() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
-  const { user, role } = useAuth();
+  const { user } = useAuth();
 
   const [plants, setPlants] = useState<UserPlant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,8 +47,11 @@ export default function MyPlants() {
   const [actionPopupOpen, setActionPopupOpen] = useState(false);
   const [actionSubtitle, setActionSubtitle] = useState("");
   const [completingTask, setCompletingTask] = useState(false);
-
-  const navigate = useNavigate();
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
+  
 
   /* "Hoy" y "en una semana" se calculan una sola vez al montar la página */
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
@@ -178,16 +181,7 @@ export default function MyPlants() {
         <BottomNav />
       </div>
 
-      <div className="w-full flex-1 md:max-w-5xl md:mx-auto">
-        {/* Solo visible para administradores: revisar y aprobar/rechazar pedidos */}
-        {role === "admin" && (
-          <button
-            onClick={() => navigate("/admin/stats")}
-            className="text-left px-3 py-3 rounded-xl hover:bg-primarioClaro text-[#1e2d24] text-sm font-medium bg-primarioOscuro text-white mt-8 m-4"
-          >
-            Volver al Dashboard de admin
-          </button>
-        )}
+      <div id="first" className="w-full flex-1 md:max-w-5xl md:mx-auto">
         <div className="p-5 md:px-12 md:py-8">
           {/* Secciones "Hoy" y "Actividades próximas", con datos reales */}
           {sections.map((section) => (
@@ -345,6 +339,8 @@ export default function MyPlants() {
           onTaskClick={(task) => openTaskAction(task, proximaSubtitle(task))}
         />
       </div>
+
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
 
       <Footer />
     </div>
