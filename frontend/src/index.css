@@ -31,7 +31,18 @@ html, body {
   }
 }
 
-/* Cambia el color de la bolita activa del carrusel Swiper al verde institucional */
-.swiper-pagination-bullet-active {
-  background-color: #4a6b53 !important;
+/* Bolitas del carrusel Swiper: borde blanco + aro oscuro fino para que se vean sobre cualquier imagen */
+.swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  opacity: 1; /* Swiper las trae al 20% de opacidad, por eso se pierden sobre las imágenes */
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* La activa mantiene el verde institucional y se ve un poco más grande */
+.swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #4a6b53;
+  transform: scale(1.3);
 }
