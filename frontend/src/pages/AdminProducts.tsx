@@ -11,6 +11,7 @@ import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+import { Plus } from "lucide-react";
 
 interface Category {
     id: string;
@@ -147,20 +148,22 @@ export default function AdminProducts() {
                 {loading ? (
                     <p className="text-sm text-[#537a63] text-center py-10">Cargando...</p>
                 ) : (
-                    <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
+                    <div className="gap-6 lg:flex-row lg:gap-10">
                         {/* Botón añadir producto */}
-                        <div className="w-full lg:w-auto">
+                        <div className="w-full lg:w-auto pb-6">
                             <button
                                 className="
                                     w-full sm:w-auto
-                                    btn btn-Secondary btn-sm md:btn-md
-                                    bg-white border border-[#e8efe4] text-textoNegro
-                                    hover:bg-fondoGlobal hover:border-[#d7e3d0]
+                                    btn btn-Secondary btn-sm md:btn-md font-bold min-h-12
+                                    bg-primarioBase border border-[#e8efe4] text-white
+                                    hover:bg-fondoGlobal hover:border-[#d7e3d0] hover:text-black
                                     transition-all duration-300
                                     lg:shadow-none"
                                 onClick={() => setRegisterOpen(true)}
                             >
                                 Añadir producto
+
+                                <Plus className="w-7 h-7"></Plus>
                             </button>
                         </div>
 

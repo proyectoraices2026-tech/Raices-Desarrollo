@@ -63,16 +63,17 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-sm md:max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8 relative md:flex md:gap-8"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-sm md:max-w-2xl max-h-[90vh] overflow-y-auto p-6 pt-16 md:p-8 md:pt-8 relative md:flex md:gap-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 z-10"
+          className="absolute top-3 right-3 md:top-5 md:right-5 text-slate-600 hover:text-slate-400 z-10 p-2"
           aria-label="Cerrar ficha del producto"
         >
-          <X className="w-5 h-5" />
+          <X className="w-8 h-8" />
         </button>
+
 
         {/* Imagen */}
         {/* Foto completa (object-contain) sobre fondo blanco: nunca se recorta.
