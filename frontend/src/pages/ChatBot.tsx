@@ -6,6 +6,7 @@ import { SendHorizonal, BotMessageSquare, RefreshCcw } from "lucide-react";
 import { sendMessageToRut,  } from "../services/ChatService"; 
 import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 
 
@@ -13,6 +14,11 @@ export default function Chatbot() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
   // Mensaje inicial , se podria cambiar 
   const [messages, setMessages] = useState<Message[]>([
@@ -66,7 +72,7 @@ export default function Chatbot() {
       <BottomNav />
 
       {/* Contenedor principal centrado, máximo ancho 4xl para escritorio */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col mb-20 md:mb-6 mt-16 md:mt-24">
+      <main id="first" className="flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col mb-20 md:mb-6 mt-16 md:mt-24">
         
         {/* Tarjeta del Chat - Estilo contenedor del diseño */}
         <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-1 flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner">
@@ -173,6 +179,7 @@ export default function Chatbot() {
 
         </div>
       </main>
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
       <Footer />
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
