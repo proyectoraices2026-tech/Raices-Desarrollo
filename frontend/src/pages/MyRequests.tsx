@@ -4,7 +4,7 @@ import { ArrowLeft, Package } from "lucide-react";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
-import { getMyRequests, archiveRequest } from "../services/RequestService";
+import { getMyRequests, archiveRequest, archiveAllRequests } from "../services/RequestService";
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
@@ -40,9 +40,9 @@ export default function MyRequests() {
   const [error, setError] = useState<string | null>(null);
 
   /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
-    const handleScrollUp = () => {
-        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
-    };
+  const handleScrollUp = () => {
+    document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const { showAlert } = useAlert();
 
@@ -65,6 +65,24 @@ export default function MyRequests() {
     } catch (err) {
       showAlert({
         title: "No se pudo eliminar el pedido",
+        variant: "error",
+        message: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
+      });
+    }
+  };
+
+  const hasArchivable = requests.some(
+    (request) => request.status === "accepted" || request.status === "rejected"
+  );
+
+  const handleArchiveAll = async () => {
+    try {
+      await archiveAllRequests();
+      // recargar la lista, mismo patrón que loadPendingRequests
+      loadMyRequests();
+    } catch (err) {
+      showAlert({
+        title: "No se pudieron eliminar los pedido",
         variant: "error",
         message: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
       });
@@ -97,7 +115,18 @@ export default function MyRequests() {
           <ArrowLeft className="w-6 h-6" aria-hidden="true" />
         </button>
 
-        <h1 className="font-poppins text-2xl font-bold text-[#1e2d24] mb-5">Mis pedidos</h1>
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <h1 className="text-2xl font-bold">Mis pedidos</h1>
+
+          {hasArchivable && (
+            <button
+              onClick={() => handleArchiveAll()}
+              className="btn bg-red-800 text-xs font-semibold text-white hover:bg-red-400 hover:text-black"
+            >
+              Ocultar todos
+            </button>
+          )}
+        </div>
 
         {loading && (
           <p className="text-sm text-[#537a63] animate-pulse">Cargando tus pedidos...</p>
@@ -116,6 +145,7 @@ export default function MyRequests() {
             <p className="text-xs text-[#537a63] max-w-xs">
               Los pedidos que hagas desde el carrito van a aparecer aquí, junto con su estado.
             </p>
+
           </div>
         )}
 
@@ -125,12 +155,12 @@ export default function MyRequests() {
               {(request.status === "accepted" || request.status === "rejected") && (
                 <button
                   onClick={() => handleArchive(request.id)}
-                  className="text-xs font-semibold text-red-600 hover:underline"
+                  className="btn bg-red-800 text-xs font-semibold text-white hover:bg-red-400 hover:text-black"
                 >
                   Ocultar pedido
                 </button>
               )}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 mt-3">
                 <p className="text-xs text-[#537a63]">
                   {new Date(request.createdAt).toLocaleDateString("es-CR", {
                     day: "numeric",
@@ -176,7 +206,7 @@ export default function MyRequests() {
           ))}
         </div>
       </div>
-      
+
       <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
       <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />

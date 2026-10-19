@@ -160,5 +160,16 @@ export async function archiveRequest(id: string): Promise<OrderRequest> {
     return parseResponse<OrderRequest>(res);
 }
 
+export async function archiveAllRequests(): Promise<OrderRequest> {
+    const headers = await getAuthHeader();
+
+    const res = await fetch(`${API_URL}/api/requests/archive-all`, {
+        method: "PATCH",
+        headers,
+    });
+
+    return parseResponse<OrderRequest>(res);
+}
+
 
 
