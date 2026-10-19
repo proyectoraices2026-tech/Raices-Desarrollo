@@ -27,6 +27,7 @@ import {
 } from "../services/PlantTasksService";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 import { getPlantIconUrl } from "../constants/plantIcons";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 const TASK_TYPE_LABELS: Record<string, string> = {
   watering: "Regar",
@@ -61,6 +62,11 @@ export default function Calendar() {
 
   const pendingTaskIdsRef = useRef<Set<string>>(new Set());
   const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(new Set());
+
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
   // Cargar plantas del usuario
   useEffect(() => {
@@ -167,7 +173,7 @@ export default function Calendar() {
         <BottomNav />
       </div>
 
-      <main className="w-full flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">
+      <main id="first" className="w-full flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto">
       
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
@@ -480,6 +486,7 @@ export default function Calendar() {
         </div>
       </main>
 
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
       <Footer />
 
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />

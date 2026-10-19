@@ -11,6 +11,7 @@ import { useTopSellers } from "../hooks/UseTopSellers";
 import { getAllProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import type { StatsRange } from "../services/StatsService";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 const CHART_COLORS = ["#645244", "#537a63", "#c4a557", "#1c2b18", "#5a7a54", "#929487"];
 
@@ -37,6 +38,11 @@ export default function AdminStats() {
 
     const { buckets, loading: summaryLoading, error: summaryError } = useFinancialSummary(range);
     const { sellers, loading: sellersLoading, error: sellersError } = useTopSellers(range, TOP_SELLERS_LIMIT);
+
+    /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
     useEffect(() => {
         getAllProducts()
@@ -121,7 +127,7 @@ export default function AdminStats() {
                 <BottomNav />
             </div>
 
-            <div className="md:max-w-5xl md:mx-auto p-5 md:px-12 md:py-8">
+            <div id="first" className="md:max-w-5xl md:mx-auto p-5 md:px-12 md:py-8">
                 <h1 className="font-poppins text-3xl md:text-4xl leading-tight font-bold text-primarioOscuro mb-1">
                     Estadísticas
                 </h1>
@@ -293,6 +299,8 @@ export default function AdminStats() {
 
                 <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
             </div>
+
+            <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
             <Footer/>
 
         </div>

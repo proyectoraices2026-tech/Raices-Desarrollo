@@ -4,6 +4,7 @@ import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
 import { SendHorizonal, BotMessageSquare, RefreshCcw } from "lucide-react";
 import { sendMessageToRut,  } from "../services/ChatService"; 
+import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
 
 

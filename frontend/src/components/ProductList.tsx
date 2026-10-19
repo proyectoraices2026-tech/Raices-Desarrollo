@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
@@ -136,6 +136,38 @@ export function ProductList() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
+  /* Flechas del selector de categorías: solo se muestran si hay más categorías por ver a ese lado */
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateChipsArrows = useCallback(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  /* Los chips solo existen cuando ya cargaron los productos, por eso loading y error están en las dependencias */
+  useEffect(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+
+    updateChipsArrows();
+    el.addEventListener("scroll", updateChipsArrows, { passive: true });
+    const observer = new ResizeObserver(updateChipsArrows);
+    observer.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", updateChipsArrows);
+      observer.disconnect();
+    };
+  }, [loading, error, updateChipsArrows]);
+
+  const scrollChips = (direction: "left" | "right") => {
+    chipsRef.current?.scrollBy({ left: direction === "left" ? -180 : 180, behavior: "smooth" });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -171,28 +203,59 @@ export function ProductList() {
         <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Chips de Categorías */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center">
-        {DEFAULT_CATEGORIES.map((cat) => {
-          const isActive = selectedCategory === cat;
-          return (
+       {/* Chips de Categorías: con flechas y degradado cuando hay más categorías por ver */}
+      <div className="relative">
+        <div
+          ref={chipsRef}
+          className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center"
+        >
+          {DEFAULT_CATEGORIES.map((cat) => {
+            const isActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
+                  isActive
+                    ? "bg-[#4E705B] text-white "
+                    : "bg-white text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {canScrollLeft && (
+          <div className="absolute left-0 top-0 bottom-1 flex items-center pr-6 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none">
             <button
-              key={cat}
               type="button"
-              onClick={() => {
-                setSelectedCategory(cat);
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
-                isActive
-                  ? "bg-[#4E705B] text-white "
-                  : "bg-white text-slate-600 hover:bg-slate-100"
-              }`}
+              onClick={() => scrollChips("left")}
+              aria-label="Ver categorías anteriores"
+              className="pointer-events-auto w-7 h-7 rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow-sm flex items-center justify-center"
             >
-              {cat}
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          );
-        })}
+          </div>
+        )}
+
+        {canScrollRight && (
+          <div className="absolute right-0 top-0 bottom-1 flex items-center pl-6 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none">
+            <button
+              type="button"
+              onClick={() => scrollChips("right")}
+              aria-label="Ver más categorías"
+              className="pointer-events-auto w-7 h-7 rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow-sm flex items-center justify-center"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Contador de Productos */}
