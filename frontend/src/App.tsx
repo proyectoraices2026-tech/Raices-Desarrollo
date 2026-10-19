@@ -22,6 +22,7 @@ import MyRequests from './pages/MyRequests';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Calendar from './pages/Calendar';
 import Chatbot from './pages/ChatBot';
+import ScrollToTop from './components/ScrollToTop';
 
 /* 
     Rutas privadas
@@ -90,7 +91,9 @@ function App() {
 
   return (
     <BrowserRouter>
-      {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
+      
+      <ScrollToTop></ScrollToTop>
+        {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Catalog />} />
         <Route path="/login" element={<Login />} />

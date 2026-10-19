@@ -82,13 +82,13 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
-      <div id="first" className="md:max-w-3xl md:mx-auto px-5 py-6 md:px-0">
+      <div id="first" className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 mb-2 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
