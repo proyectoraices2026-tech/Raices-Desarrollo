@@ -32,7 +32,7 @@ export function useNavTabs() {
         ),
         ...(role === "admin"
             ? [{ key: "products", label: "Gestión productos", icon: calendarIcon, path: "/admin/products/new" }]
-            : [{ key: "chatbot", label: "Chatbot", icon: chatIcon, path: null }]
+            : [{ key: "chatbot", label: "Chatbot", icon: chatIcon, path: "/chatbot" }]
         )
     ];
 

@@ -21,6 +21,7 @@ import Cart from './pages/Cart';
 import MyRequests from './pages/MyRequests';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Calendar from './pages/Calendar';
+import Chatbot from './pages/ChatBot';
 
 /* 
     Rutas privadas
@@ -127,6 +128,11 @@ function App() {
           </PrivateRoute>
         } />
 
+        <Route path="/chatbot" element={
+          <PrivateRoute>
+            <Chatbot/>
+          </PrivateRoute>
+        } />
         <Route path="/admin" element={
           <AdminRoute>
             <AdminDashboard />
