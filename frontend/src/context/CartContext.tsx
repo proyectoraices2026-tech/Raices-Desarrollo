@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
+import { getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 
 export interface CartItem {
@@ -9,14 +10,16 @@ export interface CartItem {
   image_url: string | null;
   category: string;
   quantity: number;
-  /* Stock  al momento de agregarlo, para no dejar subir la cantidad en el
-     carrito más allá de lo que realmente hay */
+  /* Unidades disponibles (stock menos lo apartado por pedidos pendientes) al momento de
+     agregarlo, para no dejar subir la cantidad en el carrito más allá de lo que se puede pedir */
   stock: number;
 }
 
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product, quantity?: number) => void;
+  /* Cuántas unidades de un producto ya hay en el carrito (0 si no está) */
+  getQuantityInCart: (id: string) => number;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -30,14 +33,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
+    const available = getAvailableStock(product);
+    if (available <= 0) return;
+
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id);
       if (existing) {
-        /* Nunca deja que la suma pase del stock real, aunque ya hubiera algo en el carrito
+        /* Nunca deja que la suma pase de lo disponible, aunque ya hubiera algo en el carrito
            de una visita anterior a la ficha del producto */
         return prev.map((i) =>
           i.id === product.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock), stock: product.stock }
+            ? { ...i, quantity: Math.min(i.quantity + quantity, available), stock: available }
             : i
         );
       }
@@ -49,12 +55,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           price: product.price,
           image_url: product.image_url,
           category: product.categories?.name || "Plantas",
-          quantity: Math.min(quantity, product.stock),
-          stock: product.stock,
+          quantity: Math.min(quantity, available),
+          stock: available,
         },
       ];
     });
   };
+
+  const getQuantityInCart = (id: string) => items.find((i) => i.id === id)?.quantity ?? 0;
 
   const removeFromCart = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
@@ -78,7 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, subtotal }}
+      value={{ items, addToCart, getQuantityInCart, removeFromCart, updateQuantity, clearCart, totalItems, subtotal }}
     >
       {children}
     </CartContext.Provider>

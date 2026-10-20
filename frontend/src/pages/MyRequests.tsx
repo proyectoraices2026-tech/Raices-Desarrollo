@@ -11,6 +11,7 @@ import type { Product } from "../services/ProductService";
 import { formatPrice } from "../utils/formatPrice";
 import { useAlert } from "../context/AlertContext"
 import Footer from "../components/Footer";
+import PickupLocationMap from "../components/PickupLocationMap";
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 /* Traduce el estado que guarda el backend a algo que un usuario entienda,
@@ -106,7 +107,13 @@ export default function MyRequests() {
         <BottomNav />
       </div>
 
-      <div id="first" className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
+      {/* Escritorio: dos columnas del mismo ancho (pedidos a la izquierda, mapa a la derecha) centradas
+          en la pantalla. Celular: una sola columna, con el mapa después de los pedidos. */}
+      <div
+        id="first"
+        className="w-full flex-1 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8 items-start"
+      >
+      <div className="p-4 sm:p-6 w-full max-w-2xl mx-auto lg:mx-0 lg:max-w-none">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 mb-2 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
@@ -207,10 +214,14 @@ export default function MyRequests() {
         </div>
       </div>
 
+      <div className="p-4 sm:p-6 w-full max-w-2xl mx-auto lg:mx-0 lg:max-w-none lg:pt-[8.5rem]">
+        <PickupLocationMap />
+      </div>
+      </div>
+
       <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
       <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }
-
