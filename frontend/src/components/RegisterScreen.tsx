@@ -84,9 +84,16 @@ export function RegisterScreen({
         Registrar
       </h1>
 
-      <div className="flex justify-center">
-        <button className="text-s font-semibold text-[#2D4A3E] hover:underline pb-4" onClick={handleGoToLogin}>¿Ya tienes una cuenta? Inicia sesión</button>
-      </div>
+      <div className="flex justify-center pb-4 text-sm font-medium text-gray-600">
+          <span>¿Ya tienes una cuenta?&nbsp;</span>
+          <button 
+            type="button" 
+            className="font-semibold text-[#2D4A3E] hover:underline" 
+            onClick={handleGoToLogin}
+          >
+            Inicia sesión
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
