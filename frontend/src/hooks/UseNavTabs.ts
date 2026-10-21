@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import calendarIcon from "../assets/iconsPhone/calendar.svg";
 import plantsIcon from "../assets/iconsPhone/seedling.svg";
 import catalogIcon from "../assets/iconsPhone/cart.svg";
-import chatIcon from "../assets/iconsPhone/robot.svg";
 import ordersIcon from "../assets/iconsPhone/cart.svg";
 
 export interface NavTab  {
