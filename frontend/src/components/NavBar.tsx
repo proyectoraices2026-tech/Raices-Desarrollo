@@ -1,4 +1,4 @@
-import { ShoppingCart, ArrowLeft } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type ReactNode } from "react";
 import logoIcon from "../assets/iconoraicesblanco.png";
@@ -97,6 +97,18 @@ export default function NavBar({
             )}
           </button>
         )}
+             {/* Chatbot */}
+              {user && (
+                <button
+                  onClick={() => navigate("/chatbot")}
+                  className="p-1 text-white hover:text-white/80 transition"
+                  title="Chatbot"
+                  aria-label="Abrir Chatbot"
+                >
+                  <Bot className="w-6 h-6" aria-hidden="true" />
+                </button>
+              )}
+          {/* Hambuguesa*/}
         {user && <>
           <button
             onClick={onMenuClick}

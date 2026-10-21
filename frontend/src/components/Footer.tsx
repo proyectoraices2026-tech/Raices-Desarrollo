@@ -3,9 +3,11 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import iconoRaices from "../assets/iconoraicesblanco.png";
 
 const CONTACT_EMAIL = "proyectoraices2026@gmail.com";
-const CONTACT_PHONE_DISPLAY = "+506 0000-0000";
-const CONTACT_PHONE_HREF = "+50600000000";
+const CONTACT_PHONE_DISPLAY = "+506 8661-3636";
+const CONTACT_PHONE_HREF = "https://wa.me/50686613636";
 const INSTAGRAM_URL = "https://www.instagram.com/raices_palmares?stkn=MTNoZjh4Mzg0OWxueg%3D%3D&utm_source=qr";
+const GOOGLE_MAPS_URL = "https://maps.google.com/?q=Palmares,+Alajuela,+Costa+Rica";
+const WAZE_URL = "https://waze.com/ul?q=Palmares+Alajuela+Costa+Rica";
 const INSTAGRAM_HANDLE = "@raices_palmares";
 const LOCATION_TEXT = "Palmares, Alajuela, Costa Rica";
 const START_YEAR = 2026;
@@ -84,9 +86,15 @@ export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?:
               </a>
             </li>
             <li>
-              <a href={`tel:${CONTACT_PHONE_HREF}`} className={linkClass}>
+              <a 
+                href={CONTACT_PHONE_HREF} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={linkClass}
+              >
                 <Phone className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 {CONTACT_PHONE_DISPLAY}
+                <span className="sr-only"> (abre chat de WhatsApp)</span>
               </a>
             </li>
             <li>
@@ -102,10 +110,31 @@ export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?:
         {/* Sección 3: Ubicación */}
         <section aria-labelledby="footer-location">
           <h2 id="footer-location" className={headingClass}>Ubicación</h2>
-          <p className="flex items-start gap-2 text-sm text-emerald-100">
-            <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
-            {LOCATION_TEXT}.
-          </p>
+  
+          <div className="flex flex-col gap-2">
+            {/* Enlace a Google Maps */}
+            <a
+              href={GOOGLE_MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              <MapPin className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+              <span>{LOCATION_TEXT}</span>
+              <span className="sr-only"> (abre en Google Maps)</span>
+            </a>
+
+            {/* Enlace a Waze */}
+            <a
+              href={WAZE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${linkClass} text-xs text-emerald-200/80 hover:text-white mt-1`}
+          >
+            <span>Abrir en Waze</span>
+            <span className="sr-only"> (abre en la aplicación de Waze)</span>
+            </a>
+          </div>
         </section>
       </div>
 
