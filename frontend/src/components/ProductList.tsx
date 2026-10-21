@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getActiveProducts } from "../services/ProductService";
+import { getActiveProducts, getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
@@ -21,6 +21,8 @@ export function ProductCard({
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  /* Sin unidades disponibles (stock menos lo apartado por pedidos pendientes) no se puede agregar */
+  const soldOut = getAvailableStock(product) <= 0;
 
   return (
     <div className="bg-white border border-[#e8efe4] rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
@@ -71,15 +73,19 @@ export function ProductCard({
 
         {/* Precio + botón de agregar */}
         <div className="flex items-center justify-between pt-1">
-          <p className="font-extrabold text-[#2D4A3E] text-sm">
-            ₡{formatPrice(product.price)}
-          </p>
+          <div className="min-w-0 flex flex-wrap items-baseline gap-x-1.5">
+            <p className="font-extrabold text-[#2D4A3E] text-sm">
+              ₡{formatPrice(product.price)}
+            </p>
+            {soldOut && <p className="text-[11px] font-bold text-red-600">Agotado</p>}
+          </div>
 
           <button
             type="button"
             onClick={() => onAddToCart(product)}
-            className="w-9 h-9 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0"
-            title="Agregar"
+            disabled={soldOut}
+            className="w-9 h-9 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#4E705B]"
+            title={soldOut ? "Agotado" : "Agregar"}
           >
             <Plus className="w-5 h-5" />
           </button>
