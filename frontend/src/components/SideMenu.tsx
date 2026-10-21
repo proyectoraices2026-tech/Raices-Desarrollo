@@ -10,7 +10,7 @@ interface SideMenuProps {
 export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const navigate = useNavigate();
   const { user} = useAuth();
-  
+  const {role} = useAuth();
 
   /* Nombre y teléfono guardados en el perfil (tabla `profiles`), NO en el metadata de
      Auth: el metadata solo se llena una vez al registrarse y nunca se actualiza, así
@@ -94,6 +94,38 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           >
             Mis pedidos
           </button>
+
+          <button
+            onClick={() => go("/chatbot")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Chatbot
+          </button>
+
+          {role == "admin" &&
+            <>
+              <button
+            onClick={() => go("/admin/stats")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() => go("/admin/requests")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Gestión pedidos
+          </button>
+
+          <button
+            onClick={() => go("/admin/products/new")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Gestión productos
+          </button>
+            </>
+          }
 
           <hr className="my-3 border-[#e8efe4]" />
 

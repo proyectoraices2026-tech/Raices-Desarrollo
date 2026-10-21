@@ -73,6 +73,7 @@ export default function MyPlants() {
       .then(setTasks)
       .catch(() => setTasks([]))
       .finally(() => setTasksLoading(false));
+      
   };
 
   useEffect(() => {

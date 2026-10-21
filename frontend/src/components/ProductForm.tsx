@@ -23,6 +23,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
     const [price, setPrice] = useState("");
     const [stock, setStock] = useState("");
     const [minStock, setMinStock] = useState("0");
+    const [costPrice, setCostPrice] = useState("");
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -44,6 +45,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
         setCategoryId("");
         setPrice("");
         setStock("");
+        setCostPrice("");
         setMinStock("0");
         setImageFile(null);
     };
@@ -59,6 +61,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
         const cleanSku = sku.trim();
         const cleanName = name.trim();
         const cleanDescription = description.trim();
+        const finalCostPrice = costPrice ? parseFloat(costPrice) : undefined;
 
         if (!cleanSku || !cleanName) {
             onError?.("El SKU y el nombre no pueden estar vacíos.");
@@ -79,6 +82,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                 description: cleanDescription,
                 price: parseFloat(price),
                 stock: parseInt(stock, 10),
+                costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
                 imageFile,
             });
@@ -145,6 +149,10 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                         <div>
                             <label className={labelClass}>Precio</label>
                             <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required className={inputClass} />
+                        </div>
+                        <div>
+                            <label className={labelClass}>Compra</label>
+                            <input type="number" step="0.01" min="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className={inputClass} />
                         </div>
                         <div>
                             <label className={labelClass}>Stock</label>

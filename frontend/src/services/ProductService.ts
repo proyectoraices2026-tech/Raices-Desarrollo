@@ -60,6 +60,7 @@ export interface NewProductInput {
   name: string;
   description?: string;
   price: number;
+  costPrice?: number;
   stock: number;
   min_stock: number;
   imageFile: File;
@@ -184,10 +185,16 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
   // Si ocurrió un error se imprime el mensaje
   if (error) throw error;
 
+  /* Si el admin indicó un costo, se guarda primero para que la inversión del
+      stock inicial ya se calcule con el costo real y no con el 50% provisional */
+  if (input.costPrice !== undefined) {
+    await setProductCost(data.id, input.costPrice);
+  }
+
   /* El stock inicial se registra como una compra (movimiento restock), para que cuente
        como inversión; add_stock es quien suma las unidades al producto */
   if (input.stock > 0) {
-    await addStock(data.id, input.stock, null, "Stock inicial");
+    await addStock(data.id, input.stock, input.costPrice ?? null, "Stock inicial");
     return { ...data, stock: input.stock };
   }
 
@@ -222,6 +229,7 @@ export interface UpdateProductInput {
   name?: string;
   description?: string;
   price?: number;
+  costPrice?: number;
   min_stock?: number;
   imageFile?: File;
 }
@@ -238,7 +246,7 @@ export async function updateProduct(
 ): Promise<void> {
   /* Se separa imageFile del resto porque ese campo no existe como columna en la tabla,
        solo se usa para subir el archivo y calcular image_url */
-  const { imageFile, ...fieldsToUpdate } = input;
+  const { imageFile, costPrice, ...fieldsToUpdate } = input;
 
   /* Si se mandó una imagen nueva, se sube igual que en createProduct y se agrega su url */
   if (imageFile) {
@@ -272,6 +280,10 @@ export async function updateProduct(
     .eq("id", id);
 
   if (error) throw error;
+
+    if (costPrice !== undefined) {
+    await setProductCost(id, costPrice);
+  }
 }
 
 /*
@@ -411,4 +423,22 @@ export async function adjustStock(
 
   if (error) throw error;
   return data as number;
+}
+
+/*
+    Guarda (o actualiza) el costo unitario habitual de un producto en product_costs.
+    upsert: si ya hay fila para ese product_id la actualiza, si no la crea.
+*/
+export async function setProductCost(
+  productId: string,
+  costPrice: number,
+): Promise<void> {
+  const { error } = await supabase
+    .from("product_costs")
+    .upsert(
+      { product_id: productId, cost_price: costPrice, updated_at: new Date().toISOString() },
+      { onConflict: "product_id" },
+    );
+
+  if (error) throw error;
 }
