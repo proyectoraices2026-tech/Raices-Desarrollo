@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
 import { X } from "lucide-react";
-import { updateProduct, getErrorMessage } from "../services/ProductService";
+import { updateProduct, getErrorMessage, getProductCostOverride } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import StockModal from "./StockModal";
 
@@ -29,10 +29,25 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     const [description, setDescription] = useState(product.description ?? "");
     const [categoryId, setCategoryId] = useState(product.category_id);
     const [price, setPrice] = useState(String(product.price));
+    const [costPrice, setCostPrice] = useState("");
     const [minStock, setMinStock] = useState(String(product.min_stock));
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
+
+    /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
+   al abrir el modal en vez de inicializarlo en el useState */
+    useEffect(() => {
+        let cancelled = false;
+        getProductCostOverride(product.id)
+            .then((cost) => {
+                if (!cancelled && cost !== null) setCostPrice(String(cost));
+            })
+            .catch((err) => console.error("No se pudo cargar el costo:", err));
+        return () => {
+            cancelled = true;
+        };
+    }, [product.id]);
 
     async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -40,6 +55,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
         const cleanSku = sku.trim();
         const cleanName = name.trim();
         const cleanDescription = description.trim();
+        const finalCostPrice = costPrice ? parseFloat(costPrice) : undefined;
 
         if (!cleanSku || !cleanName) {
             onError("El SKU y el nombre no pueden estar vacíos.");
@@ -54,6 +70,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                 name: cleanName,
                 description: cleanDescription,
                 price: parseFloat(price),
+                costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
                 /* Solo se manda si la persona escogió un archivo nuevo; si no, queda undefined
                    y updateProduct() deja la imagen que el producto ya tenía */
@@ -121,6 +138,10 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                             <div>
                                 <label className={labelClass}>Precio</label>
                                 <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required className={inputClass} />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Costo</label>
+                                <input type="number" step="0.01" min="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} placeholder="Sin definir (50% del precio)" className={inputClass} />
                             </div>
                             <div>
                                 <label className={labelClass}>Stock mín.</label>
