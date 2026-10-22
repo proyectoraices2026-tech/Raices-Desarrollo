@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { format } from "date-fns";
+import { format, isBefore, parseISO, startOfToday } from "date-fns";
 import { es } from "date-fns/locale";
 import { createManualTask, updateManualTask, type ManualTaskInput, type PlantTask } from "../services/PlantTasksService";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
@@ -54,10 +54,17 @@ export default function ManualTaskModal({ isOpen, onClose, userId, defaultDate, 
 
     const dueDate = editingTask ? editingTask.due_date : defaultDate ? format(defaultDate, "yyyy-MM-dd") : "";
 
+    /* Una tarea no puede agendarse en una fecha que ya pasó (hoy sí se permite) */
+    const dueDateIsPast = dueDate !== "" && isBefore(parseISO(dueDate), startOfToday());
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!plantId || !dueDate) {
             setError("Selecciona una planta.");
+            return;
+        }
+        if (!editingTask && dueDateIsPast) {
+            setError("No se pueden agregar tareas con una fecha que ya pasó.");
             return;
         }
         if (taskType === "custom" && !label.trim()) {
@@ -101,6 +108,12 @@ export default function ManualTaskModal({ isOpen, onClose, userId, defaultDate, 
                 <h2 className="text-lg font-bold text-[#1e2d24] mb-1">{editingTask ? "Editar tarea" : "Agregar tarea"}</h2>
                 {defaultDate && !editingTask && (
                     <p className="text-xs text-[#537a63] mb-4 capitalize">{format(defaultDate, "EEEE d 'de' MMMM", { locale: es })}</p>
+                )}
+
+                {dueDateIsPast && !editingTask && (
+                    <p className="text-xs text-[#8a5a1f] bg-[#fdf6ec] border border-[#e8d3b3] rounded-lg px-3 py-2 mb-3">
+                        La fecha de esta tarea ya pasó. No se pueden agregar tareas con fechas pasadas.
+                    </p>
                 )}
 
                 {error && <p className="text-xs text-red-600 mb-3">{error}</p>}
