@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import { updateProduct, getErrorMessage, getProductCostOverride } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import StockModal from "./StockModal";
+import PlantDefaultsFields from "./PlantDefaultsFields";
+import { plantDefaultsStateFromProduct, plantDefaultsToPayload, validatePlantDefaults } from "../utils/plantDefaults";
 
 interface EditProductModalProps {
     product: Product;
@@ -34,6 +36,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
+    const [plantDefaults, setPlantDefaults] = useState(() => plantDefaultsStateFromProduct(product));
 
     /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
    al abrir el modal en vez de inicializarlo en el useState */
@@ -62,6 +65,12 @@ export default function EditProductModal({ product, categories, onClose, onSucce
             return;
         }
 
+        const plantError = validatePlantDefaults(plantDefaults);
+        if (plantError) {
+            onError(plantError);
+            return;
+        }
+
         setLoading(true);
         try {
             await updateProduct(product.id, {
@@ -72,6 +81,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                 price: parseFloat(price),
                 costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
+                plantDefaults: plantDefaultsToPayload(plantDefaults),
                 /* Solo se manda si la persona escogió un archivo nuevo; si no, queda undefined
                    y updateProduct() deja la imagen que el producto ya tenía */
                 imageFile: imageFile ?? undefined,
@@ -172,6 +182,13 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                                 </button>
                             </div>
                         </div>
+
+                        <PlantDefaultsFields
+                            value={plantDefaults}
+                            onChange={setPlantDefaults}
+                            inputClass={inputClass}
+                            labelClass={labelClass}
+                        />
 
                         <div>
                             <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>

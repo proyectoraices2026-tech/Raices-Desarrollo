@@ -124,6 +124,13 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           >
             Gestión productos
           </button>
+
+          <button
+            onClick={() => go("/admin/plants")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Registrar plantas a usuarios
+          </button>
             </>
           }
 

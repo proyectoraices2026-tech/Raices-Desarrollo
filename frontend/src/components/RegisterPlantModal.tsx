@@ -4,11 +4,19 @@ import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
 import TaskFrequencyField, { type TaskUnit } from "./TaskFrequencyField";
 import { PLANT_ICONS } from "../constants/plantIcons";
+import type { Product } from "../services/ProductService";
+import { plantDefaultsStateFromProduct } from "../utils/plantDefaults";
 
 interface RegisterPlantModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPlantAdded?: () => void;
+  /* Solo para el admin: id del usuario al que se le registra la planta (si no viene, es el usuario logueado) */
+  targetUserId?: string;
+  /* Nombre o email de ese usuario, para mostrarlo en el modal */
+  targetUserLabel?: string;
+  /* Producto del que se toman nombre científico y frecuencias de cuidado. El nombre NO se precarga */
+  prefillProduct?: Product | null;
 }
 
 interface FrequencyState {
@@ -21,16 +29,27 @@ const defaultWatering: FrequencyState = { enabled: true, interval: 3, unit: "day
 const defaultPruning: FrequencyState = { enabled: true, interval: 2, unit: "month" };
 const defaultFertilizing: FrequencyState = { enabled: true, interval: 1, unit: "month" };
 
-export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: RegisterPlantModalProps) {
+export default function RegisterPlantModal({
+  isOpen,
+  onClose,
+  onPlantAdded,
+  targetUserId,
+  targetUserLabel,
+  prefillProduct,
+}: RegisterPlantModalProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"form" | "success">("form");
   const [name, setName] = useState("");
-  const [scientificName, setScientificName] = useState("");
-  const [watering, setWatering] = useState<FrequencyState>(defaultWatering);
-  const [pruning, setPruning] = useState<FrequencyState>(defaultPruning);
-  const [fertilizing, setFertilizing] = useState<FrequencyState>(defaultFertilizing);
+  /* Con prefillProduct (asignación desde admin) el formulario arranca con los datos de planta del
+  producto, y el admin puede editarlos. Estos valores iniciales solo se leen al montarse, por eso
+   el padre debe montar el modal únicamente cuando hay un producto elegido (o usar key). */
+  const initialDefaults = prefillProduct ? plantDefaultsStateFromProduct(prefillProduct) : null;
+  const [scientificName, setScientificName] = useState(initialDefaults?.scientificName ?? "");
+  const [watering, setWatering] = useState<FrequencyState>(initialDefaults?.watering ?? defaultWatering);
+  const [pruning, setPruning] = useState<FrequencyState>(initialDefaults?.pruning ?? defaultPruning);
+  const [fertilizing, setFertilizing] = useState<FrequencyState>(initialDefaults?.fertilizing ?? defaultFertilizing);
   const [selectedIcon, setSelectedIcon] = useState<number | null>(null);
 
   useEffect(() => {
@@ -101,7 +120,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           pruning: { enabled: pruning.enabled, interval: pruning.enabled ? Number(pruning.interval) : null, unit: pruning.enabled ? pruning.unit : null },
           fertilizing: { enabled: fertilizing.enabled, interval: fertilizing.enabled ? Number(fertilizing.interval) : null, unit: fertilizing.enabled ? fertilizing.unit : null },
         },
-        user.id
+        targetUserId ?? user.id
       );
       setStep("success");
       onPlantAdded?.();
@@ -125,7 +144,9 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           </button>
 
           <h2 id="register-plant-title" className="text-lg md:text-xl font-bold text-[#1e2d24]">Registrar planta</h2>
-          <p className="text-xs md:text-sm text-[#537a63] mb-6 md:mb-8">Añade una nueva compañera a tu colección</p>
+          <p className="text-xs md:text-sm text-[#537a63] mb-6 md:mb-8">
+            {targetUserLabel ? `Registrando para ${targetUserLabel}` : "Añade una nueva compañera a tu colección"}
+          </p>
 
           {error && <p className="text-xs text-red-600 mb-3" role="alert">{error}</p>}
 
@@ -184,9 +205,8 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
                       onClick={() => setSelectedIcon(i)}
                       aria-pressed={selected}
                       aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                      className={`aspect-square rounded-full border-2 overflow-hidden transition ${
-                        selected ? "border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "border-transparent hover:border-[#c9c4b8]"
-                      }`}
+                      className={`aspect-square rounded-full border-2 overflow-hidden transition ${selected ? "border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "border-transparent hover:border-[#c9c4b8]"
+                        }`}
                     >
                       <img src={icon} alt="" className="w-full h-full object-cover rounded-full" />
                     </button>
@@ -206,8 +226,12 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
             <Check className="w-7 h-7 text-[#3E5C4A]" />
           </div>
 
-          <h2 className="text-lg font-bold text-[#1e2d24]">Tu planta ha sido añadida</h2>
-          <p className="text-xs text-[#537a63] mt-1 mb-5">Aparecerá entre tus plantas.</p>
+          <h2 className="text-lg font-bold text-[#1e2d24]">
+            {targetUserLabel ? "La planta ha sido añadida" : "Tu planta ha sido añadida"}
+          </h2>
+          <p className="text-xs text-[#537a63] mt-1 mb-5">
+            {targetUserLabel ? `Aparecerá entre las plantas de ${targetUserLabel}.` : "Aparecerá entre tus plantas."}
+          </p>
 
           <div className="bg-[#f5f7f2] border border-[#e8efe4] rounded-xl p-3 flex items-center gap-3 mb-6 text-left">
             <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0" aria-hidden="true">

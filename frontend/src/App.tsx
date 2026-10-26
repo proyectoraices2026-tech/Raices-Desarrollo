@@ -23,6 +23,7 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import Calendar from './pages/Calendar';
 import Chatbot from './pages/ChatBot';
 import ScrollToTop from './components/ScrollToTop';
+import AdminAssignPlants from './pages/AdminAssignPlants';
 
 /* 
     Rutas privadas
@@ -159,6 +160,12 @@ function App() {
         <Route path="/admin/requests" element={
           <AdminRoute>
             <AdminRequests />
+          </AdminRoute>
+        } />
+
+        <Route path="/admin/plants" element={
+          <AdminRoute>
+            <AdminAssignPlants />
           </AdminRoute>
         } />
 
