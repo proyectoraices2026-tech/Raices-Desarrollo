@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
 import { X } from "lucide-react";
 import { createProduct, getErrorMessage } from "../services/ProductService";
+import PlantDefaultsFields from "./PlantDefaultsFields";
+import { emptyPlantDefaultsState, plantDefaultsToPayload, validatePlantDefaults } from "../utils/plantDefaults";
 
 interface ProductFormProps {
     isOpen: boolean;
@@ -25,6 +27,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
     const [minStock, setMinStock] = useState("0");
     const [costPrice, setCostPrice] = useState("");
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [plantDefaults, setPlantDefaults] = useState(emptyPlantDefaultsState);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -48,6 +51,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
         setCostPrice("");
         setMinStock("0");
         setImageFile(null);
+        setPlantDefaults(emptyPlantDefaultsState());
     };
 
     const handleCancel = () => {
@@ -73,6 +77,12 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
             return;
         }
 
+        const plantError = validatePlantDefaults(plantDefaults);
+        if (plantError) {
+            onError?.(plantError);
+            return;
+        }
+
         setLoading(true);
         try {
             await createProduct({
@@ -85,6 +95,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                 costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
                 imageFile,
+                plantDefaults: plantDefaultsToPayload(plantDefaults),
             });
 
             /* Solo se limpia y se cierra el modal una vez confirmado que la creación tuvo éxito */
@@ -163,6 +174,13 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                             <input type="number" min="0" value={minStock} onChange={(e) => setMinStock(e.target.value)} className={inputClass} />
                         </div>
                     </div>
+
+                    <PlantDefaultsFields
+                        value={plantDefaults}
+                        onChange={setPlantDefaults}
+                        inputClass={inputClass}
+                        labelClass={labelClass}
+                    />
 
                     <div>
                         <label className={labelClass}>Imagen</label>

@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import type { TaskUnit } from "./UserPlantsService";
 
 /*
     Los errores que lanza Supabase (por ejemplo cuando una política de RLS bloquea algo)
@@ -35,6 +36,14 @@ export interface Product {
   /* Nombre de la categoría, traído por la relación con la tabla `categories`
        (category_id es solo el uuid; esto es lo que se muestra en pantalla) */
   categories: { name: string } | null;
+    /* Datos de planta opcionales (null en productos que no son plantas, como una pala) */
+  default_scientific_name?: string | null;
+  default_watering_interval?: number | null;
+  default_watering_unit?: TaskUnit | null;
+  default_pruning_interval?: number | null;
+  default_pruning_unit?: TaskUnit | null;
+  default_fertilizer_interval?: number | null;
+  default_fertilizer_unit?: TaskUnit | null;
 }
 
 /*
@@ -46,6 +55,27 @@ export function getAvailableStock(
   product: Pick<Product, "stock" | "reserved_stock">,
 ): number {
   return Math.max(0, product.stock - (product.reserved_stock ?? 0));
+}
+
+/* Datos de planta que se guardan en products; todos opcionales (null = sin dato) */
+export interface PlantDefaults {
+  default_scientific_name: string | null;
+  default_watering_interval: number | null;
+  default_watering_unit: TaskUnit | null;
+  default_pruning_interval: number | null;
+  default_pruning_unit: TaskUnit | null;
+  default_fertilizer_interval: number | null;
+  default_fertilizer_unit: TaskUnit | null;
+}
+
+/* Un producto cuenta como "planta asignable" si tiene al menos uno de esos datos */
+export function hasPlantDefaults(product: Partial<PlantDefaults>): boolean {
+  return (
+    !!product.default_scientific_name ||
+    product.default_watering_interval != null ||
+    product.default_pruning_interval != null ||
+    product.default_fertilizer_interval != null
+  );
 }
 
 /* 
@@ -64,6 +94,7 @@ export interface NewProductInput {
   stock: number;
   min_stock: number;
   imageFile: File;
+  plantDefaults?: PlantDefaults;
 }
 
 /* 
@@ -177,6 +208,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       price: input.price,
       stock: 0,
       min_stock: input.min_stock,
+      ...input.plantDefaults,
     })
     .select()
     .single();
@@ -219,6 +251,24 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 /*
+    Productos activos que tienen datos de planta, para la pantalla donde el admin le asigna
+    plantas a un usuario. Un producto sin ningún dato de planta (una pala, por ejemplo) no aparece.
+*/
+export async function getPlantProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, categories(name)")
+    .eq("is_active", true)
+    .or(
+      "default_scientific_name.not.is.null,default_watering_interval.not.is.null,default_pruning_interval.not.is.null,default_fertilizer_interval.not.is.null",
+    )
+    .order("name");
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+/*
     Esquema para editar un producto existente. Todos los campos son opcionales porque
     se puede editar solo uno (ej. solo el precio) sin tener que reenviar todo el resto.
     imageFile también es opcional: si no se manda, el producto se queda con la imagen que ya tenía.
@@ -232,6 +282,7 @@ export interface UpdateProductInput {
   costPrice?: number;
   min_stock?: number;
   imageFile?: File;
+  plantDefaults?: PlantDefaults;
 }
 
 /*
@@ -246,7 +297,7 @@ export async function updateProduct(
 ): Promise<void> {
   /* Se separa imageFile del resto porque ese campo no existe como columna en la tabla,
        solo se usa para subir el archivo y calcular image_url */
-  const { imageFile, costPrice, ...fieldsToUpdate } = input;
+  const { imageFile, costPrice, plantDefaults, ...fieldsToUpdate } = input;
 
   /* Si se mandó una imagen nueva, se sube igual que en createProduct y se agrega su url */
   if (imageFile) {
@@ -276,7 +327,7 @@ export async function updateProduct(
     */
   const { error } = await supabase
     .from("products")
-    .update(fieldsToUpdate)
+    .update({ ...fieldsToUpdate, ...plantDefaults })
     .eq("id", id);
 
   if (error) throw error;
