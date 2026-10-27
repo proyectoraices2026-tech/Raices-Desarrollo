@@ -1,3 +1,5 @@
+// src/components/RegisterPlantModal.tsx
+
 import { useAuth } from "../context/AuthContext";
 import { registerPlant } from "../services/UserPlantsService";
 import { useEffect, useState } from "react";
