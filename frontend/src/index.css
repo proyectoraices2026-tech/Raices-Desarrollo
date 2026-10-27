@@ -2,8 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fuerza el modo claro */
+:root {
+  color-scheme: light only !important;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #ffffff;
+  overscroll-behavior-y: contain;
+}
+
+@keyframes top-pull-bounce {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(28px); }
+  65% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+#root.top-pull-bounce {
+  animation: top-pull-bounce 420ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root.top-pull-bounce {
+    animation-duration: 1ms;
+  }
+}
+
 @media (min-width: 768px) {
   html {
     zoom: 90%;
   }
+
+  /* Con zoom 90%, "min-h-screen" (100vh) se queda un 10% más corto que la pantalla y deja una franja
+     blanca debajo del footer en las páginas cortas. 100 / 0.9 = 111.12vh compensa el zoom. */
+  .min-h-screen {
+    min-height: 111.12vh;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4.5rem;
+  }
+}
+
+/* Indicadores de paginación para ambos sliders */
+.swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  margin: 0 !important;
+  padding: 0;
+  opacity: 1;
+  border: 0;
+  border-radius: 9999px;
+  background-color: #929487;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    width 220ms ease,
+    background-color 220ms ease,
+    transform 150ms ease;
+}
+
+.swiper-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+}
+
+.swiper-pagination .swiper-pagination-bullet:hover {
+  background-color: #537a63;
+  transform: scale(1.08);
+}
+
+.swiper-pagination .swiper-pagination-bullet-active {
+  width: 34px;
+  background-color: #537a63;
+}
+
+.swiper-pagination .swiper-pagination-bullet:focus-visible {
+  outline: 2px solid #3a6b35;
+  outline-offset: 3px;
+}
+
+.catalog-banner-slider .swiper-pagination {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  transform: none;
 }

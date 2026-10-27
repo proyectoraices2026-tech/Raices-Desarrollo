@@ -4,12 +4,15 @@ import { ArrowLeft, Package } from "lucide-react";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
-import { getMyRequests, archiveRequest } from "../services/RequestService";
+import { getMyRequests, archiveRequest, archiveAllRequests } from "../services/RequestService";
 import type { OrderRequest } from "../services/RequestService";
 import { getActiveProducts } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { formatPrice } from "../utils/formatPrice";
 import { useAlert } from "../context/AlertContext"
+import Footer from "../components/Footer";
+import PickupLocationMap from "../components/PickupLocationMap";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 /* Traduce el estado que guarda el backend a algo que un usuario entienda,
    y a un color de acuerdo a si sigue pendiente, se aceptó o se rechazó */
@@ -36,6 +39,11 @@ export default function MyRequests() {
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+  const handleScrollUp = () => {
+    document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const { showAlert } = useAlert();
 
@@ -64,6 +72,24 @@ export default function MyRequests() {
     }
   };
 
+  const hasArchivable = requests.some(
+    (request) => request.status === "accepted" || request.status === "rejected"
+  );
+
+  const handleArchiveAll = async () => {
+    try {
+      await archiveAllRequests();
+      // recargar la lista, mismo patrón que loadPendingRequests
+      loadMyRequests();
+    } catch (err) {
+      showAlert({
+        title: "No se pudieron eliminar los pedido",
+        variant: "error",
+        message: err instanceof Error ? err.message : "Ocurrió un error inesperado.",
+      });
+    }
+  };
+
   useEffect(() => {
     Promise.all([getMyRequests(), getActiveProducts()])
       .then(([myRequests, products]) => {
@@ -75,13 +101,19 @@ export default function MyRequests() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2]">
+    <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
         <BottomNav />
       </div>
 
-      <div className="md:max-w-3xl md:mx-auto px-5 py-6 md:px-0">
+      {/* Escritorio: dos columnas del mismo ancho (pedidos a la izquierda, mapa a la derecha) centradas
+          en la pantalla. Celular: una sola columna, con el mapa después de los pedidos. */}
+      <div
+        id="first"
+        className="w-full flex-1 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-8 items-start"
+      >
+      <div className="p-4 sm:p-6 w-full max-w-2xl mx-auto lg:mx-0 lg:max-w-none">
         <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 mb-2 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
@@ -90,7 +122,18 @@ export default function MyRequests() {
           <ArrowLeft className="w-6 h-6" aria-hidden="true" />
         </button>
 
-        <h1 className="font-poppins text-2xl font-bold text-[#1e2d24] mb-5">Mis pedidos</h1>
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <h1 className="text-2xl font-bold">Mis pedidos</h1>
+
+          {hasArchivable && (
+            <button
+              onClick={() => handleArchiveAll()}
+              className="btn bg-red-800 text-xs font-semibold text-white hover:bg-red-400 hover:text-black"
+            >
+              Ocultar todos
+            </button>
+          )}
+        </div>
 
         {loading && (
           <p className="text-sm text-[#537a63] animate-pulse">Cargando tus pedidos...</p>
@@ -109,21 +152,22 @@ export default function MyRequests() {
             <p className="text-xs text-[#537a63] max-w-xs">
               Los pedidos que hagas desde el carrito van a aparecer aquí, junto con su estado.
             </p>
+
           </div>
         )}
 
         <div className="space-y-4">
           {requests.map((request) => (
-            <div key={request.id} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+            <div key={request.id} className="bg-white border border-[#e8efe4] rounded-2xl p-4 md:p-5 shadow-sm">
               {(request.status === "accepted" || request.status === "rejected") && (
                 <button
                   onClick={() => handleArchive(request.id)}
-                  className="text-xs font-semibold text-red-600 hover:underline"
+                  className="btn bg-red-800 text-xs font-semibold text-white hover:bg-red-400 hover:text-black"
                 >
-                  Ocultar pedidos
+                  Ocultar pedido
                 </button>
               )}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 mt-3">
                 <p className="text-xs text-[#537a63]">
                   {new Date(request.createdAt).toLocaleDateString("es-CR", {
                     day: "numeric",
@@ -170,8 +214,14 @@ export default function MyRequests() {
         </div>
       </div>
 
+      <div className="p-4 sm:p-6 w-full max-w-2xl mx-auto lg:mx-0 lg:max-w-none lg:pt-[8.5rem]">
+        <PickupLocationMap />
+      </div>
+      </div>
+
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
+      <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );
 }
-

@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
 import { X } from "lucide-react";
-import { updateProduct, getErrorMessage } from "../services/ProductService";
+import { updateProduct, getErrorMessage, getProductCostOverride } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import StockModal from "./StockModal";
+import PlantDefaultsFields from "./PlantDefaultsFields";
+import { plantDefaultsStateFromProduct, plantDefaultsToPayload, validatePlantDefaults } from "../utils/plantDefaults";
 
 interface EditProductModalProps {
     product: Product;
@@ -19,17 +22,35 @@ const labelClass = "block text-sm font-semibold text-[#2D4A3E] mb-1.5";
 
 /* Formulario para editar un producto ya existente. Se precarga con los datos que ya tiene
    (product), a diferencia de ProductForm.tsx que siempre arranca vacío. La imagen es la
-   única excepción: no se precarga un archivo, se deja tal cual si no se selecciona una nueva. */
+   única excepción: no se precarga un archivo, se deja tal cual si no se selecciona una nueva.
+   El stock ya no se edita aquí: se cambia con "Agregar" (compra) o "Ajustar" (corrección),
+   para que cada movimiento quede registrado en el historial. */
 export default function EditProductModal({ product, categories, onClose, onSuccess, onError }: EditProductModalProps) {
     const [sku, setSku] = useState(product.sku);
     const [name, setName] = useState(product.name);
     const [description, setDescription] = useState(product.description ?? "");
     const [categoryId, setCategoryId] = useState(product.category_id);
     const [price, setPrice] = useState(String(product.price));
-    const [stock, setStock] = useState(String(product.stock));
+    const [costPrice, setCostPrice] = useState("");
     const [minStock, setMinStock] = useState(String(product.min_stock));
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
+    const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
+    const [plantDefaults, setPlantDefaults] = useState(() => plantDefaultsStateFromProduct(product));
+
+    /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
+   al abrir el modal en vez de inicializarlo en el useState */
+    useEffect(() => {
+        let cancelled = false;
+        getProductCostOverride(product.id)
+            .then((cost) => {
+                if (!cancelled && cost !== null) setCostPrice(String(cost));
+            })
+            .catch((err) => console.error("No se pudo cargar el costo:", err));
+        return () => {
+            cancelled = true;
+        };
+    }, [product.id]);
 
     async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -37,9 +58,16 @@ export default function EditProductModal({ product, categories, onClose, onSucce
         const cleanSku = sku.trim();
         const cleanName = name.trim();
         const cleanDescription = description.trim();
+        const finalCostPrice = costPrice ? parseFloat(costPrice) : undefined;
 
         if (!cleanSku || !cleanName) {
             onError("El SKU y el nombre no pueden estar vacíos.");
+            return;
+        }
+
+        const plantError = validatePlantDefaults(plantDefaults);
+        if (plantError) {
+            onError(plantError);
             return;
         }
 
@@ -51,8 +79,9 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                 name: cleanName,
                 description: cleanDescription,
                 price: parseFloat(price),
-                stock: parseInt(stock, 10),
+                costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
+                plantDefaults: plantDefaultsToPayload(plantDefaults),
                 /* Solo se manda si la persona escogió un archivo nuevo; si no, queda undefined
                    y updateProduct() deja la imagen que el producto ya tenía */
                 imageFile: imageFile ?? undefined,
@@ -67,96 +96,142 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     }
 
     return (
-        <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-            role="dialog"
-            aria-modal="true"
-            onClick={onClose}
-        >
+        <>
             <div
-                className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative"
-                onClick={(e) => e.stopPropagation()}
+                className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+                role="dialog"
+                aria-modal="true"
+                onClick={onClose}
             >
-                <button
-                    onClick={onClose}
-                    className="absolute top-5 right-5 text-slate-400 hover:text-slate-600"
-                    aria-label="Cerrar"
+                <div
+                    className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative"
+                    onClick={(e) => e.stopPropagation()}
                 >
-                    <X className="w-5 h-5" />
-                </button>
+                    <button
+                        onClick={onClose}
+                        className="absolute top-5 right-5 text-slate-400 hover:text-slate-600"
+                        aria-label="Cerrar"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
 
-                <h2 className="text-lg font-bold text-[#1F2937] mb-4">Editar producto</h2>
+                    <h2 className="text-lg font-bold text-[#1F2937] mb-4">Editar producto</h2>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className={labelClass}>SKU</label>
-                            <input value={sku} onChange={(e) => setSku(e.target.value)} required className={inputClass} />
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className={labelClass}>SKU</label>
+                                <input value={sku} onChange={(e) => setSku(e.target.value)} required className={inputClass} />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Nombre</label>
+                                <input value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
+                            </div>
                         </div>
-                        <div>
-                            <label className={labelClass}>Nombre</label>
-                            <input value={name} onChange={(e) => setName(e.target.value)} required className={inputClass} />
-                        </div>
-                    </div>
 
-                    <div>
-                        <label className={labelClass}>Descripción</label>
-                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputClass} />
-                    </div>
-
-                    <div>
-                        <label className={labelClass}>Categoría</label>
-                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}>
-                            <option value="">Selecciona una categoría</option>
-                            {categories.map((c) => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
                         <div>
-                            <label className={labelClass}>Precio</label>
-                            <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required className={inputClass} />
+                            <label className={labelClass}>Descripción</label>
+                            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputClass} />
                         </div>
-                        <div>
-                            <label className={labelClass}>Stock</label>
-                            <input type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)} required className={inputClass} />
-                        </div>
-                        <div>
-                            <label className={labelClass}>Stock mín.</label>
-                            <input type="number" min="0" value={minStock} onChange={(e) => setMinStock(e.target.value)} className={inputClass} />
-                        </div>
-                    </div>
 
-                    <div>
-                        <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-                            className="w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#4E705B] file:text-white hover:file:bg-[#3E5C4A] file:cursor-pointer cursor-pointer"
+                        <div>
+                            <label className={labelClass}>Categoría</label>
+                            <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className={inputClass}>
+                                <option value="">Selecciona una categoría</option>
+                                {categories.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className={labelClass}>Precio</label>
+                                <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required className={inputClass} />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Costo</label>
+                                <input type="number" step="0.01" min="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} placeholder="Sin definir (50% del precio)" className={inputClass} />
+                            </div>
+                            <div>
+                                <label className={labelClass}>Stock mín.</label>
+                                <input type="number" min="0" value={minStock} onChange={(e) => setMinStock(e.target.value)} className={inputClass} />
+                            </div>
+                        </div>
+
+                        {/* Stock actual (solo lectura): se cambia con las acciones de la derecha */}
+                        <div className="flex items-center justify-between bg-[#f5f7f2] rounded-xl px-4 py-3">
+                            <div>
+                                <p className="text-xs font-semibold text-[#2D4A3E]">Stock actual</p>
+                                <p className="text-lg font-bold text-[#1e2d24]">{product.stock}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setStockMode("add")}
+                                    className="px-4 py-2 rounded-full bg-[#4E705B] text-white text-xs font-semibold hover:bg-[#3E5C4A] transition"
+                                >
+                                    Agregar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setStockMode("adjust")}
+                                    className="px-4 py-2 rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] text-xs font-semibold hover:bg-[#f0f5ec] transition"
+                                >
+                                    Ajustar
+                                </button>
+                            </div>
+                        </div>
+
+                        <PlantDefaultsFields
+                            value={plantDefaults}
+                            onChange={setPlantDefaults}
+                            inputClass={inputClass}
+                            labelClass={labelClass}
                         />
-                    </div>
 
-                    <div className="flex gap-3 pt-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex-1 py-3 rounded-full bg-[#f0f0ec] text-[#1e2d24] font-semibold text-sm hover:bg-[#e4e4dc] transition"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 py-3 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition disabled:opacity-60"
-                        >
-                            {loading ? "Guardando..." : "Guardar cambios"}
-                        </button>
-                    </div>
-                </form>
+                        <div>
+                            <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+                                className="w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#4E705B] file:text-white hover:file:bg-[#3E5C4A] file:cursor-pointer cursor-pointer"
+                            />
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="flex-1 py-3 rounded-full bg-[#f0f0ec] text-[#1e2d24] font-semibold text-sm hover:bg-[#e4e4dc] transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 py-3 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition disabled:opacity-60"
+                            >
+                                {loading ? "Guardando..." : "Guardar cambios"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+
+            {stockMode && (
+                <StockModal
+                    product={product}
+                    mode={stockMode}
+                    onClose={() => setStockMode(null)}
+                    /* Tras mover el stock se cierra todo y AdminProducts recarga la lista */
+                    onSuccess={() => {
+                        setStockMode(null);
+                        onSuccess();
+                    }}
+                />
+            )}
+        </>
     );
 }

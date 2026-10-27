@@ -32,5 +32,17 @@ export function getFriendlyAuthErrorMessage(error: unknown): string {
     return 'Hiciste demasiados intentos en poco tiempo. Espera unos minutos antes de volver a intentarlo.';
   }
 
+  if (err?.message?.toLowerCase().includes('should be different from the old password')) {
+    return 'La nueva contraseña debe ser diferente a la actual.';
+  }
+
+  if (err?.message?.includes('Invalid login credentials')) {
+    return 'El correo electrónico o la contraseña son incorrectos';
+  }
+
+  if (err?.message?.includes('Email not confirmed')) {
+    return 'El correo electrónico no ha sido confirmado';
+  }
+
   return err?.message ?? 'Ocurrió un error inesperado. Intenta de nuevo.';
 }

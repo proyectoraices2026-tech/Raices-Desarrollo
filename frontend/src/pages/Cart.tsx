@@ -5,8 +5,12 @@ import { useCart } from "../context/CartContext";
 import { useAlert } from "../context/AlertContext";
 import { createOrderRequest } from "../services/RequestService";
 import { formatPrice } from "../utils/formatPrice";
+import { useAuth } from "../context/AuthContext";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
+import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+
 export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, subtotal, totalItems, clearCart } = useCart();
@@ -16,6 +20,7 @@ export default function Cart() {
   const [submitting, setSubmitting] = useState(false);
   /* Pide confirmación antes de vaciar, para que un clic accidental no borre todo el carrito*/
   const [confirmingClear, setConfirmingClear] = useState(false);
+  const {user} = useAuth();
 
   const handleClearCart = () => {
     clearCart();
@@ -23,16 +28,27 @@ export default function Cart() {
     showAlert({ title: "Carrito vacío", message: "Se quitaron todos los productos.", variant: "success" });
   };
 
-  const handleClose = () => navigate("/catalog");
+  /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
+
+  const handleClose = () => navigate("/");
 
   const handleConfirm = async () => {
     if (items.length === 0 || submitting) return;
 
-    setSubmitting(true);
+    if (!user){
+      navigate("/login");
+    } else{
+      setSubmitting(true);
     try {
       await createOrderRequest(
         items.map((item) => ({ productId: item.id, quantity: item.quantity }))
       );
+
+    
+
 
       showAlert({
         title: "Tu pedido ha sido solicitado",
@@ -40,7 +56,7 @@ export default function Cart() {
         variant: "success",
       });
       clearCart();
-      navigate("/catalog");
+      navigate("/");
     } catch (err) {
       showAlert({
         title: "No se pudo enviar el pedido",
@@ -50,15 +66,16 @@ export default function Cart() {
     } finally {
       setSubmitting(false);
     }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-verdePastel flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <div className="sticky top-0 z-40">
         <NavBar onMenuClick={() => setMenuOpen(true)} />
       </div>
 
-      <div className="bg-white border-b border-[#e8efe4] px-5 py-4">
+      <div id="first" className="bg-white border-b border-[#e8efe4] px-5 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-bold text-[#1e2d24]">Lista de pedidos</h1>
@@ -108,7 +125,7 @@ export default function Cart() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl p-3 md:p-4 flex gap-3 md:gap-4 items-start shadow-sm"
+                  className="bg-white border border-[#e8efe4] rounded-2xl p-3 md:p-4 flex gap-3 md:gap-4 items-start shadow-sm"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-[#e8efe4] overflow-hidden flex-shrink-0">
                     {item.image_url && (
@@ -161,17 +178,22 @@ export default function Cart() {
               <p className="text-xl text-[#1e2d24]">₡{formatPrice(subtotal)}</p>
             </div>
 
-            <button
+          
+              <button
               onClick={handleConfirm}
               disabled={submitting}
               className="w-full h-12 rounded-2xl bg-primarioBase text-white font-semibold text-sm shadow-md hover:opacity-90 transition disabled:opacity-60"
             >
               {submitting ? "Enviando..." : "Confirmar pedido"}
             </button>
+          
+            
           </div>
         </>
       )}
 
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
+      <Footer></Footer>
       <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
   );

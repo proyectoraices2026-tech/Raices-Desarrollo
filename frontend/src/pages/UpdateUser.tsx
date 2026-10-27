@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { logAuthError, getFriendlyAuthErrorMessage } from "../lib/logger";
+import { logAuthError } from "../lib/logger";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
-import { useAlert } from "../context/AlertContext";
+import Footer from "../components/Footer";
+import BottomNav from "../components/BottomNav";
 
 /* Página privada para editar el nombre, correo, teléfono y dirección del usuario actual */
 export default function UpdateUser() {
     const { user } = useAuth();
-    const { showAlert } = useAlert();
     const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState("");
@@ -89,33 +89,18 @@ export default function UpdateUser() {
         }
     };
 
-    const handleChangePassword = async () => {
-        if (!user?.email) return;
-
-        const PASSWORD_RESET_ORIGIN_TTL_MS = 60 * 60 * 1000;
-
-        /* Marca el origen para que ResetPassword.tsx sepa que debe volver a "Editar perfil" */
-        localStorage.setItem(
-            "passwordResetOrigin",
-            JSON.stringify({ origin: "profile", expiresAt: Date.now() + PASSWORD_RESET_ORIGIN_TTL_MS })
-        );
-
-        const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-            redirectTo: `${window.location.origin}/reset-password`,
-        });
-
-        if (error) {
-            logAuthError("reset-password-request", error);
-            showAlert({ title: "No se pudo enviar el correo", message: getFriendlyAuthErrorMessage(error), variant: "error" });
-            return;
-        }
-
-        showAlert({ title: "Correo enviado", message: "Te enviamos un enlace para restablecer tu contraseña.", variant: "success" });
+    const handleChangePassword = () => {
+        navigate("/profile-password")
     };
 
     return (
-        <div className="min-h-screen bg-[#DFE5DC] flex flex-col relative">
-            <NavBar onMenuClick={() => setMenuOpen(true)} />
+        <div className="min-h-screen bg-white flex flex-col relative">
+            <div className="sticky top-0 z-40">
+                <NavBar
+                    onMenuClick={() => setMenuOpen(true)}
+                />
+                <BottomNav />
+            </div>
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
             <div className="w-full max-w-sm sm:max-w-lg md:max-w-xl mx-auto my-auto py-8 px-6 md:px-12">
@@ -135,7 +120,7 @@ export default function UpdateUser() {
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 placeholder="Tu nombre"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
 
@@ -149,7 +134,7 @@ export default function UpdateUser() {
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 placeholder="Tu apellido"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
                     </div>
@@ -165,7 +150,7 @@ export default function UpdateUser() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Tu correo"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
 
@@ -179,7 +164,7 @@ export default function UpdateUser() {
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 placeholder="8888-8888"
-                                className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                             />
                         </div>
                     </div>
@@ -194,7 +179,7 @@ export default function UpdateUser() {
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             placeholder="Ingresa la dirección en la que reside actualmente"
-                            className="w-full px-4 py-3 bg-white border border-transparent rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                            className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
                         />
                     </div>
 
@@ -235,6 +220,8 @@ export default function UpdateUser() {
             </div>
 
             <div className="h-6"></div>
+
+            <Footer />
         </div>
     );
 }

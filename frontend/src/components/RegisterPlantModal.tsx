@@ -119,7 +119,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]" role="dialog" aria-modal="true" aria-labelledby="register-plant-title">
       {step === "form" ? (
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-9 relative">
+        <div className="bg-verdePastel rounded-2xl shadow-xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-y-auto p-6 md:p-9 relative">
           <button onClick={resetAndClose} className="absolute top-5 right-5 md:top-6 md:right-6 text-slate-400 hover:text-slate-600" aria-label="Cerrar formulario de registro de planta">
             <X className="w-5 h-5" />
           </button>
@@ -130,7 +130,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           {error && <p className="text-xs text-red-600 mb-3" role="alert">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
-            <div className="md:grid md:grid-cols-2 md:gap-x-5 space-y-4 md:space-y-0">
+            <div className="space-y-4">
               <div>
                 <label htmlFor="plant-name" className={labelClass}>Nombre</label>
                 <input id="plant-name" type="text" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
@@ -141,7 +141,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <TaskFrequencyField
                 label="Regar"
                 enabled={watering.enabled}
@@ -174,7 +174,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
             <fieldset>
               <legend className={labelClass}>Ícono</legend>
               <p className="text-[11px] text-[#8a8a82] -mt-1 mb-3">Elige el ícono que mejor represente a tu planta</p>
-              <div className="grid grid-cols-6 gap-3 max-w-xs md:max-w-sm">
+              <div className="grid grid-cols-5 gap-3 max-w-xs md:max-w-sm">
                 {PLANT_ICONS.map((icon, i) => {
                   const selected = selectedIcon === i;
                   return (
@@ -184,11 +184,11 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
                       onClick={() => setSelectedIcon(i)}
                       aria-pressed={selected}
                       aria-label={`Ícono ${i + 1}${selected ? ", seleccionado" : ""}`}
-                      className={`aspect-square rounded-full border-2 p-1 transition ${
-                        selected ? "bg-[#ece9e3] border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "bg-[#f5f3ee] border-transparent hover:border-[#c9c4b8]"
+                      className={`aspect-square rounded-full border-2 overflow-hidden transition ${
+                        selected ? "border-[#645244] ring-2 ring-offset-2 ring-[#645244]" : "border-transparent hover:border-[#c9c4b8]"
                       }`}
                     >
-                      <img src={icon} alt="" className="w-full h-full object-contain" />
+                      <img src={icon} alt="" className="w-full h-full object-cover rounded-full" />
                     </button>
                   );
                 })}
@@ -201,7 +201,7 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           </form>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
+        <div className="bg-verdePastel rounded-2xl shadow-xl w-full max-w-sm p-8 text-center">
           <div className="w-14 h-14 rounded-full bg-[#DCE3DB] flex items-center justify-center mx-auto mb-4" aria-hidden="true">
             <Check className="w-7 h-7 text-[#3E5C4A]" />
           </div>
@@ -210,9 +210,9 @@ export default function RegisterPlantModal({ isOpen, onClose, onPlantAdded }: Re
           <p className="text-xs text-[#537a63] mt-1 mb-5">Aparecerá entre tus plantas.</p>
 
           <div className="bg-[#f5f7f2] border border-[#e8efe4] rounded-xl p-3 flex items-center gap-3 mb-6 text-left">
-            <div className="w-10 h-10 rounded-lg bg-[#ece9e3] flex-shrink-0 p-1.5" aria-hidden="true">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0" aria-hidden="true">
               {selectedIcon !== null && (
-                <img src={PLANT_ICONS[selectedIcon]} alt="" className="w-full h-full object-contain" />
+                <img src={PLANT_ICONS[selectedIcon]} alt="" className="w-full h-full object-cover" />
               )}
             </div>
             <div>

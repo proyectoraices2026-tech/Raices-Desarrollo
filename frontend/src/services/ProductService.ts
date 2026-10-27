@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import type { TaskUnit } from "./UserPlantsService";
 
 /*
     Los errores que lanza Supabase (por ejemplo cuando una política de RLS bloquea algo)
@@ -7,29 +8,74 @@ import { supabase } from "../lib/supabase";
     lee el mensaje sin importar cuál de los dos casos sea, para no mostrar nunca un
     "Error inesperado" genérico si Supabase sí mandó una razón concreta.
 */
-export function getErrorMessage(err: unknown, fallback = "Ocurrió un error inesperado."): string {
-    if (err instanceof Error) return err.message;
-    if (err && typeof err === "object" && "message" in err) {
-        return String((err as { message: unknown }).message);
-    }
-    return fallback;
+export function getErrorMessage(
+  err: unknown,
+  fallback = "Ocurrió un error inesperado.",
+): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object" && "message" in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return fallback;
 }
 
 /* Esquema del formato de producto para que pueda ser guardado en la base de datos */
 export interface Product {
-    id: string;
-    category_id: string;
-    sku: string;
-    name: string;
-    description: string | null;
-    image_url: string | null;
-    price: number;
-    stock: number;
-    min_stock: number;
-    is_active: boolean;
-    /* Nombre de la categoría, traído por la relación con la tabla `categories`
+  id: string;
+  category_id: string;
+  sku: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  price: number;
+  stock: number;
+  /* Unidades apartadas por pedidos pendientes*/
+  reserved_stock?: number | null;
+  min_stock: number;
+  is_active: boolean;
+  /* Nombre de la categoría, traído por la relación con la tabla `categories`
        (category_id es solo el uuid; esto es lo que se muestra en pantalla) */
-    categories: { name: string } | null;
+  categories: { name: string } | null;
+    /* Datos de planta opcionales (null en productos que no son plantas, como una pala) */
+  default_scientific_name?: string | null;
+  default_watering_interval?: number | null;
+  default_watering_unit?: TaskUnit | null;
+  default_pruning_interval?: number | null;
+  default_pruning_unit?: TaskUnit | null;
+  default_fertilizer_interval?: number | null;
+  default_fertilizer_unit?: TaskUnit | null;
+}
+
+/*
+    Unidades que realmente se pueden pedir ahora: stock menos lo que ya está apartado por pedidos
+    pendientes. Es la misma cuenta que hace el backend al crear un pedido, por eso la tienda
+    muestra este número y no el stock a secas.
+*/
+export function getAvailableStock(
+  product: Pick<Product, "stock" | "reserved_stock">,
+): number {
+  return Math.max(0, product.stock - (product.reserved_stock ?? 0));
+}
+
+/* Datos de planta que se guardan en products; todos opcionales (null = sin dato) */
+export interface PlantDefaults {
+  default_scientific_name: string | null;
+  default_watering_interval: number | null;
+  default_watering_unit: TaskUnit | null;
+  default_pruning_interval: number | null;
+  default_pruning_unit: TaskUnit | null;
+  default_fertilizer_interval: number | null;
+  default_fertilizer_unit: TaskUnit | null;
+}
+
+/* Un producto cuenta como "planta asignable" si tiene al menos uno de esos datos */
+export function hasPlantDefaults(product: Partial<PlantDefaults>): boolean {
+  return (
+    !!product.default_scientific_name ||
+    product.default_watering_interval != null ||
+    product.default_pruning_interval != null ||
+    product.default_fertilizer_interval != null
+  );
 }
 
 /* 
@@ -39,14 +85,16 @@ export interface Product {
     se guarda la url.
 */
 export interface NewProductInput {
-    category_id: string;
-    sku: string;
-    name: string;
-    description?: string;
-    price: number;
-    stock: number;
-    min_stock: number;
-    imageFile: File;
+  category_id: string;
+  sku: string;
+  name: string;
+  description?: string;
+  price: number;
+  costPrice?: number;
+  stock: number;
+  min_stock: number;
+  imageFile: File;
+  plantDefaults?: PlantDefaults;
 }
 
 /* 
@@ -59,26 +107,25 @@ export interface NewProductInput {
 
 /* Esta función va a consultar por productos por ende es un arreglo de productos */
 export async function getActiveProducts(): Promise<Product[]> {
-
-    /* 
+  /* 
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue)
     */
-    const { data, error } = await supabase
-        // Seleccionar tabla
-        .from("products")
-        // Consultar por todos los productos y todos sus atributos, más el nombre
-        // de la categoría relacionada (category_id -> categories.name)
-        .select("*, categories(name)")
-        // Que su atributo is_active = true
-        .eq("is_active", true)
-        // Se acomodan los resultados de forma desendente (Se especifica que de forma ascendente no)
-        .order("created_at", { ascending: false });
-    
-    // Si ocurrió un error se imprime el mensaje
-    if (error) throw error;
-    // Devolver datos
-    return data ?? [];
+  const { data, error } = await supabase
+    // Seleccionar tabla
+    .from("products")
+    // Consultar por todos los productos y todos sus atributos, más el nombre
+    // de la categoría relacionada (category_id -> categories.name)
+    .select("*, categories(name)")
+    // Que su atributo is_active = true
+    .eq("is_active", true)
+    // Se acomodan los resultados de forma desendente (Se especifica que de forma ascendente no)
+    .order("created_at", { ascending: false });
+
+  // Si ocurrió un error se imprime el mensaje
+  if (error) throw error;
+  // Devolver datos
+  return data ?? [];
 }
 
 /* 
@@ -88,23 +135,22 @@ export async function getActiveProducts(): Promise<Product[]> {
     en el formulario donde se creen los productos, las mismas categorias que se encuentran registradas
 */
 export async function getCategories() {
-
-    /* 
+  /* 
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue)
     */
-    const { data, error } = await supabase
-        // Seleccionar tabla
-        .from("categories")
-        // Consultar únicamente por el id y el nombre de la categoria
-        .select("id, name")
-        // Ordena los datos de forma alfabética
-        .order("name");
+  const { data, error } = await supabase
+    // Seleccionar tabla
+    .from("categories")
+    // Consultar únicamente por el id y el nombre de la categoria
+    .select("id, name")
+    // Ordena los datos de forma alfabética
+    .order("name");
 
-    // Si ocurrió un error se imprime el mensaje
-    if (error) throw error;
-    // Devolver datos
-    return data ?? [];
+  // Si ocurrió un error se imprime el mensaje
+  if (error) throw error;
+  // Devolver datos
+  return data ?? [];
 }
 
 /* 
@@ -120,57 +166,72 @@ export async function getCategories() {
     asignar a Product para que se pueda usar la base de datos
 */
 export async function createProduct(input: NewProductInput): Promise<Product> {
-    
-    /* Para asignarle el nombre a la imagen, se hace uso del atributo sku del producto y se le añade la fecha */
-    const fileName = `${input.sku}-${Date.now()}.${input.imageFile.name.split(".").pop()}`;
-    /* 
+  /* Para asignarle el nombre a la imagen, se hace uso del atributo sku del producto y se le añade la fecha */
+  const fileName = `${input.sku}-${Date.now()}.${input.imageFile.name.split(".").pop()}`;
+  /* 
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue).
 
         await supabase.storage hace referencia la bucket que es el lugar donde se guardan las imágenes
     */
-    const { data: uploadData, error: uploadError } = await supabase.storage
-        // seleccionar el bucket donde se guardan las imagenes
-        .from("product-images")
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    // seleccionar el bucket donde se guardan las imagenes
+    .from("product-images")
 
-        // se actualiza el nombre dentro de la base de datos
-        .upload(fileName, input.imageFile);
+    // se actualiza el nombre dentro de la base de datos
+    .upload(fileName, input.imageFile);
 
-       // Si ocurrió un error se imprime el mensaje 
-    if (uploadError) throw uploadError;
+  // Si ocurrió un error se imprime el mensaje
+  if (uploadError) throw uploadError;
 
-    // se extrae la url de la imagen en el bucket para ponersela al producto en la tabla
-    const { data: { publicUrl } } = supabase.storage
-        .from("product-images")
-        .getPublicUrl(uploadData.path);
+  // se extrae la url de la imagen en el bucket para ponersela al producto en la tabla
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("product-images").getPublicUrl(uploadData.path);
 
-    // insertar la data en la tablar productos
+  // insertar la data en la tablar productos
 
-    /* 
+  /* 
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue).
     */
-    const { data, error } = await supabase
-        // seleccionar tabla products
-        .from("products")
-        // insetar los datos en la tabla
-        .insert({
-            category_id: input.category_id,
-            sku: input.sku,
-            name: input.name,
-            description: input.description ?? null,
-            image_url: publicUrl,
-            price: input.price,
-            stock: input.stock,
-            min_stock: input.min_stock,
-        })
-        .select()
-        .single();
+  const { data, error } = await supabase
+    // seleccionar tabla products
+    .from("products")
+    // insetar los datos en la tabla
+    .insert({
+      category_id: input.category_id,
+      sku: input.sku,
+      name: input.name,
+      description: input.description ?? null,
+      image_url: publicUrl,
+      price: input.price,
+      stock: 0,
+      min_stock: input.min_stock,
+      ...input.plantDefaults,
+    })
+    .select()
+    .single();
 
-    // Si ocurrió un error se imprime el mensaje
-    if (error) throw error;
-    // Devolver datos
-    return data;
+  // Si ocurrió un error se imprime el mensaje
+  // Si ocurrió un error se imprime el mensaje
+  if (error) throw error;
+
+  /* Si el admin indicó un costo, se guarda primero para que la inversión del
+      stock inicial ya se calcule con el costo real y no con el 50% provisional */
+  if (input.costPrice !== undefined) {
+    await setProductCost(data.id, input.costPrice);
+  }
+
+  /* El stock inicial se registra como una compra (movimiento restock), para que cuente
+       como inversión; add_stock es quien suma las unidades al producto */
+  if (input.stock > 0) {
+    await addStock(data.id, input.stock, input.costPrice ?? null, "Stock inicial");
+    return { ...data, stock: input.stock };
+  }
+
+  // Devolver datos
+  return data;
 }
 
 /*
@@ -180,13 +241,31 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
     el admin pueda verlos en la lista y reactivarlos si fue un error.
 */
 export async function getAllProducts(): Promise<Product[]> {
-    const { data, error } = await supabase
-        .from("products")
-        .select("*, categories(name)")
-        .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, categories(name)")
+    .order("created_at", { ascending: false });
 
-    if (error) throw error;
-    return data ?? [];
+  if (error) throw error;
+  return data ?? [];
+}
+
+/*
+    Productos activos que tienen datos de planta, para la pantalla donde el admin le asigna
+    plantas a un usuario. Un producto sin ningún dato de planta (una pala, por ejemplo) no aparece.
+*/
+export async function getPlantProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, categories(name)")
+    .eq("is_active", true)
+    .or(
+      "default_scientific_name.not.is.null,default_watering_interval.not.is.null,default_pruning_interval.not.is.null,default_fertilizer_interval.not.is.null",
+    )
+    .order("name");
+
+  if (error) throw error;
+  return data ?? [];
 }
 
 /*
@@ -195,14 +274,15 @@ export async function getAllProducts(): Promise<Product[]> {
     imageFile también es opcional: si no se manda, el producto se queda con la imagen que ya tenía.
 */
 export interface UpdateProductInput {
-    category_id?: string;
-    sku?: string;
-    name?: string;
-    description?: string;
-    price?: number;
-    stock?: number;
-    min_stock?: number;
-    imageFile?: File;
+  category_id?: string;
+  sku?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  costPrice?: number;
+  min_stock?: number;
+  imageFile?: File;
+  plantDefaults?: PlantDefaults;
 }
 
 /*
@@ -211,30 +291,32 @@ export interface UpdateProductInput {
     Sigue el mismo patrón que createProduct: si viene una imagen nueva, primero se sube
     al bucket y se reemplaza la url; si no viene, se deja la imagen tal como estaba.
 */
-export async function updateProduct(id: string, input: UpdateProductInput): Promise<void> {
-
-    /* Se separa imageFile del resto porque ese campo no existe como columna en la tabla,
+export async function updateProduct(
+  id: string,
+  input: UpdateProductInput,
+): Promise<void> {
+  /* Se separa imageFile del resto porque ese campo no existe como columna en la tabla,
        solo se usa para subir el archivo y calcular image_url */
-    const { imageFile, ...fieldsToUpdate } = input;
+  const { imageFile, costPrice, plantDefaults, ...fieldsToUpdate } = input;
 
-    /* Si se mandó una imagen nueva, se sube igual que en createProduct y se agrega su url */
-    if (imageFile) {
-        const fileName = `${input.sku ?? id}-${Date.now()}.${imageFile.name.split(".").pop()}`;
+  /* Si se mandó una imagen nueva, se sube igual que en createProduct y se agrega su url */
+  if (imageFile) {
+    const fileName = `${input.sku ?? id}-${Date.now()}.${imageFile.name.split(".").pop()}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from("product-images")
-            .upload(fileName, imageFile);
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, imageFile);
 
-        if (uploadError) throw uploadError;
+    if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-            .from("product-images")
-            .getPublicUrl(uploadData.path);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("product-images").getPublicUrl(uploadData.path);
 
-        (fieldsToUpdate as Record<string, unknown>).image_url = publicUrl;
-    }
+    (fieldsToUpdate as Record<string, unknown>).image_url = publicUrl;
+  }
 
-    /*
+  /*
         Ojo: aquí a propósito NO se encadena .select() después de .update(). Pedir de
         vuelta la fila recién editada se filtra por la policy de LECTURA (products_select_all,
         que solo deja ver productos con is_active = true), no por la de escritura — así
@@ -243,12 +325,16 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
         a esta función (EditProductModal.tsx) nunca usa el producto que devuelve, ni falta
         que le pidamos.
     */
-    const { error } = await supabase
-        .from("products")
-        .update(fieldsToUpdate)
-        .eq("id", id);
+  const { error } = await supabase
+    .from("products")
+    .update({ ...fieldsToUpdate, ...plantDefaults })
+    .eq("id", id);
 
-    if (error) throw error;
+  if (error) throw error;
+
+    if (costPrice !== undefined) {
+    await setProductCost(id, costPrice);
+  }
 }
 
 /*
@@ -260,14 +346,150 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
     rompería el historial de esos pedidos. getActiveProducts() ya solo trae productos
     activos, así que uno desactivado desaparece de la tienda automáticamente.
 */
-export async function setProductActive(id: string, isActive: boolean): Promise<void> {
-    /* Mismo motivo que en updateProduct: sin .select() después de .update(), para no
+export async function setProductActive(
+  id: string,
+  isActive: boolean,
+): Promise<void> {
+  /* Mismo motivo que en updateProduct: sin .select() después de .update(), para no
        chocar con la policy de lectura al desactivar un producto (deja de cumplir
        is_active = true justo en la misma operación que lo cambia). */
-    const { error } = await supabase
-        .from("products")
-        .update({ is_active: isActive })
-        .eq("id", id);
+  const { error } = await supabase
+    .from("products")
+    .update({ is_active: isActive })
+    .eq("id", id);
 
+  if (error) throw error;
+}
+
+/*
+    Obtener los productos más vendidos
+
+    El ranking lo calcula la función de Postgres get_best_sellers (suma las cantidades de
+    las solicitudes aprobadas). Desde el cliente no se puede calcular directamente porque
+    la RLS de request_items solo deja ver las solicitudes propias. Si hay menos productos
+    con ventas que el límite pedido, se completa con los más recientes.
+*/
+export async function getBestSellers(limit = 10): Promise<Product[]> {
+  const { data: ranking, error: rankingError } = await supabase.rpc(
+    "get_best_sellers",
+    {
+      limit_count: limit,
+    },
+  );
+  if (rankingError) throw rankingError;
+
+  const ids: string[] = (ranking ?? []).map(
+    (row: { product_id: string }) => row.product_id,
+  );
+
+  let bestSellers: Product[] = [];
+  if (ids.length > 0) {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*, categories(name)")
+      .in("id", ids)
+      .eq("is_active", true);
     if (error) throw error;
+
+    /* .in() no garantiza el orden, así que se reordena según el ranking */
+    const byId = new Map<string, Product>(
+      (data ?? []).map((p: Product) => [p.id, p] as [string, Product]),
+    );
+    bestSellers = ids
+      .map((id) => byId.get(id))
+      .filter((p): p is Product => p !== undefined);
+  }
+
+  if (bestSellers.length >= limit) return bestSellers;
+
+  /* Relleno: productos más recientes que todavía no estén en la lista */
+  const { data: recent, error: recentError } = await supabase
+    .from("products")
+    .select("*, categories(name)")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (recentError) throw recentError;
+
+  const alreadyIncluded = new Set(bestSellers.map((p) => p.id));
+  const filler = (recent ?? []).filter(
+    (p: Product) => !alreadyIncluded.has(p.id),
+  );
+
+  return [...bestSellers, ...filler].slice(0, limit);
+}
+
+/*
+    Costo unitario guardado para un producto (tabla product_costs, solo visible para admin).
+    null significa que no hay uno guardado y se usa el 50% del precio como valor provisional.
+*/
+export async function getProductCostOverride(
+  productId: string,
+): Promise<number | null> {
+  const { data, error } = await supabase
+    .from("product_costs")
+    .select("cost_price")
+    .eq("product_id", productId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data ? Number(data.cost_price) : null;
+}
+
+/*
+    Registra una compra de mercancía y suma las unidades al stock, todo en una sola operación
+    en la base de datos. Si unitCost es null, se usa el costo guardado del producto o, si no
+    hay, el 50% del precio. saveAsProductCost guarda unitCost como costo habitual del producto.
+*/
+export async function addStock(
+  productId: string,
+  quantity: number,
+  unitCost: number | null = null,
+  note: string | null = null,
+  saveAsProductCost = false,
+): Promise<number> {
+  const { data, error } = await supabase.rpc("add_stock", {
+    p_product_id: productId,
+    p_quantity: quantity,
+    p_unit_cost: unitCost,
+    p_note: note,
+    p_set_as_product_cost: saveAsProductCost,
+  });
+
+  if (error) throw error;
+  return data as number;
+}
+
+/* Corrección o merma: delta positivo suma, negativo resta. No cuenta como inversión. */
+export async function adjustStock(
+  productId: string,
+  delta: number,
+  note: string | null = null,
+): Promise<number> {
+  const { data, error } = await supabase.rpc("adjust_stock", {
+    p_product_id: productId,
+    p_delta: delta,
+    p_note: note,
+  });
+
+  if (error) throw error;
+  return data as number;
+}
+
+/*
+    Guarda (o actualiza) el costo unitario habitual de un producto en product_costs.
+    upsert: si ya hay fila para ese product_id la actualiza, si no la crea.
+*/
+export async function setProductCost(
+  productId: string,
+  costPrice: number,
+): Promise<void> {
+  const { error } = await supabase
+    .from("product_costs")
+    .upsert(
+      { product_id: productId, cost_price: costPrice, updated_at: new Date().toISOString() },
+      { onConflict: "product_id" },
+    );
+
+  if (error) throw error;
 }

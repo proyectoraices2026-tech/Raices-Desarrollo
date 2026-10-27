@@ -10,6 +10,8 @@ import { formatPrice } from "../utils/formatPrice";
 import NavBar from "../components/NavBar";
 import SideMenu from "../components/SideMenu";
 import BottomNav from "../components/BottomNav";
+import Footer from "../components/Footer";
+import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
 /* Nombre del cliente que hizo el pedido. Solo trae id y name, igual que en
    UpdateUser.tsx, para poder mostrar "quién pidió" en vez de solo el uuid. */
@@ -39,6 +41,11 @@ export default function AdminRequests() {
 
     const [acceptingId, setAcceptingId] = useState<string | null>(null);
     const [acceptMessage, setAcceptMessage] = useState("");
+
+    /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
+    const handleScrollUp = () => {
+        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const loadPendingRequests = () => {
         setLoading(true);
@@ -115,11 +122,11 @@ export default function AdminRequests() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F4F6F3]">
+        <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0">
             <NavBar onMenuClick={() => setMenuOpen(true)} />
             <BottomNav />
 
-            <main className="p-4 sm:p-6 max-w-2xl mx-auto">
+            <main id="first" className="p-4 sm:p-6 w-full max-w-2xl mx-auto flex-1">
                 {loading && (
                     <p className="text-sm text-[#537a63] text-center py-10 animate-pulse">Cargando pedidos...</p>
                 )}
@@ -143,7 +150,7 @@ export default function AdminRequests() {
                         const isProcessing = processingId === request.id;
 
                         return (
-                            <div key={request.id} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+                            <div key={request.id} className="bg-white border border-[#e8efe4] rounded-2xl p-4 md:p-5 shadow-sm">
                                 <div className="flex items-center justify-between mb-3">
                                     <div>
                                         <p className="text-sm font-semibold text-[#1e2d24]">
@@ -231,7 +238,7 @@ export default function AdminRequests() {
                             onChange={(e) => setRejectReason(e.target.value)}
                             rows={3}
                             placeholder="Ej. No hay suficiente stock de una de las plantas."
-                            className="w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
+                            className="bg-white w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
                         />
                         <div className="flex gap-3">
                             <button
@@ -269,7 +276,7 @@ export default function AdminRequests() {
                             onChange={(e) => setAcceptMessage(e.target.value)}
                             rows={3}
                             placeholder="Ej. Tu pedido estará listo el 25 de agosto para que pases a recogerlo."
-                            className="w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
+                            className="bg-white w-full border border-[#dcdcd4] rounded-xl p-3 text-sm text-[#1e2d24] mb-4 focus:outline-none focus:ring-2 focus:ring-[#4E705B]/40"
                         />
                         <div className="flex gap-3">
                             <button
@@ -289,9 +296,12 @@ export default function AdminRequests() {
                     </div>
                 </div>
             )}
-
+            
             {/* Panel lateral, visible en toda la pantalla */}
             <SideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+                <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
+                <Footer/>
         </div>
     );
 }

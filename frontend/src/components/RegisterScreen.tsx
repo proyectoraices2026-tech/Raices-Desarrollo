@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { validatePassword } from '../utils/ValidatePassword';
+import { useNavigate } from 'react-router-dom';
 
 interface RegisterScreenProps {
   onRegisterSubmit: (data: {
@@ -33,6 +34,11 @@ export function RegisterScreen({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleGoToLogin = () => {
+    navigate ("/login");
+  }
 
   /* Valida los datos y entrega la información de registro a la página */
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,7 +69,7 @@ export function RegisterScreen({
   };
 
   return (
-    <div className="min-h-screen bg-[#DFE5DC] flex flex-col justify-between p-6 md:p-12 relative">
+    <div className="min-h-screen bg-white flex flex-col justify-between p-6 md:p-12 relative">
 
       <button
         onClick={onBackToOnboarding}
@@ -78,6 +84,17 @@ export function RegisterScreen({
         Registrar
       </h1>
 
+      <div className="flex justify-center pb-4 text-sm font-medium text-gray-600">
+          <span>¿Ya tienes una cuenta?&nbsp;</span>
+          <button 
+            type="button" 
+            className="font-semibold text-[#2D4A3E] hover:underline" 
+            onClick={handleGoToLogin}
+          >
+            Inicia sesión
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -90,7 +107,7 @@ export function RegisterScreen({
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="John"
-                className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
               />
             </div>
 
@@ -104,7 +121,7 @@ export function RegisterScreen({
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Doe"
-                className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
               />
             </div>
           </div>
@@ -119,7 +136,7 @@ export function RegisterScreen({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Ingresa tu correo electrónico"
-              className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+              className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
             />
           </div>
 
@@ -133,7 +150,7 @@ export function RegisterScreen({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="8888-8888"
-              className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+              className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
             />
           </div>
 
@@ -147,7 +164,7 @@ export function RegisterScreen({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Ingresa la dirección en la que recide actualmente"
-              className="w-full px-4 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
+              className="w-full px-4 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm  transition"
             />
           </div>
 
@@ -162,7 +179,7 @@ export function RegisterScreen({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-4 pr-11 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                className="w-full pl-4 pr-11 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
               />
               <button
                 type="button"
@@ -192,7 +209,7 @@ export function RegisterScreen({
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-4 pr-11 py-3 bg-white rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
+                className="w-full pl-4 pr-11 py-3 bg-white border border-[#dcdcd4] rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-sm transition"
               />
               <button
                 type="button"

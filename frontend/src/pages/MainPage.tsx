@@ -42,7 +42,7 @@ export default function MainPage() {
 };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-fondoGlobal">
+        <div className="flex min-h-screen items-center justify-center bg-white">
 
             {error && (
                 <div className="alert alert-error bg-error text-texto">

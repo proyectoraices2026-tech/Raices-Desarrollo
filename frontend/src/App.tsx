@@ -1,17 +1,18 @@
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import MainPage from './pages/MainPage';
 import UpdateUser from './pages/UpdateUser';
+import UpdatePasswordFromProfile from './pages/UpdatePasswordFromProfile';
 import ResetPassword from './pages/ResetPassword';
 import Catalog from './pages/Catalog';
 import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
 import AdminDashboard from './pages/AdminDashboard'
+import AdminStats from './pages/AdminStats'
 
 //aaa
 import MyPlants from './pages/MyPlants';
@@ -20,6 +21,9 @@ import Cart from './pages/Cart';
 import MyRequests from './pages/MyRequests';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Calendar from './pages/Calendar';
+import Chatbot from './pages/ChatBot';
+import ScrollToTop from './components/ScrollToTop';
+import TopPullRefresh from './components/TopPullRefresh';
 
 /* 
     Rutas privadas
@@ -88,14 +92,18 @@ function App() {
 
   return (
     <BrowserRouter>
-      {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
+      
+      <ScrollToTop></ScrollToTop>
+      <TopPullRefresh />
+        {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
-        <Route path="/" element={<Onboarding />} />
+        <Route path="/" element={<Catalog />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/cart" element={<Cart />}/>
 
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
         <Route path="/home" element={
@@ -112,9 +120,9 @@ function App() {
         } />
 
         {/*Ruta privada, requiere autenticación por parte del usuario*/}
-        <Route path="/catalog" element={
+        <Route path="/profile-password" element={
           <PrivateRoute>
-            <Catalog />
+            <UpdatePasswordFromProfile />
           </PrivateRoute>
         } />
 
@@ -125,9 +133,21 @@ function App() {
           </PrivateRoute>
         } />
 
+        <Route path="/chatbot" element={
+          <PrivateRoute>
+            <Chatbot/>
+          </PrivateRoute>
+        } />
         <Route path="/admin" element={
           <AdminRoute>
             <AdminDashboard />
+          </AdminRoute>
+        } />
+
+        {/*Ruta de admin: página aparte de estadísticas*/}
+        <Route path="/admin/stats" element={
+          <AdminRoute>
+            <AdminStats />
           </AdminRoute>
         } />
 
@@ -150,16 +170,7 @@ function App() {
             <MyPlants />
           </PrivateRoute>
         } />
-        <Route path="/about" element={
-          <PrivateRoute>
-            <AboutUs />
-          </PrivateRoute>
-        } />
-        <Route path="/cart" element={
-          <PrivateRoute>
-            <Cart />
-          </PrivateRoute>
-        } />
+        <Route path="/about" element={<AboutUs />} />
         <Route path="/my-requests" element={
           <PrivateRoute>
             <MyRequests />

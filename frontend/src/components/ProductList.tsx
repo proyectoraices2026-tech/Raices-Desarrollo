@@ -1,18 +1,16 @@
-import { useEffect, useState, useMemo } from "react";
-import { getActiveProducts } from "../services/ProductService";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getActiveProducts, getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
 
-import { formatPrice } from "../utils/formatPrice";
-import { useCart } from "../context/CartContext";
-import { useAlert } from "../context/AlertContext";
 import ProductDetailModal from "./ProductDetailModal";
+import { formatPrice } from "../utils/formatPrice";
 /* 10 filas de 5 productos cada una */
 const ITEMS_PER_PAGE = 50;
 
 /* Categorías */
 const DEFAULT_CATEGORIES = ["Todo", "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
-function ProductCard({
+export function ProductCard({
   product,
   onProductClick,
   onAddToCart,
@@ -23,12 +21,14 @@ function ProductCard({
 }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  /* Sin unidades disponibles (stock menos lo apartado por pedidos pendientes) no se puede agregar */
+  const soldOut = getAvailableStock(product) <= 0;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
+    <div className="bg-white border border-[#e8efe4] rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
       <div
         onClick={() => onProductClick(product)}
-        className="relative w-full aspect-[4/3] bg-slate-100 cursor-pointer flex-shrink-0 overflow-hidden"
+        className="relative w-full aspect-[4/3] bg-white cursor-pointer flex-shrink-0 overflow-hidden"
       >
         {!imageLoaded && !imageError && (
           <div className="absolute inset-0 bg-slate-200 animate-pulse flex items-center justify-center">
@@ -47,7 +47,7 @@ function ProductCard({
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
+            className={`w-full h-full object-contain transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
           />
@@ -73,15 +73,19 @@ function ProductCard({
 
         {/* Precio + botón de agregar */}
         <div className="flex items-center justify-between pt-1">
-          <p className="font-extrabold text-[#2D4A3E] text-sm">
-            ₡{formatPrice(product.price)}
-          </p>
+          <div className="min-w-0 flex flex-wrap items-baseline gap-x-1.5">
+            <p className="font-extrabold text-[#2D4A3E] text-sm">
+              ₡{formatPrice(product.price)}
+            </p>
+            {soldOut && <p className="text-[11px] font-bold text-red-600">Agotado</p>}
+          </div>
 
           <button
             type="button"
             onClick={() => onAddToCart(product)}
-            className="w-9 h-9 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0"
-            title="Agregar"
+            disabled={soldOut}
+            className="w-9 h-9 rounded-full bg-[#4E705B] hover:bg-[#3A5A40] text-white flex items-center justify-center shadow-sm transition flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#4E705B]"
+            title={soldOut ? "Agotado" : "Agregar"}
           >
             <Plus className="w-5 h-5" />
           </button>
@@ -100,9 +104,6 @@ export function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState("Todo");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const { addToCart } = useCart();
-  const { showAlert } = useAlert();
 
   useEffect(() => {
     getActiveProducts()
@@ -141,6 +142,38 @@ export function ProductList() {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
+  /* Flechas del selector de categorías: solo se muestran si hay más categorías por ver a ese lado */
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateChipsArrows = useCallback(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  /* Los chips solo existen cuando ya cargaron los productos, por eso loading y error están en las dependencias */
+  useEffect(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+
+    updateChipsArrows();
+    el.addEventListener("scroll", updateChipsArrows, { passive: true });
+    const observer = new ResizeObserver(updateChipsArrows);
+    observer.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", updateChipsArrows);
+      observer.disconnect();
+    };
+  }, [loading, error, updateChipsArrows]);
+
+  const scrollChips = (direction: "left" | "right") => {
+    chipsRef.current?.scrollBy({ left: direction === "left" ? -180 : 180, behavior: "smooth" });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -171,33 +204,64 @@ export function ProductList() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Buscar productos..."
-          className="w-full pl-4 pr-10 py-2.5 bg-white rounded-full text-xs sm:text-sm  focus:outline-none focus:ring-2 focus:ring-[#4E705B] text-slate-700 placeholder-slate-400"
+          className="w-full pl-4 pr-10 py-2.5 bg-white rounded-full text-xs sm:text-sm outline-none ring-2 ring-[#4E705B] text-slate-700 placeholder-slate-400"
         />
         <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Chips de Categorías */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center">
-        {DEFAULT_CATEGORIES.map((cat) => {
-          const isActive = selectedCategory === cat;
-          return (
+       {/* Chips de Categorías: con flechas y degradado cuando hay más categorías por ver */}
+      <div className="relative">
+        <div
+          ref={chipsRef}
+          className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center"
+        >
+          {DEFAULT_CATEGORIES.map((cat) => {
+            const isActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
+                  isActive
+                    ? "bg-[#4E705B] text-white "
+                    : "bg-white text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {canScrollLeft && (
+          <div className="absolute left-0 top-0 bottom-1 flex items-center pr-6 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none">
             <button
-              key={cat}
               type="button"
-              onClick={() => {
-                setSelectedCategory(cat);
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
-                isActive
-                  ? "bg-[#4E705B] text-white "
-                  : "bg-white text-slate-600 hover:bg-slate-100"
-              }`}
+              onClick={() => scrollChips("left")}
+              aria-label="Ver categorías anteriores"
+              className="pointer-events-auto w-7 h-7 rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow-sm flex items-center justify-center"
             >
-              {cat}
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          );
-        })}
+          </div>
+        )}
+
+        {canScrollRight && (
+          <div className="absolute right-0 top-0 bottom-1 flex items-center pl-6 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none">
+            <button
+              type="button"
+              onClick={() => scrollChips("right")}
+              aria-label="Ver más categorías"
+              className="pointer-events-auto w-7 h-7 rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow-sm flex items-center justify-center"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Contador de Productos */}
@@ -213,10 +277,10 @@ export function ProductList() {
               key={product.id}
               product={product}
               onProductClick={(p) => setSelectedProduct(p)}
-              onAddToCart={(p) => {
-                addToCart(p);
-                showAlert({ title: "Añadido al carrito", message: p.name, variant: "success" });
-              }}            />
+              /* El "+" ya no agrega directo al carrito: abre la ficha del producto,
+                 igual que si se tocara la imagen o el nombre */
+              onAddToCart={(p) => setSelectedProduct(p)}
+            />
           ))}
         </div>
       ) : (

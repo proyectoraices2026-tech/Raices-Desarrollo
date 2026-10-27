@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2] p-6">
+    <div className="min-h-screen bg-white p-6">
       <button
         onClick={() => navigate(-1)}
         className="p-2 -ml-2 mb-4 text-[#3E5C4A] rounded-full hover:bg-[#4E705B]/10"
