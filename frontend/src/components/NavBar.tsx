@@ -5,6 +5,7 @@ import logoIcon from "../assets/iconoraicesblanco.png";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import DesktopNavLinks from "./DesktopNavLinks";
+import NotificationBell from "./NotificationBell";
 
 interface NavBarProps {
   /* Abre el panel lateral (SideMenu); cada página sigue siendo dueña de ese estado */
@@ -97,6 +98,8 @@ export default function NavBar({
             )}
           </button>
         )}
+        {/* Notificaciones */}
+        <NotificationBell />
              {/* Chatbot */}
               {user && (
                 <button

@@ -31,6 +31,9 @@ export interface Product {
   stock: number;
   /* Unidades apartadas por pedidos pendientes*/
   reserved_stock?: number | null;
+  /* Marca de "segura para mascotas" (slider del catálogo). Todavía NO existe en la base de datos:
+     cuando se agregue la columna con este nombre, el slider se activa solo; mientras tanto viene undefined */
+  pet_safe?: boolean | null;
   min_stock: number;
   is_active: boolean;
   /* Nombre de la categoría, traído por la relación con la tabla `categories`

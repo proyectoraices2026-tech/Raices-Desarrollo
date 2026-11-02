@@ -13,7 +13,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
 import AdminDashboard from './pages/AdminDashboard'
 import AdminStats from './pages/AdminStats'
-
+import NewsPage from './pages/NewsPage';
 //aaa
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
@@ -24,6 +24,9 @@ import Calendar from './pages/Calendar';
 import Chatbot from './pages/ChatBot';
 import ScrollToTop from './components/ScrollToTop';
 import AdminAssignPlants from './pages/AdminAssignPlants';
+import Notifications from './pages/Notifications';
+import Guides from './pages/Guides';
+import GuidePopup from './components/GuidePopup';
 
 /* 
     Rutas privadas
@@ -94,6 +97,7 @@ function App() {
     <BrowserRouter>
       
       <ScrollToTop></ScrollToTop>
+      <GuidePopup />
         {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Catalog />} />
@@ -150,6 +154,9 @@ function App() {
           </AdminRoute>
         } />
 
+        <Route path="/noticias" element={<NewsPage />} />
+
+
         {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
         <Route path="/admin/products/new" element={
           <AdminRoute>
@@ -176,6 +183,12 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/guides" element={<Guides />} />
+        <Route path="/notifications" element={
+          <PrivateRoute>
+            <Notifications />
+          </PrivateRoute>
+        } />
         <Route path="/my-requests" element={
           <PrivateRoute>
             <MyRequests />

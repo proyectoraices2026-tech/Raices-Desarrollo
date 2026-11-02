@@ -23,6 +23,7 @@ export function useNavTabs() {
 
     const tabs: NavTab[] = [
         { key: "catalog", label: "Inicio", icon: catalogIcon, path: "/" },
+        { key: "news", label: "Noticias", icon: calendarIcon, path: "/noticias" },
         ...(role === "admin"
             ? [{ key: "dashboard", label: "Dashboard", icon: calendarIcon, path: "/admin/stats" }]
             : [{ key: "my-requests", label: "Mis pedidos", icon: ordersIcon, path: "/my-requests" }]),

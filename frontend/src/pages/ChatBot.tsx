@@ -3,12 +3,10 @@ import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
 import { SendHorizonal, BotMessageSquare, RefreshCcw } from "lucide-react";
-import { sendMessageToRut,  } from "../services/ChatService"; 
+import { sendMessageToRut } from "../services/ChatService"; 
 import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
-
-
 
 export default function Chatbot() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,11 +14,11 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false);
 
   /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
-    const handleScrollUp = () => {
-        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
-    };
+  const handleScrollUp = () => {
+    document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  // Mensaje inicial , se podria cambiar 
+  // Mensaje inicial
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "bot",
@@ -34,7 +32,7 @@ export default function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Envio Real al backend de Railway + Gemini
+  // Envío Real al backend de Railway + Gemini
   const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
     if (!text.trim() || loading) return;
@@ -46,11 +44,23 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      // 2. Petición a Express / Railway
-      const reply = await sendMessageToRut(text, messages);
+     // 2. Petición a Express / Railway
+      const responseData = await sendMessageToRut(text, messages);
 
-      // 3. Agregar la respuesta real de Rut (Gemini 2.5 Flash)
-      setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+      const responseObj = responseData as unknown as { reply: string; actionExecuted?: any };
+      const replyText = typeof responseData === "string" ? responseData : responseObj.reply;
+
+      // 3. Agregar la respuesta real de Rut
+      setMessages((prev) => [...prev, { sender: "bot", text: replyText }]);
+
+      // 4. Si Rut ejecutó una acción sobre una tarea, disparamos un evento global para actualizar el calendario/tareas
+      if (typeof responseData === "object" && responseData !== null && "actionExecuted" in responseData) {
+        window.dispatchEvent(
+          new CustomEvent("task-updated", {
+            detail: (responseData as any).actionExecuted,
+          })
+        );
+      }
     } catch (error) {
       console.error("Error al comunicarse con Rut:", error);
       setMessages((prev) => [
@@ -68,19 +78,17 @@ export default function Chatbot() {
   return (
     <div className="min-h-screen bg-[#FDFEFD] flex flex-col">
       <NavBar onMenuClick={() => setMenuOpen(true)} />
-      {/* El BottomNav se renderiza automáticamente abajo en móvil por su clase fixed */}
       <BottomNav />
 
       {/* Contenedor principal centrado, máximo ancho 4xl para escritorio */}
       <main id="first" className="flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col mb-20 md:mb-6 mt-16 md:mt-24">
         
-        {/* Tarjeta del Chat - Estilo contenedor del diseño */}
+        {/* Tarjeta del Chat */}
         <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-1 flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner">
           
-          {/* Encabezado del Chat (Rut + Estado + Reset) */}
+          {/* Encabezado del Chat */}
           <div className="p-3 border-b border-[#D9E2D7] bg-[#EDF2EB] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {/* Icono de Bot (Marrón/Crema como el diseño) */}
               <div className="w-9 h-9 rounded-full bg-[#E8DCCB] border border-[#DCCBB5] flex items-center justify-center text-[#907A60]">
                 <BotMessageSquare className="w-5 h-5" />
               </div>
@@ -92,9 +100,8 @@ export default function Chatbot() {
                 </p>
               </div>
             </div>
-            {/* Icono de reiniciar chat */}
             <button 
-              onClick={() => setMessages([messages[0]])} // Reinicia visualmente la conversación
+              onClick={() => setMessages([messages[0]])}
               className="p-1.5 text-[#A6B7A9] hover:text-[#718878] transition"
               title="Reiniciar chat"
             >
@@ -102,27 +109,23 @@ export default function Chatbot() {
             </button>
           </div>
 
-          {/* Área Principal de Mensajes y Preguntas Frecuentes */}
+          {/* Área Principal de Mensajes */}
           <div className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
             
-            {/* Separador de Fecha "Hoy" */}
             <div className="flex justify-center my-2">
               <span className="text-[10px] text-[#A6B7A9] bg-[#EDF2EB] px-3 py-1 rounded-full border border-[#D9E2D7]">Hoy</span>
             </div>
 
-            {/* Mapeo de Mensajes */}
             {messages.map((msg, index) => {
               const isUser = msg.sender === "user";
               return (
                 <div key={index} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
                   <div className="flex gap-2 max-w-[85%] md:max-w-[75%] items-end">
-                    {/* Icono de Rut a la izquierda solo para el bot */}
                     {!isUser && (
                       <div className="w-6 h-6 rounded-full bg-[#DCCBB5] flex items-center justify-center text-[#907A60] flex-shrink-0">
                         <BotMessageSquare className="w-3.5 h-3.5" />
                       </div>
                     )}
-                    {/* Burbuja de chat - Estilo Redondeado y color crema */}
                     <div
                       className={`p-3 md:p-3.5 rounded-2xl text-[11px] md:text-xs leading-relaxed ${
                         isUser
@@ -137,8 +140,6 @@ export default function Chatbot() {
               );
             })}
 
-           
-            {/* Indicador de "Escribiendo..." */}
             {loading && (
               <div className="flex justify-start items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-[#DCCBB5] flex items-center justify-center text-[#907A60] flex-shrink-0">
@@ -152,7 +153,7 @@ export default function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Caja de Entrada de Mensaje (Estilo Píldora del Diseño) */}
+          {/* Caja de Entrada de Mensaje */}
           <div className="p-3 md:p-4 border-t border-[#D9E2D7] bg-[#EDF2EB]">
             <div className="relative flex items-center">
               <input
@@ -171,7 +172,6 @@ export default function Chatbot() {
                 <SendHorizonal className="w-4 h-4" />
               </button>
             </div>
-            {/* Texto de pie de página */}
             <p className="text-center text-[9px] text-[#A6B7A9] mt-2.5">
               Rut puede cometer errores. Verifica los cuidados importantes.
             </p>

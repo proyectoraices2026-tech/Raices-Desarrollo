@@ -71,6 +71,9 @@ export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?:
               <Link to="/about" className={linkClass}>Sobre nosotros</Link>
             </li>
             <li>
+              <Link to="/guides" className={linkClass}>Guía rápida</Link>
+            </li>
+            <li>
               <Link to="/terms" className={linkClass}>Términos y condiciones</Link>
             </li>
           </ul>
