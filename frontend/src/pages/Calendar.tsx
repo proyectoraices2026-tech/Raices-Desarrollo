@@ -91,6 +91,20 @@ export default function Calendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentMonth]);
 
+  // Escuchar el evento global emitido por Rut cuando completa una tarea
+  useEffect(() => {
+    const handleTaskUpdatedFromRut = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log("Tarea actualizada mediante Rut en el chat:", customEvent.detail);
+      loadTasks(); // Recarga automática de las tareas del mes
+    };
+
+    window.addEventListener("task-updated", handleTaskUpdatedFromRut);
+    return () => {
+      window.removeEventListener("task-updated", handleTaskUpdatedFromRut);
+    };
+  }, [user, currentMonth]);
+
   // Filtrar tareas por planta seleccionada (si hay alguna seleccionada)
   const filteredTasks = useMemo(() => {
     if (!selectedPlantId) return tasks;
@@ -114,7 +128,7 @@ export default function Calendar() {
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  // Cambi para tareas para el día seleccionado
+  // Cambio para tareas para el día seleccionado
   const selectedDayTasks = useMemo(() => {
     const key = format(selectedDate, "yyyy-MM-dd");
     return tasksByDay.get(key) ?? [];
@@ -177,7 +191,6 @@ export default function Calendar() {
       
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           
-        
           <div className="lg:col-span-3 space-y-6">
             <div className="bg-white rounded-2xl p-5 border border-[#e2eae1]">
               <h2 className="text-base font-bold text-[#1e2d24] mb-1">Mis plantas</h2>
@@ -235,7 +248,6 @@ export default function Calendar() {
             </div>
           </div>
 
-         
           <div className="lg:col-span-6 space-y-6">
             {/* Calendario Mensual */}
             <div className="bg-white rounded-2xl p-5 border border-[#e2eae1]">
@@ -307,8 +319,7 @@ export default function Calendar() {
                 })}
               </div>
             </div>
-
-          
+         
             <div className="bg-white rounded-2xl p-5 border border-[#e2eae1]">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -445,7 +456,6 @@ export default function Calendar() {
                       </div>
                     )}
                   </div>
-
                  
                   <div className="space-y-2">
                     <button
