@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getActiveProducts, getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
-import { ChevronLeft, ChevronRight, Image as ImageIcon, Plus, Search} from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Plus, Search} from "lucide-react";
 
 import ProductDetailModal from "./ProductDetailModal";
 import { formatPrice } from "../utils/formatPrice";
+import { useFavorites } from "../context/FavoritesContext";
+import { useAlert } from "../context/AlertContext";
+import { useAuth } from "../context/AuthContext";
 /* 10 filas de 5 productos cada una */
 const ITEMS_PER_PAGE = 50;
 
 /* Categorías */
-const DEFAULT_CATEGORIES = ["Todo", "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
+/* "Favoritos" no es una categoría real: es un filtro con los productos que el usuario marcó con el corazón */
+const FAVORITES_FILTER = "Favoritos";
+const DEFAULT_CATEGORIES = ["Todo", FAVORITES_FILTER, "Plantas", "Macetas", "Sustratos", "Herramientas", "Accesorios"];
 export function ProductCard({
   product,
   onProductClick,
@@ -23,6 +28,21 @@ export function ProductCard({
   const [imageError, setImageError] = useState(false);
   /* Sin unidades disponibles (stock menos lo apartado por pedidos pendientes) no se puede agregar */
   const soldOut = getAvailableStock(product) <= 0;
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { showAlert } = useAlert();
+  const favorite = isFavorite(product.id);
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    /* El corazón está encima de la imagen: sin esto también se abriría la ficha del producto */
+    e.stopPropagation();
+    if (!toggleFavorite(product.id)) {
+      showAlert({
+        title: "Inicia sesión para guardar favoritos",
+        message: "Así tu lista se queda guardada en tu cuenta.",
+        variant: "info",
+      });
+    }
+  };
 
   return (
     <div className="bg-white border border-[#e8efe4] rounded-2xl overflow-hidden hover:shadow-md transition duration-200 flex flex-col w-full">
@@ -35,6 +55,20 @@ export function ProductCard({
             <ImageIcon className="w-6 h-6 text-slate-400" />
           </div>
         )}
+
+        <button
+          type="button"
+          onClick={handleFavorite}
+          aria-pressed={favorite}
+          aria-label={favorite ? `Quitar ${product.name} de favoritos` : `Añadir ${product.name} a favoritos`}
+          title={favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+          className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 border border-[#e8d5d9] flex items-center justify-center shadow-sm hover:bg-white transition"
+        >
+          <Heart
+            className={`w-4 h-4 ${favorite ? "fill-[#722F37] text-[#722F37]" : "text-[#722F37]"}`}
+            aria-hidden="true"
+          />
+        </button>
 
         {imageError || !product.image_url ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
@@ -104,6 +138,8 @@ export function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState("Todo");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { favoriteIds } = useFavorites();
+  const { user } = useAuth();
 
   useEffect(() => {
     getActiveProducts()
@@ -129,11 +165,13 @@ export function ProductList() {
       const normalize = (value: string) => value.toLowerCase().trim().replace(/s$/, "");
       const matchesCategory =
         selectedCategory === "Todo" ||
-        normalize(productCat) === normalize(selectedCategory);
+        (selectedCategory === FAVORITES_FILTER
+          ? favoriteIds.includes(product.id)
+          : normalize(productCat) === normalize(selectedCategory));
 
       return matchesSearch && matchesCategory;
     });
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, searchTerm, selectedCategory, favoriteIds]);
 
   /* Paginación va a salir con 5 productos */
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
@@ -217,6 +255,7 @@ export function ProductList() {
         >
           {DEFAULT_CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat;
+            const isFavoritesChip = cat === FAVORITES_FILTER;
             return (
               <button
                 key={cat}
@@ -226,11 +265,16 @@ export function ProductList() {
                   setCurrentPage(1);
                 }}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
-                  isActive
-                    ? "bg-[#4E705B] text-white "
-                    : "bg-white text-slate-600 hover:bg-slate-100"
+                  isFavoritesChip
+                    ? isActive
+                      ? "bg-[#722F37] text-white"
+                      : "bg-white text-[#722F37] border border-[#722F37] hover:bg-[#f7ebed]"
+                    : isActive
+                      ? "bg-[#4E705B] text-white "
+                      : "bg-white text-slate-600 hover:bg-slate-100"
                 }`}
               >
+                {isFavoritesChip && <Heart className="inline w-3 h-3 mr-1 -mt-0.5" aria-hidden="true" />}
                 {cat}
               </button>
             );
@@ -285,7 +329,11 @@ export function ProductList() {
         </div>
       ) : (
         <div className="bg-white/60 rounded-2xl p-8 text-center text-slate-500 text-xs font-medium">
-          No se encontraron productos disponibles.
+          {selectedCategory === FAVORITES_FILTER
+            ? user
+              ? "Aún no tienes favoritos. Toca el corazón de un producto para guardarlo aquí."
+              : "Inicia sesión para guardar y ver tus favoritos."
+            : "No se encontraron productos disponibles."}
         </div>
       )}
 

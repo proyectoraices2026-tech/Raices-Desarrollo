@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 import BestSellers from "../components/BestSellers";
+import PetSafeSlider from "../components/PetSafeSlider";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -66,6 +67,8 @@ export default function Catalog() {
             </Swiper>
 
             <BestSellers />
+
+            <PetSafeSlider />
 
             {/* Contenido Principal */}
             <main id="catalogo" className="p-4 sm:p-6 flex-1 scroll-mt-20">

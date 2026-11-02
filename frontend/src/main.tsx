@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
+import { FavoritesProvider } from './context/FavoritesContext'
+import { NotificationsProvider } from './context/NotificationsContext'
 import { AlertProvider } from './context/AlertContext'
 import './index.css'
 import App from './App.tsx'
@@ -21,7 +23,9 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <CartProvider>
         <AlertProvider>
-          <App />
+          <FavoritesProvider><NotificationsProvider>
+            <App />
+          </NotificationsProvider></FavoritesProvider>
         </AlertProvider>
       </CartProvider>
     </AuthProvider>

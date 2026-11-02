@@ -24,6 +24,9 @@ import Calendar from './pages/Calendar';
 import Chatbot from './pages/ChatBot';
 import ScrollToTop from './components/ScrollToTop';
 import AdminAssignPlants from './pages/AdminAssignPlants';
+import Notifications from './pages/Notifications';
+import Guides from './pages/Guides';
+import GuidePopup from './components/GuidePopup';
 
 /* 
     Rutas privadas
@@ -94,6 +97,7 @@ function App() {
     <BrowserRouter>
       
       <ScrollToTop></ScrollToTop>
+      <GuidePopup />
         {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Catalog />} />
@@ -179,6 +183,12 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/guides" element={<Guides />} />
+        <Route path="/notifications" element={
+          <PrivateRoute>
+            <Notifications />
+          </PrivateRoute>
+        } />
         <Route path="/my-requests" element={
           <PrivateRoute>
             <MyRequests />
