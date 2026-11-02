@@ -68,6 +68,13 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           </button>
 
           <button
+            onClick={() => go("/noticias")}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Noticias
+          </button>
+
+          <button
             onClick={() => go("/my-plants")}
             className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
           >

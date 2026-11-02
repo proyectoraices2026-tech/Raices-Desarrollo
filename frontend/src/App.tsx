@@ -13,7 +13,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminRequests from './pages/AdminRequests';
 import AdminDashboard from './pages/AdminDashboard'
 import AdminStats from './pages/AdminStats'
-
+import NewsPage from './pages/NewsPage';
 //aaa
 import MyPlants from './pages/MyPlants';
 import AboutUs from './pages/AboutUs';
@@ -149,6 +149,9 @@ function App() {
             <AdminStats />
           </AdminRoute>
         } />
+
+        <Route path="/noticias" element={<NewsPage />} />
+
 
         {/*Ruta de admin, sólo deja pasar a usuarios con rol admin*/}
         <Route path="/admin/products/new" element={
