@@ -18,10 +18,16 @@ const CHART_COLORS = ["#645244", "#537a63", "#c4a557", "#1c2b18", "#5a7a54", "#9
 /* Cantidad de productos que muestran la dona y el panel de "Más vendidos" */
 const TOP_SELLERS_LIMIT = 6;
 
+const RANGE_LABELS: Record<StatsRange, string> = {
+    week: "Semanal",
+    month: "Mensual",
+    year: "Anual",
+};
+
 const RANGE_OPTIONS: { key: StatsRange; label: string }[] = [
-    { key: "week", label: "Semanal" },
-    { key: "month", label: "Mensual" },
-    { key: "year", label: "Anual" },
+    { key: "week", label: RANGE_LABELS.week },
+    { key: "month", label: RANGE_LABELS.month },
+    { key: "year", label: RANGE_LABELS.year },
 ];
 
 type PanelKey = "vendidos" | "agotarse" | "agotados" | null;
@@ -134,27 +140,33 @@ export default function AdminStats() {
                 <p className="text-sm text-primarioBase mb-4">Resumen del estado del vivero.</p>
 
                 {/* Selector de período: lo usan el resumen financiero, el gráfico de ganancias y los más vendidos */}
-                <div
-                    className="inline-flex bg-white border border-primarioClaro rounded-full p-1 mb-4"
-                    role="group"
-                    aria-label="Período de las estadísticas"
-                >
-                    {RANGE_OPTIONS.map((option) => (
-                        <button
-                            key={option.key}
-                            type="button"
-                            onClick={() => setRange(option.key)}
-                            aria-pressed={range === option.key}
-                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
-                                range === option.key ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
-                            }`}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div
+                        className="inline-flex bg-white border border-primarioClaro rounded-full p-1"
+                        role="group"
+                        aria-label="Período de las estadísticas"
+                    >
+                        {RANGE_OPTIONS.map((option) => (
+                            <button
+                                key={option.key}
+                                type="button"
+                                onClick={() => setRange(option.key)}
+                                aria-pressed={range === option.key}
+                                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
+                                    range === option.key ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
+                                }`}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        type="button"
+                        className="px-5 py-2.5 rounded-full text-xs font-semibold bg-primarioBase text-white"
+                    >
+                        Generar reporte {RANGE_LABELS[range].toLowerCase()}
+                    </button>
                 </div>
-
-                
 
                 {/* Fila de filtros desplegables: cada panel flota debajo de su botón */}
                 <div ref={panelsRef} className="flex flex-col sm:flex-row gap-3 mb-4 relative">
