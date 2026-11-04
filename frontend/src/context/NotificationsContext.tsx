@@ -36,18 +36,19 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const reload = useCallback(async () => {
-    if (!userId) {
+    if (!user) {
       setNotifications([]);
       return;
     }
     setLoading(true);
     try {
-      setNotifications(await getNotifications(userId));
+      setNotifications(await getNotifications(user));
     } catch {
       setNotifications([]);
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   /* Se carga al iniciar sesión y se refresca cada 2 minutos */
@@ -59,14 +60,14 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [reload, userId]);
 
   const markRead = (id: string) => {
-    if (!userId) return;
-    markAsReadInService(userId, [id]);
+    if (!user) return;
+    markAsReadInService(user, [id]);
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
   const markAllRead = () => {
-    if (!userId) return;
-    markAsReadInService(userId, notifications.map((n) => n.id));
+    if (!user) return;
+    markAsReadInService(user, notifications.map((n) => n.id));
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 

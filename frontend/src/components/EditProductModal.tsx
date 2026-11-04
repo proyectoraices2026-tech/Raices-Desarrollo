@@ -184,6 +184,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                         </div>
 
                         <PlantDefaultsFields
+                            petSafeSupported={"pet_safe" in product}
                             value={plantDefaults}
                             onChange={setPlantDefaults}
                             inputClass={inputClass}

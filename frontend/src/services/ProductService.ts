@@ -39,7 +39,7 @@ export interface Product {
   /* Nombre de la categoría, traído por la relación con la tabla `categories`
        (category_id es solo el uuid; esto es lo que se muestra en pantalla) */
   categories: { name: string } | null;
-    /* Datos de planta opcionales (null en productos que no son plantas, como una pala) */
+  /* Datos de planta opcionales (null en productos que no son plantas, como una pala) */
   default_scientific_name?: string | null;
   default_watering_interval?: number | null;
   default_watering_unit?: TaskUnit | null;
@@ -69,6 +69,28 @@ export interface PlantDefaults {
   default_pruning_unit: TaskUnit | null;
   default_fertilizer_interval: number | null;
   default_fertilizer_unit: TaskUnit | null;
+  /* Si la columna pet_safe aún no existe en la base de datos, se quita y se reintenta (ver más abajo) */
+  pet_safe?: boolean | null;
+}
+
+/* ¿El error significa "la columna pet_safe no existe todavía en products"? (PostgREST: PGRST204, Postgres: 42703) */
+function isMissingPetSafeColumn(
+  error: { code?: string; message?: string; details?: string } | null,
+): boolean {
+  if (!error) return false;
+  const text = `${error.message ?? ""} ${error.details ?? ""}`;
+  return (
+    text.includes("pet_safe") &&
+    (error.code === "PGRST204" ||
+      error.code === "42703" ||
+      /column|schema cache/i.test(text))
+  );
+}
+
+/* Copia del objeto sin la clave pet_safe */
+function withoutPetSafe(row: Record<string, unknown>): Record<string, unknown> {
+  const { pet_safe: _omit, ...rest } = row;
+  return rest;
 }
 
 /* Un producto cuenta como "planta asignable" si tiene al menos uno de esos datos */
@@ -198,23 +220,33 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue).
     */
-  const { data, error } = await supabase
-    // seleccionar tabla products
+  const newRow: Record<string, unknown> = {
+    category_id: input.category_id,
+    sku: input.sku,
+    name: input.name,
+    description: input.description ?? null,
+    image_url: publicUrl,
+    price: input.price,
+    stock: 0,
+    min_stock: input.min_stock,
+    ...input.plantDefaults,
+  };
+
+  // seleccionar tabla products e insertar los datos en la tabla
+  let { data, error } = await supabase
     .from("products")
-    // insetar los datos en la tabla
-    .insert({
-      category_id: input.category_id,
-      sku: input.sku,
-      name: input.name,
-      description: input.description ?? null,
-      image_url: publicUrl,
-      price: input.price,
-      stock: 0,
-      min_stock: input.min_stock,
-      ...input.plantDefaults,
-    })
+    .insert(newRow)
     .select()
     .single();
+
+  /* Si la columna pet_safe todavía no existe, se reintenta sin ese campo */
+  if (isMissingPetSafeColumn(error)) {
+    ({ data, error } = await supabase
+      .from("products")
+      .insert(withoutPetSafe(newRow))
+      .select()
+      .single());
+  }
 
   // Si ocurrió un error se imprime el mensaje
   // Si ocurrió un error se imprime el mensaje
@@ -229,7 +261,12 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
   /* El stock inicial se registra como una compra (movimiento restock), para que cuente
        como inversión; add_stock es quien suma las unidades al producto */
   if (input.stock > 0) {
-    await addStock(data.id, input.stock, input.costPrice ?? null, "Stock inicial");
+    await addStock(
+      data.id,
+      input.stock,
+      input.costPrice ?? null,
+      "Stock inicial",
+    );
     return { ...data, stock: input.stock };
   }
 
@@ -328,14 +365,23 @@ export async function updateProduct(
         a esta función (EditProductModal.tsx) nunca usa el producto que devuelve, ni falta
         que le pidamos.
     */
-  const { error } = await supabase
-    .from("products")
-    .update({ ...fieldsToUpdate, ...plantDefaults })
-    .eq("id", id);
+  const changes: Record<string, unknown> = {
+    ...fieldsToUpdate,
+    ...plantDefaults,
+  };
+  let { error } = await supabase.from("products").update(changes).eq("id", id);
+
+  /* Si la columna pet_safe todavía no existe, se reintenta sin ese campo */
+  if (isMissingPetSafeColumn(error)) {
+    ({ error } = await supabase
+      .from("products")
+      .update(withoutPetSafe(changes))
+      .eq("id", id));
+  }
 
   if (error) throw error;
 
-    if (costPrice !== undefined) {
+  if (costPrice !== undefined) {
     await setProductCost(id, costPrice);
   }
 }
@@ -490,7 +536,11 @@ export async function setProductCost(
   const { error } = await supabase
     .from("product_costs")
     .upsert(
-      { product_id: productId, cost_price: costPrice, updated_at: new Date().toISOString() },
+      {
+        product_id: productId,
+        cost_price: costPrice,
+        updated_at: new Date().toISOString(),
+      },
       { onConflict: "product_id" },
     );
 
