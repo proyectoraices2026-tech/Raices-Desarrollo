@@ -37,7 +37,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     const [loading, setLoading] = useState(false);
     const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
     const [plantDefaults, setPlantDefaults] = useState(() => plantDefaultsStateFromProduct(product));
-    const [petSafe, setPetSafe] = useState(product.pet_safe ?? false);
+    const [petSafe] = useState(product.pet_safe ?? false);
 
     /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
    al abrir el modal en vez de inicializarlo en el useState */
@@ -193,7 +193,8 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                             labelClass={labelClass}
                         />
 
-                        <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
+{/*
+    <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={petSafe}
@@ -207,6 +208,8 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                                 </span>
                             </span>
                         </label>
+*/}
+                        
 
                         <div>
                             <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>
