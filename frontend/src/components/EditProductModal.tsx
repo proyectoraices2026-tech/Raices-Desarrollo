@@ -37,6 +37,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     const [loading, setLoading] = useState(false);
     const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
     const [plantDefaults, setPlantDefaults] = useState(() => plantDefaultsStateFromProduct(product));
+    const [petSafe, setPetSafe] = useState(product.pet_safe ?? false);
 
     /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
    al abrir el modal en vez de inicializarlo en el useState */
@@ -82,6 +83,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                 costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
                 plantDefaults: plantDefaultsToPayload(plantDefaults),
+                pet_safe: petSafe,
                 /* Solo se manda si la persona escogió un archivo nuevo; si no, queda undefined
                    y updateProduct() deja la imagen que el producto ya tenía */
                 imageFile: imageFile ?? undefined,
@@ -190,6 +192,21 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                             inputClass={inputClass}
                             labelClass={labelClass}
                         />
+
+                        <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={petSafe}
+                                onChange={(e) => setPetSafe(e.target.checked)}
+                                className="w-4 h-4 accent-[#4E705B]"
+                            />
+                            <span>
+                                <span className="block text-sm font-semibold text-[#2D4A3E]">Segura para mascotas</span>
+                                <span className="block text-xs text-slate-500">
+                                    Aparecerá en la sección "Plantas seguras para mascotas" del catálogo.
+                                </span>
+                            </span>
+                        </label>
 
                         <div>
                             <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>

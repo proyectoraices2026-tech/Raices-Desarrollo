@@ -138,13 +138,13 @@ export default function AdminProducts() {
     }, [totalPages, currentPage]);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0">
             <div className="sticky top-0 z-40">
                 <NavBar onMenuClick={() => setMenuOpen(true)} />
                 <BottomNav />
             </div>
 
-            <main id="first" className="p-4 sm:p-6 max-w-6xl mx-auto">
+            <main id="first" className="p-4 sm:p-6 w-full max-w-4xl mx-auto flex-1">
                 {loading ? (
                     <p className="text-sm text-[#537a63] text-center py-10">Cargando...</p>
                 ) : (
