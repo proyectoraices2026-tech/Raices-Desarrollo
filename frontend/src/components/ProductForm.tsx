@@ -185,7 +185,8 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                         labelClass={labelClass}
                     />
 
-                    <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
+                    {/*
+                        <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={petSafe}
@@ -199,6 +200,9 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                             </span>
                         </span>
                     </label>
+                    */}
+
+                    
 
                     <div>
                         <label className={labelClass}>Imagen</label>
