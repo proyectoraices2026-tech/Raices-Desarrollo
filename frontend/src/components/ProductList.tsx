@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getActiveProducts, getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
-import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Plus, Search} from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Plus, Search, Share2 } from "lucide-react";
 
 import ProductDetailModal from "./ProductDetailModal";
 import { formatPrice } from "../utils/formatPrice";
 import { useFavorites } from "../context/FavoritesContext";
 import { useAlert } from "../context/AlertContext";
 import { useAuth } from "../context/AuthContext";
+import { MAX_SHARE_ITEMS, shareFavorites } from "../utils/shareFavorites";
 /* 10 filas de 5 productos cada una */
 const ITEMS_PER_PAGE = 50;
 
@@ -81,9 +82,8 @@ export function ProductCard({
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
-            className={`w-full h-full object-contain transition-opacity duration-300 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
+            className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
           />
         )}
       </div>
@@ -140,6 +140,8 @@ export function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { favoriteIds } = useFavorites();
   const { user } = useAuth();
+  const { showAlert } = useAlert();
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     getActiveProducts()
@@ -212,6 +214,33 @@ export function ProductList() {
     chipsRef.current?.scrollBy({ left: direction === "left" ? -180 : 180, behavior: "smooth" });
   };
 
+  /* Genera la imagen con la cuadrícula de favoritos y la comparte (o la descarga) */
+  const handleShareFavorites = async () => {
+    const favoriteProducts = products.filter((p) => favoriteIds.includes(p.id));
+    if (favoriteProducts.length === 0 || sharing) return;
+
+    setSharing(true);
+    try {
+      const result = await shareFavorites(favoriteProducts);
+      if (result === "downloaded") {
+        showAlert({
+          title: "Imagen descargada",
+          message: "Súbela a Instagram o Facebook desde tu galería.",
+          variant: "success",
+        });
+      }
+    } catch (err) {
+      console.error("Error al compartir favoritos:", err);
+      showAlert({
+        title: "No se pudo generar la imagen",
+        message: "Inténtalo de nuevo en unos segundos.",
+        variant: "error",
+      });
+    } finally {
+      setSharing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -234,7 +263,7 @@ export function ProductList() {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-5">
-      
+
       {/* Buscador */}
       <div className="relative w-full">
         <input
@@ -247,7 +276,7 @@ export function ProductList() {
         <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
       </div>
 
-       {/* Chips de Categorías: con flechas y degradado cuando hay más categorías por ver */}
+      {/* Chips de Categorías: con flechas y degradado cuando hay más categorías por ver */}
       <div className="relative">
         <div
           ref={chipsRef}
@@ -264,15 +293,14 @@ export function ProductList() {
                   setSelectedCategory(cat);
                   setCurrentPage(1);
                 }}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${
-                  isFavoritesChip
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${isFavoritesChip
                     ? isActive
                       ? "bg-[#722F37] text-white"
                       : "bg-white text-[#722F37] border border-[#722F37] hover:bg-[#f7ebed]"
                     : isActive
                       ? "bg-[#4E705B] text-white "
                       : "bg-white text-slate-600 hover:bg-slate-100"
-                }`}
+                  }`}
               >
                 {isFavoritesChip && <Heart className="inline w-3 h-3 mr-1 -mt-0.5" aria-hidden="true" />}
                 {cat}
@@ -308,10 +336,26 @@ export function ProductList() {
         )}
       </div>
 
-      {/* Contador de Productos */}
-      <p className="text-xs text-slate-500 font-medium">
-        {filteredProducts.length} productos
-      </p>
+      {/* Contador de Productos + botón para compartir (solo en la vista de Favoritos) */}
+      {selectedCategory === FAVORITES_FILTER && favoriteIds.length > 0 && (
+        <div className="flex flex-col items-end gap-1">
+          <button
+            type="button"
+            onClick={handleShareFavorites}
+            disabled={sharing}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#722F37] hover:bg-[#5e262d] text-white text-xs font-semibold transition disabled:opacity-50"
+          >
+            <Share2 className="w-3.5 h-3.5" aria-hidden="true" />
+            {sharing ? "Generando..." : "Compartir lista"}
+          </button>
+
+          {favoriteIds.length > MAX_SHARE_ITEMS && (
+            <p className="text-[11px] text-slate-500">
+              La imagen incluye tus primeros {MAX_SHARE_ITEMS} favoritos
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Cuadrícula de Tarjetas */}
       {paginatedProducts.length > 0 ? (
