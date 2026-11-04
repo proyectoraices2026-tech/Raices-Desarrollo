@@ -8,6 +8,9 @@ interface PlantDefaultsFieldsProps {
     onChange: (next: PlantDefaultsState) => void;
     inputClass: string;
     labelClass: string;
+    /* false = ya se sabe que la base de datos todavía no tiene la columna pet_safe (se avisa);
+       undefined = no se sabe todavía (no se muestra aviso) */
+    petSafeSupported?: boolean;
 }
 
 const FREQUENCIES = [
@@ -16,7 +19,7 @@ const FREQUENCIES = [
     ["fertilizing", "Abonar"],
 ] as const;
 
-export default function PlantDefaultsFields({ value, onChange, inputClass, labelClass }: PlantDefaultsFieldsProps) {
+export default function PlantDefaultsFields({ value, onChange, inputClass, labelClass, petSafeSupported }: PlantDefaultsFieldsProps) {
     const updateFrequency = (key: (typeof FREQUENCIES)[number][0], patch: Partial<FrequencyState>) =>
         onChange({ ...value, [key]: { ...value[key], ...patch } });
 
@@ -46,6 +49,22 @@ export default function PlantDefaultsFields({ value, onChange, inputClass, label
                             onChange={(e) => onChange({ ...value, scientificName: e.target.value })}
                             className={inputClass}
                         />
+                    </div>
+
+                    <div>
+                        <label className="flex items-center gap-2 text-sm font-semibold text-[#2D4A3E]">
+                            <input
+                                type="checkbox"
+                                checked={value.petSafe}
+                                onChange={(e) => onChange({ ...value, petSafe: e.target.checked })}
+                                className="w-4 h-4"
+                            />
+                            Segura para mascotas (pet friendly)
+                        </label>
+                        <p className="text-xs text-[#537a63] mt-1">
+                            Las plantas marcadas aparecen en el slider "Plantas seguras para mascotas" del catálogo.
+                            {petSafeSupported === false && " Por ahora esta marca no se guarda: falta el campo pet_safe en el backend."}
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3">

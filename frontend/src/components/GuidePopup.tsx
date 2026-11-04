@@ -16,19 +16,29 @@ export default function GuidePopup() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const userId = user?.id ?? null;
   const excluded = EXCLUDED_PATHS.includes(location.pathname);
 
   useEffect(() => {
-    if (!loading && userId && !excluded && !hasSeenGuide(userId)) setOpen(true);
-  }, [loading, userId, excluded]);
+    if (!loading && user && !excluded && !hasSeenGuide(user)) setOpen(true);
+  }, [loading, user, excluded]);
 
-  if (!open || !userId) return null;
+  /* Escape también cierra la guía */
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  });
 
-  const close = () => {
-    markGuideSeen(userId);
+  if (!open || !user) return null;
+
+  /* Cerrar por cualquier vía (botón, X, clic fuera, Escape) cuenta como "ya la vio" */
+  function close() {
+    if (user) markGuideSeen(user);
     setOpen(false);
-  };
+  }
 
   const goToFullGuide = () => {
     close();
@@ -38,6 +48,9 @@ export default function GuidePopup() {
   return (
     <div
       className="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="guide-popup-title"
