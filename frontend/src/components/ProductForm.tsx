@@ -28,6 +28,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
     const [costPrice, setCostPrice] = useState("");
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [plantDefaults, setPlantDefaults] = useState(emptyPlantDefaultsState);
+    const [petSafe, setPetSafe] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -50,6 +51,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
         setStock("");
         setCostPrice("");
         setMinStock("0");
+        setPetSafe(false);
         setImageFile(null);
         setPlantDefaults(emptyPlantDefaultsState());
     };
@@ -94,6 +96,7 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                 stock: parseInt(stock, 10),
                 costPrice: finalCostPrice,
                 min_stock: parseInt(minStock, 10),
+                pet_safe: petSafe,
                 imageFile,
                 plantDefaults: plantDefaultsToPayload(plantDefaults),
             });
@@ -181,6 +184,21 @@ export function ProductForm({ isOpen, onClose, categories, onSuccess, onError }:
                         inputClass={inputClass}
                         labelClass={labelClass}
                     />
+
+                    <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={petSafe}
+                            onChange={(e) => setPetSafe(e.target.checked)}
+                            className="w-4 h-4 accent-[#4E705B]"
+                        />
+                        <span>
+                            <span className="block text-sm font-semibold text-[#2D4A3E]">Segura para mascotas</span>
+                            <span className="block text-xs text-slate-500">
+                                Aparecerá en la sección "Plantas seguras para mascotas" del catálogo.
+                            </span>
+                        </span>
+                    </label>
 
                     <div>
                         <label className={labelClass}>Imagen</label>

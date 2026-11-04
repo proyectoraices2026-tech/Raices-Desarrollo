@@ -98,6 +98,7 @@ export interface NewProductInput {
   min_stock: number;
   imageFile: File;
   plantDefaults?: PlantDefaults;
+  pet_safe?: boolean;
 }
 
 /* 
@@ -210,6 +211,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
       image_url: publicUrl,
       price: input.price,
       stock: 0,
+      pet_safe: input.pet_safe ?? false,
       min_stock: input.min_stock,
       ...input.plantDefaults,
     })
@@ -286,6 +288,7 @@ export interface UpdateProductInput {
   min_stock?: number;
   imageFile?: File;
   plantDefaults?: PlantDefaults;
+  pet_safe?: boolean;
 }
 
 /*
