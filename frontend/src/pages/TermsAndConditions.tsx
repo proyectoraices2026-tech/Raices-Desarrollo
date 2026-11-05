@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
@@ -25,10 +26,20 @@ export default function TermsAndConditions() {
       <div className="flex-1 flex items-center justify-center p-6">
       <div className="w-full max-w-2xl bg-white border border-[#e8efe4] rounded-2xl shadow-sm p-8 text-left relative">
 
-        {/* Encabezado */}
-        <h1 className="text-2xl font-bold text-[#2D4A3E] mb-2">
-          Términos y Condiciones
-        </h1>
+        {/* Encabezado, con la misma flecha de volver que "Sobre nosotros" */}
+        <div className="flex items-center gap-4 mb-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full bg-[#eaf1ec] text-[#527a65] flex items-center justify-center flex-shrink-0 hover:bg-[#dbe8df] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527a65]"
+            aria-label="Volver a la página anterior"
+          >
+            <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+          </button>
+          <h1 className="text-2xl font-bold text-[#2D4A3E]">
+            Términos y Condiciones
+          </h1>
+        </div>
         <p className="text-xs text-[#2D4A3E]/70 mb-6 border-b border-[#DFE5DC] pb-4">
           Última actualización: Septiembre 2026
         </p>
@@ -58,16 +69,6 @@ export default function TermsAndConditions() {
           <p>
             Tus datos de usuario y el registro de tus plantas serán tratados con estricta confidencialidad y procesados exclusivamente para brindarte una mejor experiencia dentro de la plataforma.
           </p>
-        </div>
-
-        {/* Botón inferior de Regresar */}
-        <div className="mt-8 pt-4 border-t border-[#DFE5DC]">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-full py-3.5 rounded-full bg-[#4E705B] text-white font-semibold text-sm hover:bg-[#3E5C4A] transition duration-200"
-          >
-            Volver
-          </button>
         </div>
 
       </div>
