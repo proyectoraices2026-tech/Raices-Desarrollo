@@ -8,8 +8,10 @@ import SideMenu from "../components/SideMenu";
 import Footer from "../components/Footer"; 
 import { useFinancialSummary } from "../hooks/UseFinancialSummary";
 import { useTopSellers } from "../hooks/UseTopSellers";
-import { getAllProducts } from "../services/ProductService";
+import { useAlert } from "../context/AlertContext";
+import { getAllProducts, getErrorMessage } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
+import { getFinancialSummary, getTopSellers } from "../services/StatsService";
 import type { StatsRange } from "../services/StatsService";
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
 
@@ -40,8 +42,12 @@ export default function AdminStats() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [range, setRange] = useState<StatsRange>("month");
+    const [reportMenuOpen, setReportMenuOpen] = useState(false);
+    const [generatingReport, setGeneratingReport] = useState(false);
     const panelsRef = useRef<HTMLDivElement>(null);
+    const reportMenuRef = useRef<HTMLDivElement>(null);
 
+    const { showAlert } = useAlert();
     const { buckets, loading: summaryLoading, error: summaryError } = useFinancialSummary(range);
     const { sellers, loading: sellersLoading, error: sellersError } = useTopSellers(range, TOP_SELLERS_LIMIT);
 
@@ -75,6 +81,26 @@ export default function AdminStats() {
             document.removeEventListener("keydown", handleEscape);
         };
     }, [openPanel]);
+
+    useEffect(() => {
+        if (!reportMenuOpen) return;
+
+        const handlePointerDown = (e: PointerEvent) => {
+            if (reportMenuRef.current && !reportMenuRef.current.contains(e.target as Node)) {
+                setReportMenuOpen(false);
+            }
+        };
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setReportMenuOpen(false);
+        };
+
+        document.addEventListener("pointerdown", handlePointerDown);
+        document.addEventListener("keydown", handleEscape);
+        return () => {
+            document.removeEventListener("pointerdown", handlePointerDown);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [reportMenuOpen]);
 
     const agotados = useMemo(
         () => products.filter((p) => p.is_active && p.stock === 0),
@@ -116,6 +142,41 @@ export default function AdminStats() {
     }, [topSellers, topSellersTotal]);
 
     const togglePanel = (key: PanelKey) => setOpenPanel((current) => (current === key ? null : key));
+
+    const handleGenerateReport = async (reportRange: StatsRange) => {
+        setReportMenuOpen(false);
+        setGeneratingReport(true);
+
+        try {
+            const [reportBuckets, reportSellers, productList] = await Promise.all([
+                getFinancialSummary(reportRange),
+                getTopSellers(reportRange, TOP_SELLERS_LIMIT),
+                products.length > 0 ? Promise.resolve(products) : getAllProducts(),
+            ]);
+
+            const namesById = new Map(
+                productList.map((product) => [product.id, product.name] as [string, string])
+            );
+
+            const { downloadStatsReportPdf } = await import("../utils/statsReportPdf");
+            downloadStatsReportPdf({
+                range: reportRange,
+                buckets: reportBuckets,
+                sellers: reportSellers.map((seller) => ({
+                    name: namesById.get(seller.productId) ?? "Producto",
+                    value: seller.totalSold,
+                })),
+            });
+        } catch (err) {
+            showAlert({
+                title: "No se pudo generar el reporte",
+                message: getErrorMessage(err, "Intenta de nuevo en unos segundos."),
+                variant: "error",
+            });
+        } finally {
+            setGeneratingReport(false);
+        }
+    };
 
     const pillClass = (active: boolean) =>
         `w-full flex items-center justify-between gap-2 px-5 py-3 rounded-2xl text-sm font-semibold border transition ${
@@ -160,12 +221,41 @@ export default function AdminStats() {
                             </button>
                         ))}
                     </div>
-                    <button
-                        type="button"
-                        className="px-5 py-2.5 rounded-full text-xs font-semibold bg-primarioBase text-white"
-                    >
-                        Generar reporte {RANGE_LABELS[range].toLowerCase()}
-                    </button>
+                    <div ref={reportMenuRef} className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setReportMenuOpen((open) => !open)}
+                            aria-haspopup="menu"
+                            aria-expanded={reportMenuOpen}
+                            disabled={generatingReport}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold bg-primarioBase text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {generatingReport ? "Generando reporte…" : "Generar reporte PDF"}
+                            <ChevronDown
+                                className={`w-4 h-4 transition-transform ${reportMenuOpen ? "rotate-180" : ""}`}
+                            />
+                        </button>
+
+                        {reportMenuOpen && (
+                            <div
+                                role="menu"
+                                aria-label="Período del reporte"
+                                className="absolute right-0 top-full mt-2 z-30 w-40 bg-verdePastel border border-primarioClaro rounded-2xl p-2 space-y-1 shadow-lg"
+                            >
+                                {RANGE_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.key}
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={() => void handleGenerateReport(option.key)}
+                                        className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-primarioBase hover:bg-white transition"
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Fila de filtros desplegables: cada panel flota debajo de su botón */}
