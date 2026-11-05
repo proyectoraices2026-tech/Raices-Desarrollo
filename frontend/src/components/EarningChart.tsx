@@ -144,7 +144,7 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                         <p className="text-[11px] text-textoSecundario first-letter:uppercase pb-2">{selected.fullLabel}</p>
                     )}
                 </div>
-                <span className="text-xs font-semibold text-primarioBase border border-primarioBase rounded-full px-3 py-1.5">
+                <span className="text-xs font-semibold text-primarioBase select-none py-1.5">
                     {RANGE_BADGE[range]}
                 </span>
             </div>
