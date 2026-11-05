@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Bell, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
+import bellIcon from "../assets/iconsPhone/notiBlanco.png";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationsContext";
 import { formatRelativeDate, type AppNotification } from "../services/NotificationsService";
@@ -57,7 +58,7 @@ export default function NotificationBell() {
         aria-haspopup="true"
         aria-expanded={open}
       >
-        <Bell className="w-6 h-6" aria-hidden="true" />
+        <img src={bellIcon} alt="" className="w-6 h-6 object-contain" aria-hidden="true" />
         {unreadCount > 0 && (
           <span
             className="absolute -top-1 -right-1 bg-white text-primarioBase text-[9px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center"
