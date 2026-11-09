@@ -13,16 +13,15 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 const BANNERS = [
-    { src: "/Banner 1.png", position: "object-center" },
-    { src: "/Banner 2.png", position: "object-center" },
-    { src: "/Banner 3.png", position: "object-center" },
-    { src: "/Banner 4.png", position: "object-left" },
-    { src: "/Banner 5.png", position: "object-left" },
-    { src: "/Banner 6.png", position: "object-[75%_center]" },
-    { src: "/Banner 7.png", position: "object-right" },
-    { src: "/Banner 8.png", position: "object-[75%_center]" },
-    { src: "/Banner 9.png", position: "object-right" },
-    { src: "/Banner 10.png", position: "object-center" },
+    { src: "/Banner 1.png", mobileSrc: "/Banner 1 Mobile.png", position: "object-center" },
+    { src: "/Banner 2.png", mobileSrc: "/Banner 2 Mobile.png", position: "object-center" },
+    { src: "/Banner 3.png", mobileSrc: "/Banner 3 Mobile.png", position: "object-center" },
+    { src: "/Banner 4.png", mobileSrc: "/Banner 4 Mobile.png", position: "object-center" },
+    { src: "/Banner 5.png", mobileSrc: "/Banner 5 Mobile.png", position: "object-center" },
+    { src: "/Banner 6.png", mobileSrc: "/Banner 6 Mobile.png", position: "object-center" },
+    { src: "/Banner 7.png", mobileSrc: "/Banner 7 Mobile.png", position: "object-center" },
+    { src: "/Banner 8.png", mobileSrc: "/Banner 8 Mobile.png", position: "object-center" },
+    { src: "/Banner 9.png", mobileSrc: "/Banner 9 Mobile.png", position: "object-center" },
 ];
 
 /* Página privada que muestra el catálogo y las acciones disponibles para el rol */
@@ -49,7 +48,7 @@ export default function Catalog() {
             {/* w-full + min-w-0: dentro de un contenedor flex, Swiper sin esto calcula un ancho gigante */}
             <Swiper
                 id="first"
-                className="w-full min-w-0"
+                className="catalog-banner-slider w-full min-w-0"
                 modules={[Autoplay, Pagination]}
                 autoplay={{ delay: 4000 }}
                 pagination={{ clickable: true }}
@@ -57,11 +56,14 @@ export default function Catalog() {
             >
                 {BANNERS.map((banner) => (
                     <SwiperSlide key={banner.src}>
-                        <img
-                            src={banner.src}
-                            alt=""
-                            className={`block w-full h-36 sm:h-44 md:h-auto md:aspect-[1506/275] object-cover ${banner.position}`}
-                        />
+                        <picture className="block w-full">
+                            <source media="(max-width: 767px)" srcSet={encodeURI(banner.mobileSrc)} />
+                            <img
+                                src={banner.src}
+                                alt=""
+                                className={`block w-full h-auto md:aspect-[1506/271] md:object-cover ${banner.position}`}
+                            />
+                        </picture>
                     </SwiperSlide>
                 ))}
             </Swiper>

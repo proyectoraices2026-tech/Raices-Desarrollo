@@ -1,4 +1,6 @@
-import { ShoppingCart, ArrowLeft, Bot } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import cartIcon from "../assets/iconsPhone/carritoBlanco.png";
+import chatIcon from "../assets/iconsPhone/chatBlanco.png";
 import { useNavigate } from "react-router-dom";
 import { type ReactNode } from "react";
 import logoIcon from "../assets/iconoraicesblanco.png";
@@ -87,7 +89,7 @@ export default function NavBar({
                 : "Carrito, vacío"
             }
           >
-            <ShoppingCart className="w-6 h-6" aria-hidden="true" />
+            <img src={cartIcon} alt="" className="w-6 h-6 object-contain" aria-hidden="true" />
             {totalItems > 0 && (
               <span
                 className="absolute -top-1 -right-1 bg-white text-primarioBase text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center"
@@ -108,7 +110,7 @@ export default function NavBar({
                   title="Chatbot"
                   aria-label="Abrir Chatbot"
                 >
-                  <Bot className="w-6 h-6" aria-hidden="true" />
+                  <img src={chatIcon} alt="" className="w-6 h-6 object-contain" aria-hidden="true" />
                 </button>
               )}
           {/* Hambuguesa*/}

@@ -60,7 +60,7 @@ export default function PetSafeSlider() {
           >
             {products.map((product) => (
               <SwiperSlide key={product.id}>
-                <div className="rounded-2xl shadow-md">
+                <div className="rounded-2xl">
                   <ProductCard product={product} onProductClick={setSelectedProduct} onAddToCart={setSelectedProduct} />
                 </div>
               </SwiperSlide>
@@ -72,7 +72,7 @@ export default function PetSafeSlider() {
             type="button"
             onClick={() => swiperRef.current?.slidePrev()}
             aria-label="Plantas anteriores"
-            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -left-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow hover:bg-[#f0f5ec] transition"
+            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -left-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
           >
             <ChevronLeft className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -80,7 +80,7 @@ export default function PetSafeSlider() {
             type="button"
             onClick={() => swiperRef.current?.slideNext()}
             aria-label="Plantas siguientes"
-            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -right-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] shadow hover:bg-[#f0f5ec] transition"
+            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -right-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
           >
             <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>

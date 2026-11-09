@@ -31,18 +31,24 @@ html, body {
   }
 }
 
-/* Bolitas del carrusel Swiper: borde blanco + aro oscuro fino para que se vean sobre cualquier imagen */
+/* Indicadores de paginación de los carruseles Swiper */
 .swiper-pagination .swiper-pagination-bullet {
   width: 10px;
   height: 10px;
-  opacity: 1; /* Swiper las trae al 20% de opacidad, por eso se pierden sobre las imágenes */
-  background-color: rgba(255, 255, 255, 0.55);
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  opacity: 1;
+  background-color: #929487;
+  border: 0;
+  box-shadow: none;
+  transition: width 0.2s ease, background-color 0.2s ease;
 }
 
-/* La activa mantiene el verde institucional y se ve un poco más grande */
 .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #4a6b53;
-  transform: scale(1.3);
+  width: 34px;
+  border-radius: 9999px;
+  background-color: #537a63;
+}
+
+.catalog-banner-slider .swiper-pagination {
+  position: static;
+  margin-top: 8px;
 }
