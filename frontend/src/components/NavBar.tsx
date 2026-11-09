@@ -1,6 +1,5 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 import cartIcon from "../assets/iconsPhone/carritoBlanco.png";
-import chatIcon from "../assets/iconsPhone/chatBlanco.png";
 import { useNavigate } from "react-router-dom";
 import { type ReactNode } from "react";
 import logoIcon from "../assets/iconoraicesblanco.png";
@@ -102,17 +101,17 @@ export default function NavBar({
         )}
         {/* Notificaciones */}
         <NotificationBell />
-             {/* Chatbot */}
-              {user && (
-                <button
-                  onClick={() => navigate("/chatbot")}
-                  className="p-1 text-white hover:text-white/80 transition"
-                  title="Chatbot"
-                  aria-label="Abrir Chatbot"
-                >
-                  <img src={chatIcon} alt="" className="w-6 h-6 object-contain" aria-hidden="true" />
-                </button>
-              )}
+        {/* Lista de deseos: lleva al catálogo con el filtro "Favoritos" activo */}
+        {user && (
+          <button
+            onClick={() => navigate("/", { state: { showFavorites: true } })}
+            className="p-1 text-white hover:text-white/80 transition"
+            title="Lista de deseos"
+            aria-label="Lista de deseos"
+          >
+            <Heart className="w-6 h-6" aria-hidden="true" />
+          </button>
+        )}
           {/* Hambuguesa*/}
         {user && <>
           <button

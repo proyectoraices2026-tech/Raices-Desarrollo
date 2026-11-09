@@ -12,12 +12,6 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const { user} = useAuth();
   const {role} = useAuth();
 
-  /* Nombre y teléfono guardados en el perfil (tabla `profiles`), NO en el metadata de
-     Auth: el metadata solo se llena una vez al registrarse y nunca se actualiza, así
-     que si se lee de ahí se puede desincronizar con lo que la persona edite después
-     en "Editar perfil" (UpdateUser.tsx). Se consulta igual que en UpdateUser.tsx para
-     que ambas pantallas siempre muestren lo mismo. */
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     onClose();
@@ -100,6 +94,16 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
             className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
           >
             Mis pedidos
+          </button>
+
+          <button
+            onClick={() => {
+              onClose();
+              navigate("/", { state: { showFavorites: true } });
+            }}
+            className="text-left px-3 py-3 rounded-xl hover:bg-[#f0f4ee] text-[#1e2d24] text-sm font-medium"
+          >
+            Lista de deseos
           </button>
 
           <button
