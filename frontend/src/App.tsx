@@ -27,6 +27,7 @@ import AdminAssignPlants from './pages/AdminAssignPlants';
 import Notifications from './pages/Notifications';
 import Guides from './pages/Guides';
 import GuidePopup from './components/GuidePopup';
+import ChatBubble from './components/ChatBubble';
 
 /* 
     Rutas privadas
@@ -98,6 +99,7 @@ function App() {
       
       <ScrollToTop></ScrollToTop>
       <GuidePopup />
+      <ChatBubble />
         {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Catalog />} />
