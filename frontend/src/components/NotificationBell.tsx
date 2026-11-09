@@ -35,7 +35,9 @@ export default function NotificationBell() {
 
   if (!user) return null;
 
-  const recent = notifications.slice(0, PANEL_LIMIT);
+  const unreaded = notifications.filter(n => !n.read);
+
+  const recent = unreaded.slice(0, PANEL_LIMIT)
 
   const toggle = () => {
     if (!open) reload();
