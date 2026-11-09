@@ -19,20 +19,18 @@ export default function Guides() {
         <BottomNav />
       </div>
 
-      <main className="w-full flex-1 max-w-6xl mx-auto px-5 py-10 md:py-16 flex flex-col gap-8 md:gap-10">
+      <main className="w-full flex-1 max-w-6xl lg:max-w-[1680px] mx-auto px-5 lg:px-12 xl:px-[120px] py-10 md:py-16 flex flex-col gap-8 md:gap-10">
         <h1 className="font-poppins text-3xl md:text-5xl text-[#1c2b18] text-center">Guías Rápidas Raíces</h1>
 
-        {/* Escritorio: dos columnas independientes. Mobile: una sobre la otra, cada una se puede minimizar */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          <GuideSection title="Recursos para nuevos usuarios">
-            <h3 className="font-poppins text-xl md:text-2xl text-[#1c2b18]">Videos disponibles</h3>
+        {/* Dos secciones, una sobre la otra; cada una se puede minimizar con la flecha de su título */}
+        <div className="flex flex-col gap-8">
+          <GuideSection title="Recursos para nuevos usuarios" heading="Videos disponibles">
             {QUICK_GUIDES.map((g) => (
               <GuideCard key={g.id} guide={g} />
             ))}
           </GuideSection>
 
-          <GuideSection title="Recursos para el cuido de plantas">
-            <h3 className="font-poppins text-xl md:text-2xl text-[#1c2b18]">Guías de cuidado</h3>
+          <GuideSection title="Recursos para el cuido de plantas" heading="Guías de cuidado">
             {CARE_GUIDES.map((g) => (
               <CareGuideCard key={g.id} guide={g} />
             ))}
