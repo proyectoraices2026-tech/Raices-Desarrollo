@@ -1,2 +1,0 @@
-# Raices-Desarrollo
-Proyecto "Raices"

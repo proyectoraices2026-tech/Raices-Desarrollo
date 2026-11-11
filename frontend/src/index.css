@@ -1,1 +1,48 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fuerza el modo claro */
+:root {
+  color-scheme: light only !important;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  html {
+    zoom: 90%;
+  }
+
+  /* Con zoom 90%, "min-h-screen" (100vh) se queda un 10% más corto que la pantalla y deja una franja
+     blanca debajo del footer en las páginas cortas. 100 / 0.9 = 111.12vh compensa el zoom. */
+  .min-h-screen {
+    min-height: 111.12vh;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4.5rem;
+  }
+}
+
+/* Bolitas del carrusel Swiper: borde blanco + aro oscuro fino para que se vean sobre cualquier imagen */
+.swiper-pagination .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  opacity: 1; /* Swiper las trae al 20% de opacidad, por eso se pierden sobre las imágenes */
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* La activa mantiene el verde institucional y se ve un poco más grande */
+.swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #4a6b53;
+  transform: scale(1.3);
+}
