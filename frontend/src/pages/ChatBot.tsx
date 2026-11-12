@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
-import { SendHorizonal, BotMessageSquare, RefreshCcw } from "lucide-react";
+import { SendHorizonal, BotMessageSquare, RefreshCcw, CheckCircle2, Sprout } from "lucide-react";
 import { sendMessageToRut } from "../services/ChatService"; 
 import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
@@ -169,6 +169,26 @@ export default function Chatbot() {
 
           {/* Caja de Entrada de Mensaje */}
           <div className="p-3 md:p-4 border-t border-[#D9E2D7] bg-[#EDF2EB]">
+            <div className="flex flex-wrap gap-2 mb-2.5">
+              <button
+                type="button"
+                onClick={() => handleSend("Quiero marcar una tarea como completada")}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Marcar tarea
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSend("Quiero registrar una nueva planta")}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
+              >
+                <Sprout className="w-3.5 h-3.5" />
+                Registrar planta
+              </button>
+            </div>
             <div className="relative flex items-center">
               <input
                 type="text"
