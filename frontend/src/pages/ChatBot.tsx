@@ -7,8 +7,39 @@ import { sendMessageToRut } from "../services/ChatService";
 import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+import { useAuth } from "../context/AuthContext";
+
+/* La conversación se guarda temporalmente en sessionStorage, separada por usuario,
+   y expira tras un lapso de inactividad para no conservarla indefinidamente. */
+const CHAT_STORAGE_PREFIX = "rut-chat";
+const CHAT_TTL_MS = 10 * 60 * 1000;
+
+const initialMessage: Message = {
+  sender: "bot",
+  text: "¡Hola! Soy Rut, tu asistente de cuidado de plantas. Puedo ayudarte con riego, luz, plagas o cualquier duda sobre tus plantas, dime la duda que tengas para conversarlo.",
+};
+
+function loadStoredMessages(userId?: string): Message[] {
+  if (!userId) return [initialMessage];
+  try {
+    const raw = sessionStorage.getItem(`${CHAT_STORAGE_PREFIX}:${userId}`);
+    if (!raw) return [initialMessage];
+    const parsed = JSON.parse(raw) as { messages?: Message[]; savedAt?: number };
+    const expired = !parsed.savedAt || Date.now() - parsed.savedAt > CHAT_TTL_MS;
+    if (expired || !Array.isArray(parsed.messages) || parsed.messages.length === 0) {
+      sessionStorage.removeItem(`${CHAT_STORAGE_PREFIX}:${userId}`);
+      return [initialMessage];
+    }
+    return parsed.messages;
+  } catch {
+    return [initialMessage];
+  }
+}
 
 export default function Chatbot() {
+  const { user } = useAuth();
+  const storageKey = user ? `${CHAT_STORAGE_PREFIX}:${user.id}` : null;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,13 +49,24 @@ export default function Chatbot() {
     document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Mensaje inicial
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      sender: "bot",
-      text: "¡Hola! Soy Rut, tu asistente de cuidado de plantas. Puedo ayudarte con riego, luz, plagas o cualquier duda sobre tus plantas, dime la duda que tengas para conversarlo.",
-    },
-  ]);
+  // Mensaje inicial (o conversación guardada dentro del lapso permitido)
+  const [messages, setMessages] = useState<Message[]>(() => loadStoredMessages(user?.id));
+
+  /* Guarda la conversación en cada cambio; el TTL se renueva con cada mensaje nuevo */
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify({ messages, savedAt: Date.now() }));
+    } catch {
+      /* Si el almacenamiento no está disponible, la conversación sigue solo en memoria */
+    }
+  }, [messages, storageKey]);
+
+  /* Reinicia la conversación y borra lo guardado para ese usuario */
+  const handleReset = () => {
+    if (storageKey) sessionStorage.removeItem(storageKey);
+    setMessages([initialMessage]);
+  };
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -116,7 +158,7 @@ export default function Chatbot() {
               </div>
             </div>
             <button 
-              onClick={() => setMessages([messages[0]])}
+              onClick={handleReset}
               className="p-1.5 text-[#A6B7A9] hover:text-[#718878] transition"
               title="Reiniciar chat"
             >
