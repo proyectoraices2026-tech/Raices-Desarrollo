@@ -1,21 +1,21 @@
-import BottomNav from "../components/BottomNav";
-import NavBar from "../components/NavBar";
-import RegisterPlantModal from "../components/RegisterPlantModal";
-import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
-
-import { useEffect, useMemo, useState } from "react";
-import { addDays, format, isTomorrow } from "date-fns";
+import { useState, useMemo, useEffect } from "react";
+import { format, addDays, isTomorrow } from "date-fns";
 import { es } from "date-fns/locale";
+
+import NavBar from "../components/NavBar";
+import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import { getUserPlants, type UserPlant } from "../services/UserPlantsService";
 import { getPlantTasksInRange, toggleTaskCompletion, type PlantTask } from "../services/PlantTasksService";
 
+import RegisterPlantModal from "../components/RegisterPlantModal";
 import PlantDetailModal from "../components/PlantDetailModal";
 import TaskActionPopup from "../components/TaskActionPopup";
 import TaskCard from "../components/TaskCard";
 import TaskListPopup from "../components/TaskListPopup";
+import {ArrowNavigateUp} from "../components/ArrowNavigateUp";
 import { getPlantIconUrl } from "../constants/plantIcons";
 import { CARE_TASK_ICONS, CARE_TASK_LABELS, type CareTaskType } from "../constants/taskIcons";
 
@@ -47,11 +47,11 @@ export default function MyPlants() {
   const [actionPopupOpen, setActionPopupOpen] = useState(false);
   const [actionSubtitle, setActionSubtitle] = useState("");
   const [completingTask, setCompletingTask] = useState(false);
+
   /* Lleva al usuario hasta el principio de la página buscando el primer elemento de la misma (id="first") */
-    const handleScrollUp = () => {
-        document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
-    };
-  
+  const handleScrollUp = () => {
+    document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   /* "Hoy" y "en una semana" se calculan una sola vez al montar la página */
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
@@ -73,13 +73,25 @@ export default function MyPlants() {
       .then(setTasks)
       .catch(() => setTasks([]))
       .finally(() => setTasksLoading(false));
-      
   };
 
   useEffect(() => {
     loadPlants();
     loadTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  /* Escuchar el evento del chatbot cuando se registra una nueva planta para actualizar la UI en tiempo real */
+  useEffect(() => {
+    const handlePlantUpdated = () => {
+      loadPlants();
+      loadTasks();
+    };
+
+    window.addEventListener("plant-updated", handlePlantUpdated);
+    return () => {
+      window.removeEventListener("plant-updated", handlePlantUpdated);
+    };
   }, [user]);
 
   const plantsById = useMemo(() => new Map(plants.map((p) => [p.id, p])), [plants]);
@@ -110,12 +122,11 @@ export default function MyPlants() {
     return `${careVerb(task)} · ${when}`;
   };
 
-  /* Si la planta tiene esa tarea de cuidado habilitada (el ícono solo aparece
-     cuando corresponde; si la planta no tiene esa tarea programada, no se muestra) */
+  /* Si la planta tiene esa tarea de cuidado habilitada */
   const isCareEnabled = (plant: UserPlant, type: CareTaskType) =>
     type === "watering" ? plant.watering_enabled : type === "pruning" ? plant.pruning_enabled : plant.fertilizer_enabled;
 
-  /* Abre el pop-up de acción de una tarea (desde una tarjeta o desde el "ver más") */
+  /* Abre el pop-up de acción de una tarea */
   const openTaskAction = (task: PlantTask, subtitle: string) => {
     setActionTask(task);
     setActionSubtitle(subtitle);
@@ -137,7 +148,7 @@ export default function MyPlants() {
       closeTaskAction();
       loadTasks();
     } catch {
-      // Silencioso: si falla, la tarea simplemente sigue apareciendo como pendiente
+      // Silencioso
     } finally {
       setCompletingTask(false);
     }
@@ -184,7 +195,6 @@ export default function MyPlants() {
 
       <div id="first" className="w-full flex-1 md:max-w-5xl md:mx-auto">
         <div className="p-5 md:px-12 md:py-8">
-          {/* Secciones "Hoy" y "Actividades próximas", con datos reales */}
           {sections.map((section) => (
             <div key={section.key} className="mb-6">
               <h2 className="text-lg font-bold text-textoSecundario mb-3">{section.title}</h2>
@@ -220,7 +230,7 @@ export default function MyPlants() {
           ))}
         </div>
 
-        {/* Plantas del usuario, o el estado vacío si aún no tiene ninguna */}
+        {/* Plantas del usuario */}
         <div className="px-5 md:px-12 pb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-primarioBase">Mis plantas</h2>
@@ -265,7 +275,6 @@ export default function MyPlants() {
 
                   <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                     {CARE_TYPES.filter((type) => isCareEnabled(plant, type)).map((type) => {
-                      /* "Pendiente" = esta planta tiene una tarea de este tipo para hoy (o atrasada) */
                       const dueToday = todayTasks.some((t) => t.plant_id === plant.id && t.task_type === type);
                       const meta = CARE_TASK_ICONS[type];
                       return (
@@ -341,10 +350,8 @@ export default function MyPlants() {
         />
       </div>
 
-      <ArrowNavigateUp handleUpNavigate={handleScrollUp}></ArrowNavigateUp>
-
+      <ArrowNavigateUp handleUpNavigate={handleScrollUp} />
       <Footer />
     </div>
   );
 }
-

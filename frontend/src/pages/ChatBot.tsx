@@ -45,7 +45,7 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-     // 2. Petición a Express / Railway
+      // 2. Petición a Express / Railway
       const responseData = await sendMessageToRut(text, messages);
 
       const responseObj = responseData as unknown as { reply: string; actionExecuted?: any };
@@ -54,13 +54,27 @@ export default function Chatbot() {
       // 3. Agregar la respuesta real de Rut
       setMessages((prev) => [...prev, { sender: "bot", text: replyText }]);
 
-      // 4. Si Rut ejecutó una acción sobre una tarea, disparamos un evento global para actualizar el calendario/tareas
+      // 4. Si Rut ejecutó una acción, disparamos el evento global correspondiente
       if (typeof responseData === "object" && responseData !== null && "actionExecuted" in responseData) {
-        window.dispatchEvent(
-          new CustomEvent("task-updated", {
-            detail: (responseData as any).actionExecuted,
-          })
-        );
+        const action = (responseData as any).actionExecuted;
+
+        // Si se marcó una tarea completada
+        if (action?.type === "TASK_COMPLETED" || action?.type === "task_completed") {
+          window.dispatchEvent(
+            new CustomEvent("task-updated", {
+              detail: action,
+            })
+          );
+        }
+
+        // Si se registró una nueva planta desde el chat
+        if (action?.type === "PLANT_REGISTERED") {
+          window.dispatchEvent(
+            new CustomEvent("plant-updated", {
+              detail: action,
+            })
+          );
+        }
       }
     } catch (error) {
       console.error("Error al comunicarse con Rut:", error);
