@@ -26,10 +26,11 @@ export default function Chatbot() {
     },
   ]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
   // Envío Real al backend de Railway + Gemini
@@ -110,7 +111,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área Principal de Mensajes */}
-          <div className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
+          <div ref={messagesContainerRef} className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
             
             <div className="flex justify-center my-2">
               <span className="text-[10px] text-[#A6B7A9] bg-[#EDF2EB] px-3 py-1 rounded-full border border-[#D9E2D7]">Hoy</span>
@@ -150,7 +151,6 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Caja de Entrada de Mensaje */}
