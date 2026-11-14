@@ -26,6 +26,7 @@ import ScrollToTop from './components/ScrollToTop';
 import AdminAssignPlants from './pages/AdminAssignPlants';
 import Notifications from './pages/Notifications';
 import Guides from './pages/Guides';
+import GardeningGuides from './pages/GardeningGuides';
 import GuidePopup from './components/GuidePopup';
 import ChatBubble from './components/ChatBubble';
 
@@ -186,6 +187,7 @@ function App() {
         } />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/guides" element={<Guides />} />
+        <Route path="/gardening-guides" element={<GardeningGuides />} />
         <Route path="/notifications" element={
           <PrivateRoute>
             <Notifications />

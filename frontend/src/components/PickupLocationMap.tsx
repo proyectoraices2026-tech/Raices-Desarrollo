@@ -1,11 +1,5 @@
 import { ExternalLink, MapPin } from "lucide-react";
-
-/* Cambiar cuando se tengan las coordenadas exactas del vivero*/
-const MAP_QUERY = "Palmares, Alajuela, Costa Rica";
-const EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(MAP_QUERY)}&output=embed`;
-
-/* Enlace al lugar en Google Maps*/
-const GOOGLE_MAPS_URL = "https://maps.app.goo.gl/1UceLWL2Awn6eoP58";
+import { EMBED_URL, PICKUP_GOOGLE_MAPS_URL as GOOGLE_MAPS_URL } from "../utils/pickupLocation";
 
 /* Mapa de la ubicación del vivero.*/
 export default function PickupLocationMap() {
