@@ -18,6 +18,8 @@ const COLOR_GREEN_DARK = "#2D4A3E";
 const COLOR_GREEN = "#4E705B";
 const COLOR_WINE = "#722F37";
 const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+/* Mensaje que acompaña a la imagen al compartir */
+const SHARE_MESSAGE = "Mira mis productos favoritos de Raíces";
 
 /* Carga una imagen con CORS habilitado; si falla devuelve null para dibujar un recuadro vacío */
 function loadImage(url: string): Promise<HTMLImageElement | null> {
@@ -121,14 +123,21 @@ export async function buildFavoritesImage(products: Product[]): Promise<Blob> {
     });
 }
 
-/* Comparte la imagen con el menú nativo (móvil) o la descarga si el navegador no lo permite */
+/* Comparte la imagen con un mensaje y el enlace al sitio mediante el menú nativo (móvil), o la descarga si el navegador no lo permite */
 export async function shareFavorites(products: Product[]): Promise<"shared" | "downloaded" | "cancelled"> {
     const blob = await buildFavoritesImage(products);
     const file = new File([blob], "mis-favoritos-raices.png", { type: "image/png" });
 
-    if (navigator.canShare?.({ files: [file] })) {
+    /* El enlace va dentro del texto y no en el campo "url", porque varias apps ignoran "url" cuando se comparte un archivo */
+    const shareData = {
+        files: [file],
+        title: "Mis favoritos en Raíces",
+        text: `${SHARE_MESSAGE}\n${window.location.origin}`,
+    };
+
+    if (navigator.canShare?.(shareData)) {
         try {
-            await navigator.share({ files: [file], title: "Mis favoritos en Raíces" });
+            await navigator.share(shareData);
             return "shared";
         } catch (err) {
             /* El usuario cerró el menú de compartir: no es un error */
