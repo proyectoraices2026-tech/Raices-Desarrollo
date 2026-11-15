@@ -133,6 +133,13 @@ export default function MyRequests() {
               Ocultar todos
             </button>
           )}
+
+          <button
+              onClick={() => navigate("/archive-requests")}
+              className="btn bg-green-800 text-xs font-semibold text-white hover:bg-green-400 hover:text-black"
+            >
+              Papelera
+            </button>
         </div>
 
         {loading && (
