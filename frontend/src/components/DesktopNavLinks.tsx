@@ -15,6 +15,7 @@ export default function DesktopNavLinks() {
                 return (
                     <button
                         key={tab.key}
+                        data-tour={`nav-${tab.key}`}
                         onClick={() => handleClick(tab.path)}
                         aria-current={active ? "page" : undefined}
                         className={`text-sm font-semibold pb-1 border-b-2 transition ${active

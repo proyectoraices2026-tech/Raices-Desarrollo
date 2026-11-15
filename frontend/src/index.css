@@ -52,3 +52,37 @@ html, body {
   position: static;
   margin-top: 8px;
 }
+
+/* ===== Tour de bienvenida ===== */
+@keyframes tour-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes tour-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes tour-hop {
+  0% { opacity: 0; transform: translateY(40px); }
+  60% { opacity: 1; transform: translateY(-14px); }
+  80% { transform: translateY(4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes tour-arrow-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes tour-arrow-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.tour-fade-in { animation: tour-fade-in 0.3s ease-out both; }
+.tour-pop { animation: tour-pop 0.35s ease-out both; }
+.tour-hop { animation: tour-hop 0.7s ease-out both; }
+.tour-arrow-up { animation: tour-arrow-up 1s ease-in-out infinite; }
+.tour-arrow-down { animation: tour-arrow-down 1s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-pop, .tour-hop, .tour-arrow-up, .tour-arrow-down { animation: none; }
+}

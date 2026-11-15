@@ -54,6 +54,7 @@ export default function NotificationBell() {
     <div ref={containerRef} className="relative">
       <button
         onClick={toggle}
+        data-tour="bell"
         className="relative p-1 text-white hover:text-white/80 transition"
         title="Notificaciones"
         aria-label={unreadCount > 0 ? `Notificaciones, ${unreadCount} sin leer` : "Notificaciones"}
