@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { getActiveProducts, getAvailableStock } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Plus, Search, Share2 } from "lucide-react";
@@ -142,6 +143,31 @@ export function ProductList() {
   const { user } = useAuth();
   const { showAlert } = useAlert();
   const [sharing, setSharing] = useState(false);
+
+  /* Al llegar desde el corazón del navbar o "Lista de deseos" del menú, se abre el filtro Favoritos
+     y se baja hasta el catálogo */
+  const location = useLocation();
+  useEffect(() => {
+    if ((location.state as { showFavorites?: boolean } | null)?.showFavorites) {
+      setSelectedCategory(FAVORITES_FILTER);
+      setCurrentPage(1);
+      /* Si venimos de otra página, el catálogo tarda en pintarse y el ScrollToTop sube la vista al inicio:
+         se reintenta hasta que la sección exista y se vuelve a alinear cuando el contenido termina de cargar */
+      let tries = 0;
+      let timer: ReturnType<typeof setTimeout>;
+      const goToCatalog = () => {
+        const el = document.getElementById("catalogo");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+          timer = setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 600);
+        } else if (tries++ < 30) {
+          timer = setTimeout(goToCatalog, 100);
+        }
+      };
+      timer = setTimeout(goToCatalog, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.key, location.state]);
 
   useEffect(() => {
     getActiveProducts()

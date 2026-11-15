@@ -36,9 +36,6 @@ const headingClass = "font-poppins text-base font-bold text-white mb-4";
 const linkClass =
   "inline-flex items-center gap-2 text-sm text-emerald-100 hover:text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded transition-colors";
 
-/* reserveBottomNav: en celular las páginas con barra de navegación inferior fija necesitan
-   espacio extra al final para que la barra no tape el contenido. Páginas sin esa barra
-   (como Términos y condiciones) lo desactivan */
 export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?: boolean }) {
   const currentYear = new Date().getFullYear();
   const lastYear = Math.max(currentYear, START_YEAR);
@@ -71,7 +68,7 @@ export default function Footer({ reserveBottomNav = true }: { reserveBottomNav?:
               <Link to="/about" className={linkClass}>Sobre nosotros</Link>
             </li>
             <li>
-              <Link to="/guides" className={linkClass}>Guía rápida</Link>
+              <Link to="/guides" className={linkClass}>Guía de uso</Link>
             </li>
             <li>
               <Link to="/terms" className={linkClass}>Términos y condiciones</Link>

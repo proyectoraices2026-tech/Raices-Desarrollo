@@ -1,36 +1,19 @@
 import { useId, useState } from "react";
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
-import { useMediaQuery } from "../hooks/UseMediaQuery";
 
 interface GuideSectionProps {
-  /* Título de la columna (se muestra en mayúsculas) */
+  /* Título de la sección (se muestra en mayúsculas dentro del botón que recoge el contenido) */
   title: string;
+  /* Subtítulo que va encima de las tarjetas */
+  heading: string;
+  /* Las tarjetas de la sección */
   children: ReactNode;
 }
 
-/*
-    Una columna de la Guía rápida.
-    - Escritorio (lg y más): el título se ve como una etiqueta centrada y el contenido siempre está visible.
-    - Mobile / tablet: el título es un botón que recoge hacia arriba o despliega hacia abajo el contenido.
-*/
-export default function GuideSection({ title, children }: GuideSectionProps) {
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+export default function GuideSection({ title, heading, children }: GuideSectionProps) {
   const [open, setOpen] = useState(true);
   const contentId = useId();
-
-  const titleClass = "text-[11px] md:text-xs font-semibold uppercase tracking-widest text-[#1c2b18]";
-
-  if (isDesktop) {
-    return (
-      <section className="flex flex-col gap-5 min-w-0">
-        <div className="flex justify-center">
-          <h2 className={`${titleClass} bg-[#ddefe5] rounded-full px-4 py-1.5 text-center`}>{title}</h2>
-        </div>
-        {children}
-      </section>
-    );
-  }
 
   return (
     <section className="flex flex-col min-w-0">
@@ -40,7 +23,7 @@ export default function GuideSection({ title, children }: GuideSectionProps) {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls={contentId}
-          className={`${titleClass} w-full flex items-center justify-between gap-3 bg-[#ddefe5] rounded-2xl px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527a65]`}
+          className="text-[11px] md:text-xs font-semibold uppercase tracking-widest text-[#1c2b18] w-full flex items-center justify-between gap-3 bg-[#ddefe5] rounded-2xl px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#527a65]"
         >
           <span>{title}</span>
           <ChevronDown
@@ -58,7 +41,12 @@ export default function GuideSection({ title, children }: GuideSectionProps) {
         }`}
       >
         <div className="overflow-hidden min-h-0">
-          <div className="flex flex-col gap-5 pt-5">{children}</div>
+          <div className="flex flex-col gap-5 pt-5">
+            <h3 className="font-poppins text-xl md:text-2xl text-[#1c2b18]">{heading}</h3>
+            <div className="flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:gap-6 lg:items-stretch lg:[&>article]:h-full">
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     </section>

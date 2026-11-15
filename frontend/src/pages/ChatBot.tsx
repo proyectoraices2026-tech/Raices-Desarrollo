@@ -2,13 +2,44 @@ import { useState, useRef, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
-import { SendHorizonal, BotMessageSquare, RefreshCcw } from "lucide-react";
+import { SendHorizonal, BotMessageSquare, RefreshCcw, CheckCircle2, Sprout } from "lucide-react";
 import { sendMessageToRut } from "../services/ChatService"; 
 import type { Message } from "../services/ChatService";
 import Footer from "../components/Footer"; 
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+import { useAuth } from "../context/AuthContext";
+
+/* La conversación se guarda temporalmente en sessionStorage, separada por usuario,
+   y expira tras un lapso de inactividad para no conservarla indefinidamente. */
+const CHAT_STORAGE_PREFIX = "rut-chat";
+const CHAT_TTL_MS = 10 * 60 * 1000;
+
+const initialMessage: Message = {
+  sender: "bot",
+  text: "¡Hola! Soy Rut, tu asistente de cuidado de plantas. Puedo ayudarte con riego, luz, plagas o cualquier duda sobre tus plantas, dime la duda que tengas para conversarlo.",
+};
+
+function loadStoredMessages(userId?: string): Message[] {
+  if (!userId) return [initialMessage];
+  try {
+    const raw = sessionStorage.getItem(`${CHAT_STORAGE_PREFIX}:${userId}`);
+    if (!raw) return [initialMessage];
+    const parsed = JSON.parse(raw) as { messages?: Message[]; savedAt?: number };
+    const expired = !parsed.savedAt || Date.now() - parsed.savedAt > CHAT_TTL_MS;
+    if (expired || !Array.isArray(parsed.messages) || parsed.messages.length === 0) {
+      sessionStorage.removeItem(`${CHAT_STORAGE_PREFIX}:${userId}`);
+      return [initialMessage];
+    }
+    return parsed.messages;
+  } catch {
+    return [initialMessage];
+  }
+}
 
 export default function Chatbot() {
+  const { user } = useAuth();
+  const storageKey = user ? `${CHAT_STORAGE_PREFIX}:${user.id}` : null;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,18 +49,30 @@ export default function Chatbot() {
     document.getElementById("first")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Mensaje inicial
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      sender: "bot",
-      text: "¡Hola! Soy Rut, tu asistente de cuidado de plantas. Puedo ayudarte con riego, luz, plagas o cualquier duda sobre tus plantas, dime la duda que tengas para conversarlo.",
-    },
-  ]);
+  // Mensaje inicial (o conversación guardada dentro del lapso permitido)
+  const [messages, setMessages] = useState<Message[]>(() => loadStoredMessages(user?.id));
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  /* Guarda la conversación en cada cambio; el TTL se renueva con cada mensaje nuevo */
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify({ messages, savedAt: Date.now() }));
+    } catch {
+      /* Si el almacenamiento no está disponible, la conversación sigue solo en memoria */
+    }
+  }, [messages, storageKey]);
+
+  /* Reinicia la conversación y borra lo guardado para ese usuario */
+  const handleReset = () => {
+    if (storageKey) sessionStorage.removeItem(storageKey);
+    setMessages([initialMessage]);
+  };
+
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
   // Envío Real al backend de Railway + Gemini
@@ -44,7 +87,7 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-     // 2. Petición a Express / Railway
+      // 2. Petición a Express / Railway
       const responseData = await sendMessageToRut(text, messages);
 
       const responseObj = responseData as unknown as { reply: string; actionExecuted?: any };
@@ -53,13 +96,27 @@ export default function Chatbot() {
       // 3. Agregar la respuesta real de Rut
       setMessages((prev) => [...prev, { sender: "bot", text: replyText }]);
 
-      // 4. Si Rut ejecutó una acción sobre una tarea, disparamos un evento global para actualizar el calendario/tareas
+      // 4. Si Rut ejecutó una acción, disparamos el evento global correspondiente
       if (typeof responseData === "object" && responseData !== null && "actionExecuted" in responseData) {
-        window.dispatchEvent(
-          new CustomEvent("task-updated", {
-            detail: (responseData as any).actionExecuted,
-          })
-        );
+        const action = (responseData as any).actionExecuted;
+
+        // Si se marcó una tarea completada
+        if (action?.type === "TASK_COMPLETED" || action?.type === "task_completed") {
+          window.dispatchEvent(
+            new CustomEvent("task-updated", {
+              detail: action,
+            })
+          );
+        }
+
+        // Si se registró una nueva planta desde el chat
+        if (action?.type === "PLANT_REGISTERED") {
+          window.dispatchEvent(
+            new CustomEvent("plant-updated", {
+              detail: action,
+            })
+          );
+        }
       }
     } catch (error) {
       console.error("Error al comunicarse con Rut:", error);
@@ -101,7 +158,7 @@ export default function Chatbot() {
               </div>
             </div>
             <button 
-              onClick={() => setMessages([messages[0]])}
+              onClick={handleReset}
               className="p-1.5 text-[#A6B7A9] hover:text-[#718878] transition"
               title="Reiniciar chat"
             >
@@ -110,7 +167,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área Principal de Mensajes */}
-          <div className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
+          <div ref={messagesContainerRef} className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
             
             <div className="flex justify-center my-2">
               <span className="text-[10px] text-[#A6B7A9] bg-[#EDF2EB] px-3 py-1 rounded-full border border-[#D9E2D7]">Hoy</span>
@@ -150,11 +207,30 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Caja de Entrada de Mensaje */}
           <div className="p-3 md:p-4 border-t border-[#D9E2D7] bg-[#EDF2EB]">
+            <div className="flex flex-wrap gap-2 mb-2.5">
+              <button
+                type="button"
+                onClick={() => handleSend("Quiero marcar una tarea como completada")}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Marcar tarea
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSend("Quiero registrar una nueva planta")}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
+              >
+                <Sprout className="w-3.5 h-3.5" />
+                Registrar planta
+              </button>
+            </div>
             <div className="relative flex items-center">
               <input
                 type="text"
