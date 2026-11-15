@@ -30,6 +30,7 @@ import GardeningGuides from './pages/GardeningGuides';
 import GuidePopup from './components/GuidePopup';
 import ChatBubble from './components/ChatBubble';
 import WelcomeTour from './components/WelcomeTour';
+import ArchiveRequests from './pages/ArchiveRequests'
 
 /* 
     Rutas privadas
@@ -187,6 +188,14 @@ function App() {
             <MyPlants />
           </PrivateRoute>
         } />
+
+        {/*Ruta privada, requiere autenticación por parte del usuario*/}
+        <Route path="/archive-requests" element={
+          <PrivateRoute>
+            <ArchiveRequests></ArchiveRequests>
+          </PrivateRoute>
+        } />
+
         <Route path="/about" element={<AboutUs />} />
         <Route path="/guides" element={<Guides />} />
         <Route path="/gardening-guides" element={<GardeningGuides />} />

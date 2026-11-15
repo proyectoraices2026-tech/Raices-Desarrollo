@@ -171,5 +171,30 @@ export async function archiveAllRequests(): Promise<OrderRequest> {
     return parseResponse<OrderRequest>(res);
 }
 
+// Rutas papelera de pedidos
+/*
+    Trae todos los pedidos del usuario actual (Que se encuentren archivados), para la pantalla "Papelera".
+    GET /api/requests/archive-requests
+*/
+export async function getArchiveRequests(): Promise<OrderRequest[]> {
+    const headers = await getAuthHeader();
+
+    const res = await fetch(`${API_URL}/api/requests/archive-requests`, {
+        headers,
+    });
+
+    return parseResponse<OrderRequest[]>(res);
+}
+
+export async function unarchiveRequest(id: string): Promise<OrderRequest> {
+    const headers = await getAuthHeader();
+
+    const res = await fetch(`${API_URL}/api/requests/${id}/unarchive`, {
+        method: "PATCH",
+        headers,
+    });
+
+    return parseResponse<OrderRequest>(res);
+}
 
 

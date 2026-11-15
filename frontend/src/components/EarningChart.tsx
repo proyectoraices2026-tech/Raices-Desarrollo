@@ -157,7 +157,7 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                 <p className="text-xs text-primarioBase text-center py-16">Cargando...</p>
             ) : (
                 <>
-                {semesterMode && (
+                    {semesterMode && (
                         <div
                             className="inline-flex bg-white border border-primarioClaro rounded-full p-1"
                             role="group"
@@ -168,9 +168,8 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                                 onClick={() => setSemester(1)}
                                 aria-pressed={semester === 1}
                                 aria-label="Primer semestre, enero a junio"
-                                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
-                                    semester === 1 ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
-                                }`}
+                                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${semester === 1 ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
+                                    }`}
                             >
                                 Ene – Jun
                             </button>
@@ -179,9 +178,8 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                                 onClick={() => setSemester(2)}
                                 aria-pressed={semester === 2}
                                 aria-label="Segundo semestre, julio a diciembre"
-                                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${
-                                    semester === 2 ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
-                                }`}
+                                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition ${semester === 2 ? "bg-primarioBase text-white" : "text-primarioBase hover:bg-tarjeta"
+                                    }`}
                             >
                                 Jul – Dic
                             </button>
@@ -203,7 +201,19 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                         </div>
 
                         <div className="flex-1 min-w-0">
-                            <div className="h-40 border-l-2 border-b-2 border-primarioBase flex items-end gap-1 sm:gap-2 px-1">
+                            <div className="relative h-40 border-l-2 border-b-2 border-primarioBase flex items-end gap-1 sm:gap-2 px-1">
+                                {/* Líneas guía horizontales, una por cada número del eje (el 0 ya lo marca el borde inferior) */}
+                                {ticks
+                                    .filter((t) => t > 0)
+                                    .map((t) => (
+                                        <div
+                                            key={`grid-${t}`}
+                                            aria-hidden="true"
+                                            className="absolute inset-x-0 border-t border-primarioBase/15 pointer-events-none"
+                                            style={{ bottom: `${(t / top) * 100}%` }}
+                                        />
+                                    ))}
+
                                 {visibleBars.map((bar) => {
                                     const isSelected = selected?.key === bar.key;
                                     /* Un valor negativo se dibuja sin altura; el monto real se ve al seleccionarlo */
@@ -216,7 +226,7 @@ export default function EarningsChart({ range, buckets, loading, error }: Earnin
                                             aria-pressed={isSelected}
                                             aria-label={`${bar.fullLabel}: ${money(bar.value)}`}
                                             title={`${bar.fullLabel}: ${money(bar.value)}`}
-                                            className="flex-1 min-w-0 h-full flex items-end justify-center"
+                                            className="relative flex-1 min-w-0 h-full flex items-end justify-center"
                                         >
                                             <span
                                                 className={`block w-full max-w-[28px] rounded-t-[10px] transition-colors ${isSelected ? "bg-[#87c6a1]" : "bg-primarioBase"
