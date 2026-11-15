@@ -105,6 +105,7 @@ export default function NavBar({
         {user && (
           <button
             onClick={() => navigate("/", { state: { showFavorites: true } })}
+            data-tour="favorites"
             className="p-1 text-white hover:text-white/80 transition"
             title="Lista de deseos"
             aria-label="Lista de deseos"

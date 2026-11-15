@@ -29,6 +29,7 @@ import Guides from './pages/Guides';
 import GardeningGuides from './pages/GardeningGuides';
 import GuidePopup from './components/GuidePopup';
 import ChatBubble from './components/ChatBubble';
+import WelcomeTour from './components/WelcomeTour';
 
 /* 
     Rutas privadas
@@ -101,6 +102,7 @@ function App() {
       <ScrollToTop></ScrollToTop>
       <GuidePopup />
       <ChatBubble />
+      <WelcomeTour />
         {/*Rutas públicas que por motivos de logística no deben de requerir de autenticación*/}
       <Routes>
         <Route path="/" element={<Catalog />} />

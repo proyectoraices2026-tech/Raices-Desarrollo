@@ -18,6 +18,7 @@ export default function BottomNav() {
         return (
           <button
             key={tab.key}
+            data-tour={`nav-${tab.key}`}
             onClick={() => handleClick(tab.path)}
             className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition min-w-[64px] ${
               active ? "bg-verdePastel text-primarioOscuro" : "text-primarioBase"
