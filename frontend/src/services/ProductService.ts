@@ -425,6 +425,58 @@ export async function setProductActive(
 }
 
 /*
+    Borrado físico de un producto (PERMANENTE)
+
+    A diferencia de setProductActive, esto elimina la fila de la base de datos. Si el producto
+    ya tiene pedidos o movimientos de stock, Postgres puede bloquearlo con una violación de
+    llave foránea (código 23503); en ese caso se avisa con un mensaje claro.
+    Se usa count: "exact" porque, si la policy de RLS no permite borrar, Supabase NO da error:
+    simplemente borra 0 filas. Con el conteo se detecta ese caso.
+*/
+export async function deleteProduct(
+  id: string,
+  imageUrl?: string | null,
+): Promise<void> {
+  const { error, count } = await supabase
+    .from("products")
+    .delete({ count: "exact" })
+    .eq("id", id);
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new Error(
+        "No se puede borrar: el producto tiene pedidos o movimientos registrados. Puedes desactivarlo para ocultarlo de la tienda.",
+      );
+    }
+    throw error;
+  }
+
+  if (!count) {
+    throw new Error(
+      "No se borró ningún producto. Es posible que ya no exista o que no tengas permiso para borrarlo.",
+    );
+  }
+
+  /* Limpieza de la imagen en el bucket. Es "mejor esfuerzo": si falla, el producto ya se
+     borró y solo queda un archivo huérfano, así que no se lanza error. */
+  if (imageUrl) {
+    const marker = "/product-images/";
+    const idx = imageUrl.indexOf(marker);
+    if (idx !== -1) {
+      const path = decodeURIComponent(
+        imageUrl.slice(idx + marker.length).split("?")[0],
+      );
+      const { error: storageError } = await supabase.storage
+        .from("product-images")
+        .remove([path]);
+      if (storageError) {
+        console.warn("No se pudo borrar la imagen del bucket:", storageError);
+      }
+    }
+  }
+}
+
+/*
     Obtener los productos más vendidos
 
     El ranking lo calcula la función de Postgres get_best_sellers (suma las cantidades de

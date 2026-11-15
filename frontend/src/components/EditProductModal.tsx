@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import type { SubmitEvent } from "react";
-import { X } from "lucide-react";
-import { updateProduct, getErrorMessage, getProductCostOverride } from "../services/ProductService";
+import { X, Trash2 } from "lucide-react";
+import { updateProduct, deleteProduct, getErrorMessage, getProductCostOverride } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
 import StockModal from "./StockModal";
+import ConfirmModal from "./ConfirmModal";
 import PlantDefaultsFields from "./PlantDefaultsFields";
 import { plantDefaultsStateFromProduct, plantDefaultsToPayload, validatePlantDefaults } from "../utils/plantDefaults";
 
@@ -12,6 +13,9 @@ interface EditProductModalProps {
     categories: { id: string; name: string }[];
     onClose: () => void;
     onSuccess: () => void;
+    /* Opcional: si se pasa, se llama tras borrar el producto en vez de onSuccess
+       (útil si onSuccess muestra un mensaje de "producto editado") */
+    onDeleted?: () => void;
     onError: (message: string) => void;
 }
 
@@ -25,7 +29,7 @@ const labelClass = "block text-sm font-semibold text-[#2D4A3E] mb-1.5";
    única excepción: no se precarga un archivo, se deja tal cual si no se selecciona una nueva.
    El stock ya no se edita aquí: se cambia con "Agregar" (compra) o "Ajustar" (corrección),
    para que cada movimiento quede registrado en el historial. */
-export default function EditProductModal({ product, categories, onClose, onSuccess, onError }: EditProductModalProps) {
+export default function EditProductModal({ product, categories, onClose, onSuccess, onDeleted, onError }: EditProductModalProps) {
     const [sku, setSku] = useState(product.sku);
     const [name, setName] = useState(product.name);
     const [description, setDescription] = useState(product.description ?? "");
@@ -38,6 +42,8 @@ export default function EditProductModal({ product, categories, onClose, onSucce
     const [stockMode, setStockMode] = useState<"add" | "adjust" | null>(null);
     const [plantDefaults, setPlantDefaults] = useState(() => plantDefaultsStateFromProduct(product));
     const [petSafe] = useState(product.pet_safe ?? false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     /* El costo vive en product_costs y se consulta aparte (es asíncrono), por eso se carga
    al abrir el modal en vez de inicializarlo en el useState */
@@ -94,6 +100,21 @@ export default function EditProductModal({ product, categories, onClose, onSucce
             onError(getErrorMessage(err, "Error al editar el producto."));
         } finally {
             setLoading(false);
+        }
+    }
+
+    /* Borrado físico y permanente; se llama solo desde el popup de confirmación */
+    async function handleDelete() {
+        setDeleting(true);
+        try {
+            await deleteProduct(product.id, product.image_url);
+            setConfirmDelete(false);
+            (onDeleted ?? onSuccess)();
+        } catch (err) {
+            setConfirmDelete(false);
+            onError(getErrorMessage(err, "Error al borrar el producto."));
+        } finally {
+            setDeleting(false);
         }
     }
 
@@ -193,7 +214,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                             labelClass={labelClass}
                         />
 
-{/*
+                        {/*
     <label className="flex items-center gap-3 bg-[#f5f7f2] rounded-xl px-4 py-3 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -209,7 +230,7 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                             </span>
                         </label>
 */}
-                        
+
 
                         <div>
                             <label className={labelClass}>Imagen (opcional, solo si quieres cambiarla)</label>
@@ -237,6 +258,18 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                                 {loading ? "Guardando..." : "Guardar cambios"}
                             </button>
                         </div>
+
+                        <div className="border-t border-[#e4e4dc] pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setConfirmDelete(true)}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-full border-2 border-red-200 text-red-600 font-semibold text-sm hover:bg-red-50 transition"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                                Borrar producto
+                            </button>
+                        </div>
+
                     </form>
                 </div>
             </div>
@@ -251,6 +284,17 @@ export default function EditProductModal({ product, categories, onClose, onSucce
                         setStockMode(null);
                         onSuccess();
                     }}
+                />
+            )}
+
+            {confirmDelete && (
+                <ConfirmModal
+                    title="¿Seguro que quieres borrar este producto?"
+                    message={`«${product.name}» Borrarlo no solo significa que el producto va a desaparecer de forma permanente. Todo lo relacionado con él (ventas, inversión y ganancias) también se eliminará, lo que afectará los resultados de las estadísticas y los pedidos relacionados. Ninguno de estos cambios es reversible.`}
+                    confirmLabel="Sí, borrar"
+                    loading={deleting}
+                    onConfirm={handleDelete}
+                    onCancel={() => setConfirmDelete(false)}
                 />
             )}
         </>
