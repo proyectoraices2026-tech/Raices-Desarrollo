@@ -7,7 +7,7 @@ import { QUICK_GUIDES } from "../utils/quickGuides";
 import GuideCard from "./GuideCard";
 
 /* Pantallas donde no tiene sentido interrumpir con la guía */
-const EXCLUDED_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/guides"];
+const EXCLUDED_PATHS = ["/login", "/register", "/forgot-password", "/reset-password", "/guides", "/"];
 
 /* Popup de bienvenida: se muestra una sola vez la primera vez que el usuario entra con sesión */
 export default function GuidePopup() {
