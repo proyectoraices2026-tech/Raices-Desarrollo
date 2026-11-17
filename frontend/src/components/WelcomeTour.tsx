@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useWelcomeTour } from "../hooks/useWelcomeTour";
-import seedy from "../assets/seedy.svg";
+import seedy from "../assets/seedy_blanco.svg"
 
 /* target = valor del atributo data-tour del elemento a iluminar (null = solo saludo, sin elemento) */
 interface TourStep {
