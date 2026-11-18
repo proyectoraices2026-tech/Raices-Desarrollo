@@ -9,7 +9,7 @@ import "swiper/css/pagination";
 
 import { getBestSellers } from "../services/ProductService";
 import type { Product } from "../services/ProductService";
-import { ProductCard } from "./ProductList";
+import { ProductCard, ProductCardSkeleton } from "./ProductList";
 import ProductDetailModal from "./ProductDetailModal";
 
 /* Cantidad de productos que muestra el carrusel */
@@ -34,8 +34,8 @@ export default function BestSellers() {
         document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth" });
     };
 
-    /* Es una sección secundaria: si carga o falla, simplemente no se muestra */
-    if (loading || products.length === 0) return null;
+    /* Mientras carga se reserva el espacio; si termina sin productos (o falla), la sección no se muestra */
+    if (!loading && products.length === 0) return null;
 
     return (
         <section className="bg-[#f5f7f2] py-6" aria-labelledby="best-sellers-title">
@@ -45,7 +45,7 @@ export default function BestSellers() {
                         id="best-sellers-title"
                         className="flex items-center gap-2 text-lg font-bold text-[#1e2d24]"
                     >
-                        
+
                         Más vendidos
                     </h2>
 
@@ -59,56 +59,72 @@ export default function BestSellers() {
                     </button>
                 </div>
 
-                <div className="relative">
-                    <Swiper
-                        className="w-full min-w-0 !pt-2 !px-2 !pb-10"
-                        style={{ "--swiper-theme-color": "#4E705B" } as CSSProperties}
-                        modules={[Pagination]}
-                        onSwiper={(swiper) => {
-                            swiperRef.current = swiper;
-                        }}
-                        pagination={{ clickable: true }}
-                        spaceBetween={12}
-                        slidesPerView={2}
-                        slidesPerGroup={2}
-                        breakpoints={{
-                            640: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 16 },
-                            768: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 16 },
-                            1024: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 16 },
-                        }}
-                    >
-                        {products.map((product) => (
-                            <SwiperSlide key={product.id}>
-                                <div className="rounded-2xl">
-                                    <ProductCard
-                                        product={product}
-                                        onProductClick={setSelectedProduct}
-                                        /* Igual que en el catálogo: el "+" abre la ficha del producto */
-                                        onAddToCart={setSelectedProduct}
-                                    />
-                                </div>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
 
-                    {/* Flechas: solo en pantallas anchas; en mobile se desliza con el dedo */}
-                    <button
-                        type="button"
-                        onClick={() => swiperRef.current?.slidePrev()}
-                        aria-label="Productos anteriores"
-                        className="hidden md:flex absolute top-[45%] -translate-y-1/2 -left-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
+                {loading ? (
+                    <div
+                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 px-2 pt-2 pb-10 overflow-hidden"
+                        aria-hidden="true"
                     >
-                        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => swiperRef.current?.slideNext()}
-                        aria-label="Productos siguientes"
-                        className="hidden md:flex absolute top-[45%] -translate-y-1/2 -right-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
-                    >
-                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                    </button>
-                </div>
+                        <ProductCardSkeleton />
+                        <ProductCardSkeleton />
+                        <div className="hidden sm:block"><ProductCardSkeleton /></div>
+                        <div className="hidden md:block"><ProductCardSkeleton /></div>
+                        <div className="hidden lg:block"><ProductCardSkeleton /></div>
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <Swiper
+                            className="w-full min-w-0 !pt-2 !px-2 !pb-10"
+                            style={{ "--swiper-theme-color": "#4E705B" } as CSSProperties}
+                            modules={[Pagination]}
+                            onSwiper={(swiper) => {
+                                swiperRef.current = swiper;
+                            }}
+                            pagination={{ clickable: true }}
+                            spaceBetween={12}
+                            slidesPerView={2}
+                            slidesPerGroup={2}
+                            breakpoints={{
+                                640: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 16 },
+                                768: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 16 },
+                                1024: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 16 },
+                            }}
+                        >
+                            {products.map((product) => (
+                                <SwiperSlide key={product.id}>
+                                    <div className="rounded-2xl">
+                                        <ProductCard
+                                            product={product}
+                                            onProductClick={setSelectedProduct}
+                                            /* Igual que en el catálogo: el "+" abre la ficha del producto */
+                                            onAddToCart={setSelectedProduct}
+                                        />
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+
+                        {/* Flechas: solo en pantallas anchas; en mobile se desliza con el dedo */}
+                        <button
+                            type="button"
+                            onClick={() => swiperRef.current?.slidePrev()}
+                            aria-label="Productos anteriores"
+                            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -left-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
+                        >
+                            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => swiperRef.current?.slideNext()}
+                            aria-label="Productos siguientes"
+                            className="hidden md:flex absolute top-[45%] -translate-y-1/2 -right-4 z-10 w-8 h-8 items-center justify-center rounded-full bg-white border border-[#c8dcc2] text-[#2D4A3E] hover:bg-[#f0f5ec] transition"
+                        >
+                            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                    </div>
+                )}
+
+
             </div>
 
             <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
