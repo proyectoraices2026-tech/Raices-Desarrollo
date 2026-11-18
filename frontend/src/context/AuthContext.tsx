@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
@@ -24,18 +24,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [role, setRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    /* Id del usuario cuyo rol ya se cargó (o se está cargando). Evita pedir el mismo rol varias veces:
+       Supabase emite INITIAL_SESSION al suscribirse y, más adelante, SIGNED_IN o TOKEN_REFRESHED
+       (por ejemplo al volver a la pestaña), y todos esos eventos traen al mismo usuario */
+    const roleLoadedFor = useRef<string | null>(null);
+
     /* Consulta el rol relacionado con el perfil del usuario actual */
     async function fetchRole(userId: string) {
+        /* Se marca antes de la consulta para que un evento que llegue mientras tanto no repita la petición */
+        roleLoadedFor.current = userId;
+
         const { data, error } = await supabase
             .from("profiles")
             .select("role_id, roles(name)")
             .eq("id", userId)
             .single();
 
-            console.log("fetchRole data:", data, "error:", error);
-
         /* Si no se encuentra el perfil, se elimina el rol para evitar usar información anterior */
         if (error || !data) {
+            /* Se libera la marca para que el próximo evento pueda reintentar */
+            roleLoadedFor.current = null;
             setRole(null);
             return;
         }
@@ -63,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (session?.user) {
                 await fetchRole(session.user.id);
             } else {
+                roleLoadedFor.current = null;
                 setRole(null);
             }
             setLoading(false);
@@ -71,15 +80,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         /* Escucha cambios de autenticación para actualizar los datos del contexto */
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                /* INITIAL_SESSION lo emite Supabase al suscribirse y getSession() (arriba)
+                   ya se encarga de cargar la sesión y el rol, así que se ignora */
+                if (event === "INITIAL_SESSION") return;
+
                 setSession(session);
                 setUser(session?.user ?? null);
 
                 if (session?.user) {
-                    await fetchRole(session.user.id);
+                    /* Si el rol de este usuario ya está cargado (o en camino), no se consulta otra vez.
+                       Quien lo está cargando es quien baja loading, por eso aquí no se toca */
+                    if (roleLoadedFor.current !== session.user.id) {
+                        await fetchRole(session.user.id);
+                        setLoading(false);
+                    }
                 } else {
+                    roleLoadedFor.current = null;
                     setRole(null);
+                    setLoading(false);
                 }
-                setLoading(false);
 
                 /* Envía al usuario al formulario cuando inicia una recuperación */
                 if (event === "PASSWORD_RECOVERY") {
