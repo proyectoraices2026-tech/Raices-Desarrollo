@@ -81,6 +81,9 @@ export function ProductCard({
             src={product.image_url}
             alt={product.name}
             loading="lazy"
+            width={400}
+            height={300}
+            decoding="async"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
             className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
@@ -124,6 +127,27 @@ export function ProductCard({
           >
             <Plus className="w-5 h-5" />
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Tarjeta de relleno con las mismas medidas que ProductCard, para reservar el espacio mientras carga */
+export function ProductCardSkeleton() {
+  return (
+    <div
+      className="bg-white border border-[#e8efe4] rounded-2xl overflow-hidden flex flex-col w-full"
+      aria-hidden="true"
+    >
+      <div className="w-full aspect-[4/3] bg-slate-200 animate-pulse" />
+      <div className="flex flex-col p-2.5 space-y-0.5">
+        <div className="h-[15px] w-1/3 rounded bg-slate-200 animate-pulse" />
+        <div className="h-5 w-3/4 rounded bg-slate-200 animate-pulse" />
+        <div className="h-4 w-full rounded bg-slate-200 animate-pulse" />
+        <div className="flex items-center justify-between pt-1">
+          <div className="h-5 w-16 rounded bg-slate-200 animate-pulse" />
+          <div className="w-9 h-9 rounded-full bg-slate-200 animate-pulse" />
         </div>
       </div>
     </div>
@@ -269,10 +293,16 @@ export function ProductList() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <p className="text-sm font-semibold text-[#2D4A3E] animate-pulse">
-          Cargando productos de Raíces...
-        </p>
+      <div className="w-full max-w-6xl mx-auto space-y-5" aria-busy="true">
+        {/* Mismo alto que el buscador y los chips de categoría */}
+        <div className="h-9 sm:h-10 w-full rounded-full bg-slate-100 animate-pulse" />
+        <div className="h-8 w-full" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          {Array.from({ length: 10 }, (_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+        <p className="sr-only" role="status">Cargando productos de Raíces...</p>
       </div>
     );
   }
@@ -320,12 +350,12 @@ export function ProductList() {
                   setCurrentPage(1);
                 }}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap ${isFavoritesChip
-                    ? isActive
-                      ? "bg-[#722F37] text-white"
-                      : "bg-white text-[#722F37] border border-[#722F37] hover:bg-[#f7ebed]"
-                    : isActive
-                      ? "bg-[#4E705B] text-white "
-                      : "bg-white text-slate-600 hover:bg-slate-100"
+                  ? isActive
+                    ? "bg-[#722F37] text-white"
+                    : "bg-white text-[#722F37] border border-[#722F37] hover:bg-[#f7ebed]"
+                  : isActive
+                    ? "bg-[#4E705B] text-white "
+                    : "bg-white text-slate-600 hover:bg-slate-100"
                   }`}
               >
                 {isFavoritesChip && <Heart className="inline w-3 h-3 mr-1 -mt-0.5" aria-hidden="true" />}

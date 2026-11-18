@@ -12,17 +12,10 @@ import PetSafeSlider from "../components/PetSafeSlider";
 import "swiper/css";
 import "swiper/css/pagination";
 
-const BANNERS = [
-    { src: "/Banner 1.png", mobileSrc: "/Banner 1 Mobile.png", position: "object-center" },
-    { src: "/Banner 2.png", mobileSrc: "/Banner 2 Mobile.png", position: "object-center" },
-    { src: "/Banner 3.png", mobileSrc: "/Banner 3 Mobile.png", position: "object-center" },
-    { src: "/Banner 4.png", mobileSrc: "/Banner 4 Mobile.png", position: "object-center" },
-    { src: "/Banner 5.png", mobileSrc: "/Banner 5 Mobile.png", position: "object-center" },
-    { src: "/Banner 6.png", mobileSrc: "/Banner 6 Mobile.png", position: "object-center" },
-    { src: "/Banner 7.png", mobileSrc: "/Banner 7 Mobile.png", position: "object-center" },
-    { src: "/Banner 8.png", mobileSrc: "/Banner 8 Mobile.png", position: "object-center" },
-    { src: "/Banner 9.png", mobileSrc: "/Banner 9 Mobile.png", position: "object-center" },
-];
+const BANNERS = Array.from({ length: 9 }, (_, i) => ({
+    src: `/banner-${i + 1}.webp`,
+    mobileSrc: `/banner-${i + 1}-mobile.webp`,
+}));
 
 /* Página privada que muestra el catálogo y las acciones disponibles para el rol */
 export default function Catalog() {
@@ -54,18 +47,24 @@ export default function Catalog() {
                 pagination={{ clickable: true }}
                 loop
             >
-                {BANNERS.map((banner) => (
+                                {BANNERS.map((banner, index) => (
                     <SwiperSlide key={banner.src}>
-                        <picture className="block w-full">
-                            <source media="(max-width: 767px)" srcSet={encodeURI(banner.mobileSrc)} />
+                        <picture className="block w-full aspect-[401/209] md:aspect-[1506/271]">
+                            <source media="(max-width: 767px)" srcSet={banner.mobileSrc} />
                             <img
                                 src={banner.src}
                                 alt=""
-                                className={`block w-full h-auto md:aspect-[1506/271] md:object-cover ${banner.position}`}
+                                width={1506}
+                                height={271}
+                                loading={index === 0 ? "eager" : "lazy"}
+                                fetchPriority={index === 0 ? "high" : "auto"}
+                                decoding="async"
+                                className="block w-full h-full object-cover object-center"
                             />
                         </picture>
                     </SwiperSlide>
                 ))}
+                
             </Swiper>
 
             <BestSellers />
