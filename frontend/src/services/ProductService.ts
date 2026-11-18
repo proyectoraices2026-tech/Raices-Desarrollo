@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import type { TaskUnit } from "./UserPlantsService";
+import { compressImage } from "../utils/compressImage";
 
 /*
     Los errores que lanza Supabase (por ejemplo cuando una política de RLS bloquea algo)
@@ -192,8 +193,9 @@ export async function getCategories() {
     asignar a Product para que se pueda usar la base de datos
 */
 export async function createProduct(input: NewProductInput): Promise<Product> {
+  const imageFile = await compressImage(input.imageFile);
   /* Para asignarle el nombre a la imagen, se hace uso del atributo sku del producto y se le añade la fecha */
-  const fileName = `${input.sku}-${Date.now()}.${input.imageFile.name.split(".").pop()}`;
+  const fileName = `${input.sku}-${Date.now()}.${imageFile.name.split(".").pop()}`;
   /* 
         Se inicializan las const data (La informacion que viene desde la base de datos) 
         y error (Mensaje que aparece en casa de que la información no llegue).
@@ -205,7 +207,7 @@ export async function createProduct(input: NewProductInput): Promise<Product> {
     .from("product-images")
 
     // se actualiza el nombre dentro de la base de datos
-    .upload(fileName, input.imageFile);
+    .upload(fileName, imageFile, { cacheControl: "31536000" });
 
   // Si ocurrió un error se imprime el mensaje
   if (uploadError) throw uploadError;
@@ -355,11 +357,13 @@ export async function updateProduct(
 
   /* Si se mandó una imagen nueva, se sube igual que en createProduct y se agrega su url */
   if (imageFile) {
-    const fileName = `${input.sku ?? id}-${Date.now()}.${imageFile.name.split(".").pop()}`;
+
+    const compressed = await compressImage(imageFile);
+    const fileName = `${input.sku ?? id}-${Date.now()}.${compressed.name.split(".").pop()}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("product-images")
-      .upload(fileName, imageFile);
+      .upload(fileName, compressed, { cacheControl: "31536000" });
 
     if (uploadError) throw uploadError;
 
