@@ -68,32 +68,7 @@ export default function Chatbot() {
     setMessages([initialMessage]);
   };
 
-  /* Teclado del celular abierto: se detecta porque el área visible (visualViewport) se encoge.
-     Mientras está abierto se oculta la barra inferior y el chat ocupa el espacio que queda. */
-  const [keyboard, setKeyboard] = useState({ open: false, height: 0 });
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      setKeyboard({ open: isMobile && window.innerHeight - vv.height > 150, height: vv.height });
-    };
-    update();
-    vv.addEventListener("resize", update);
-    return () => vv.removeEventListener("resize", update);
-  }, []);
-
-  /* Al abrirse el teclado, la página vuelve arriba para que el chat quede a la vista */
-  useEffect(() => {
-    if (keyboard.open) window.scrollTo({ top: 0 });
-  }, [keyboard.open]);
-
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  /* Evita que tocar un botón le quite el foco al campo de texto: así el teclado del celular
-     no se cierra al enviar un mensaje */
-  const keepInputFocus = (e: React.PointerEvent | React.MouseEvent) => e.preventDefault();
 
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -160,18 +135,16 @@ export default function Chatbot() {
   return (
     <div className="min-h-screen bg-[#FDFEFD] flex flex-col">
       <NavBar onMenuClick={() => setMenuOpen(true)} />
-      {!keyboard.open && <BottomNav />}
+      <BottomNav />
 
       {/* Contenedor principal centrado, máximo ancho 4xl para escritorio */}
-      <main id="first" className={`flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col ${keyboard.open ? "mb-2" : "mb-20"} md:mb-6 mt-0 md:mt-24`}>
+      <main id="first" className="flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col mb-20 md:mb-6 mt-16 md:mt-24">
         
         {/* Tarjeta del Chat */}
-        <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-none flex flex-col h-[calc(100dvh-170px)] min-h-[320px] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner"
-          style={keyboard.open ? { height: `${Math.max(keyboard.height - 90, 220)}px` } : undefined}
-        >
+        <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-1 flex flex-col h-[calc(100vh-160px)] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner">
           
           {/* Encabezado del Chat */}
-          <div className="flex-shrink-0 p-3 border-b border-[#D9E2D7] bg-[#EDF2EB] flex items-center justify-between">
+          <div className="p-3 border-b border-[#D9E2D7] bg-[#EDF2EB] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-[#E8DCCB] border border-[#DCCBB5] flex items-center justify-center text-[#907A60]">
                 <BotMessageSquare className="w-5 h-5" />
@@ -194,7 +167,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área Principal de Mensajes */}
-          <div ref={messagesContainerRef} className="flex-1 min-h-0 p-3 md:p-5 overflow-y-auto overscroll-contain space-y-4 bg-[#EDF2EB]">
+          <div ref={messagesContainerRef} className="flex-1 p-3 md:p-5 overflow-y-auto space-y-4 bg-[#EDF2EB]">
             
             <div className="flex justify-center my-2">
               <span className="text-[10px] text-[#A6B7A9] bg-[#EDF2EB] px-3 py-1 rounded-full border border-[#D9E2D7]">Hoy</span>
@@ -237,12 +210,10 @@ export default function Chatbot() {
           </div>
 
           {/* Caja de Entrada de Mensaje */}
-          <div className="flex-shrink-0 p-3 md:p-4 border-t border-[#D9E2D7] bg-[#EDF2EB]">
+          <div className="p-3 md:p-4 border-t border-[#D9E2D7] bg-[#EDF2EB]">
             <div className="flex flex-wrap gap-2 mb-2.5">
               <button
                 type="button"
-                onPointerDown={keepInputFocus}
-                onMouseDown={keepInputFocus}
                 onClick={() => handleSend("Quiero marcar una tarea como completada")}
                 disabled={loading}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
@@ -252,8 +223,6 @@ export default function Chatbot() {
               </button>
               <button
                 type="button"
-                onPointerDown={keepInputFocus}
-                onMouseDown={keepInputFocus}
                 onClick={() => handleSend("Quiero registrar una nueva planta")}
                 disabled={loading}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] bg-white border border-[#D9E2D7] text-[#5E7765] hover:bg-[#D9E2D7] transition disabled:opacity-40"
@@ -264,10 +233,7 @@ export default function Chatbot() {
             </div>
             <div className="relative flex items-center">
               <input
-                ref={inputRef}
                 type="text"
-                enterKeyHint="send"
-                autoComplete="off"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -275,10 +241,6 @@ export default function Chatbot() {
                 className="w-full text-xs md:text-sm p-3.5 pr-12 rounded-full border border-[#D9E2D7] focus:outline-none focus:border-[#AFBFB2] focus:ring-1 focus:ring-[#AFBFB2] bg-white text-[#1E2D24] shadow-inner"
               />
               <button
-                type="button"
-                onPointerDown={keepInputFocus}
-                onMouseDown={keepInputFocus}
-                aria-label="Enviar mensaje"
                 onClick={() => handleSend()}
                 disabled={loading || !input.trim()}
                 className="absolute right-2 p-2 rounded-full bg-[#5E7765] hover:bg-[#4E6153] text-white transition disabled:opacity-40"
