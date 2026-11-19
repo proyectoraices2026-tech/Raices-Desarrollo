@@ -6,6 +6,12 @@ import BottomNav from "../components/BottomNav";
 import SideMenu from "../components/SideMenu";
 import Footer from "../components/Footer";
 import { ArrowNavigateUp } from "../components/ArrowNavigateUp";
+import ricardoPhoto from "../assets/team/ricardo.jpg";
+import carlosPhoto from "../assets/team/carlos.jpg";
+import yodredPhoto from "../assets/team/yodred.jpg";
+import keslyPhoto from "../assets/team/kesly.jpg";
+import mariaPhoto from "../assets/team/maria.jpg";
+import daisyPhoto from "../assets/team/daisy.jpg";
 import { EMBED_URL, PICKUP_GOOGLE_MAPS_URL } from "../utils/pickupLocation";
 
 const CONTACT_EMAIL = "proyectoraices2026@gmail.com";
@@ -24,22 +30,53 @@ const FEATURES = [
 interface TeamMember {
   name: string;
   role: string;
-  contribution: string;
+  /* Aporte al proyecto (opcional): si no se pone, no se muestra la línea */
+  contribution?: string;
   /* Enlace al perfil de LinkedIn (opcional) */
   linkedinUrl?: string;
   /* Ruta o URL de la foto (opcional). Sin foto se muestra el recuadro "Foto" del diseño */
   photo?: string;
 }
 
-/* Equipo de desarrollo: reemplazar cada tarjeta con los datos reales de la persona.
-   Mientras tanto se muestran los textos de ejemplo del diseño de Figma. */
+/* Equipo de desarrollo. Para agregar la foto de alguien: guardarla en src/assets/team/,
+   importarla arriba y ponerla en `photo`. Sin foto se muestra el recuadro "Foto". */
 const TEAM: TeamMember[] = [
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
-  { name: "Nombre", role: "Rol", contribution: "Aporte" },
+  {
+    name: "Ricardo Zúñiga",
+    role: "Desarrollador backend / frontend",
+    photo: ricardoPhoto,
+    linkedinUrl: "https://www.linkedin.com/in/ricardo-z%C3%BA%C3%B1iga-91a877450",
+  },
+  {
+    name: "Carlos Sandoval",
+    role: "Desarrollador backend / frontend",
+    photo: carlosPhoto,
+    linkedinUrl: "https://www.linkedin.com/in/carlos-mejia-443986342",
+  },
+  {
+    name: "Yodred Méndez",
+    role: "Diseñador UX/UI y Analista de QA",
+    photo: yodredPhoto,
+    linkedinUrl: "https://www.linkedin.com/in/y%C3%B3dred-m%C3%A9ndez-salas-8946123a7/",
+  },
+  {
+    name: "Kesly Rojas",
+    role: "Diseñadora UX/UI y Analista de QA",
+    photo: keslyPhoto,
+    linkedinUrl: "https://www.linkedin.com/in/kesly-rojas-46562332b/",
+  },
+  {
+    name: "María Vivas",
+    role: "Creadora Multimedia y Analista de QA",
+    photo: mariaPhoto,
+    linkedinUrl: "https://www.linkedin.com/in/malu-vivas-6b9593449",
+  },
+  {
+    name: "Daisy Pérez",
+    role: "Desarrolladora de Frontend",
+    photo: daisyPhoto,
+    linkedinUrl: "https://cr.linkedin.com/in/daisy-p%C3%A9rez-hern%C3%A1ndez-27183a324",
+  },
 ];
 
 const cardClass = "bg-white border border-[#d8e0d8] rounded-3xl";
@@ -78,7 +115,7 @@ function TeamCard({ member }: { member: TeamMember }) {
     <article className={`${cardClass} p-4 md:p-6 flex flex-col gap-4`}>
       <div className="h-40 rounded-2xl bg-[#eaf1ec] border border-[#d8e0d8] flex items-center justify-center overflow-hidden">
         {member.photo ? (
-          <img src={member.photo} alt={`Foto de ${member.name}`} className="w-full h-full object-cover" />
+          <img src={member.photo} alt={`Foto de ${member.name}`} className="w-full h-full object-cover object-[50%_30%]" />
         ) : (
           <span className="text-lg md:text-xs font-bold text-[#527a65]">Foto</span>
         )}
@@ -86,7 +123,9 @@ function TeamCard({ member }: { member: TeamMember }) {
       <div className="flex flex-col gap-2 min-w-0">
         <h3 className="text-xl font-bold text-[#0b2525] break-words">{member.name}</h3>
         <p className="text-sm font-bold text-[#527a65] break-words">{member.role}</p>
-        <p className="text-sm leading-[22px] text-[#0b2525] break-words">{member.contribution}</p>
+        {member.contribution && (
+          <p className="text-sm leading-[22px] text-[#0b2525] break-words">{member.contribution}</p>
+        )}
         {member.linkedinUrl ? (
           <a
             href={member.linkedinUrl}
