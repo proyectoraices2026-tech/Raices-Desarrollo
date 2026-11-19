@@ -68,6 +68,26 @@ export default function Chatbot() {
     setMessages([initialMessage]);
   };
 
+  /* Teclado del celular abierto: se detecta porque el área visible (visualViewport) se encoge.
+     Mientras está abierto se oculta la barra inferior y el chat ocupa el espacio que queda. */
+  const [keyboard, setKeyboard] = useState({ open: false, height: 0 });
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      setKeyboard({ open: isMobile && window.innerHeight - vv.height > 150, height: vv.height });
+    };
+    update();
+    vv.addEventListener("resize", update);
+    return () => vv.removeEventListener("resize", update);
+  }, []);
+
+  /* Al abrirse el teclado, la página vuelve arriba para que el chat quede a la vista */
+  useEffect(() => {
+    if (keyboard.open) window.scrollTo({ top: 0 });
+  }, [keyboard.open]);
+
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -140,13 +160,15 @@ export default function Chatbot() {
   return (
     <div className="min-h-screen bg-[#FDFEFD] flex flex-col">
       <NavBar onMenuClick={() => setMenuOpen(true)} />
-      <BottomNav />
+      {!keyboard.open && <BottomNav />}
 
       {/* Contenedor principal centrado, máximo ancho 4xl para escritorio */}
-      <main id="first" className="flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col mb-20 md:mb-6 mt-0 md:mt-24">
+      <main id="first" className={`flex-1 max-w-4xl w-full mx-auto p-3 md:p-6 flex flex-col ${keyboard.open ? "mb-2" : "mb-20"} md:mb-6 mt-0 md:mt-24`}>
         
         {/* Tarjeta del Chat */}
-        <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-none flex flex-col h-[calc(100dvh-170px)] min-h-[320px] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner">
+        <div className="bg-[#EDF2EB] rounded-2xl border border-[#D9E2D7] flex-none flex flex-col h-[calc(100dvh-170px)] min-h-[320px] md:h-[calc(100vh-200px)] overflow-hidden shadow-inner"
+          style={keyboard.open ? { height: `${Math.max(keyboard.height - 90, 220)}px` } : undefined}
+        >
           
           {/* Encabezado del Chat */}
           <div className="flex-shrink-0 p-3 border-b border-[#D9E2D7] bg-[#EDF2EB] flex items-center justify-between">
