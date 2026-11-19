@@ -46,7 +46,9 @@ export default function GuideCard({
             src={guide.videoUrl}
             title={guide.title}
             className="w-full h-full"
-            allow="accelerometer; encrypted-media; picture-in-picture"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
           />
         ) : (
