@@ -42,22 +42,22 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
       {/* Panel que se desliza desde la derecha */}
       <aside
-        className={`fixed top-0 right-0 h-full w-[80%] max-w-xs bg-white z-50 shadow-xl transition-transform duration-300 ease-out flex flex-col p-5 ${
+        className={`fixed top-0 right-0 h-[100dvh] w-[80%] max-w-xs bg-white z-50 shadow-xl transition-transform duration-300 ease-out flex flex-col overflow-y-auto p-5 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <button
           onClick={onClose}
-          className="self-end text-3xl leading-none text-[#537a63] mb-4 w-8 h-8 flex items-center justify-center"
+          className="self-end shrink-0 text-3xl leading-none text-[#537a63] mb-4 w-8 h-8 flex items-center justify-center"
           title="Cerrar"
         >
           ×
         </button>
 
-        <p className="text-xs text-[#537a63] mb-1">Sesión activa</p>
-        <p className="text-sm font-semibold text-[#1e2d24] mb-6 truncate">{user?.email}</p>
+        <p className="shrink-0 text-xs text-[#537a63] mb-1">Sesión activa</p>
+        <p className="shrink-0 text-sm font-semibold text-[#1e2d24] mb-6 break-words leading-normal">{user?.email}</p>
 
-        <nav className="flex flex-col gap-1">
+        <nav className="shrink-0 flex flex-col gap-1">
           
 
           <button
