@@ -70,8 +70,8 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           ×
         </button>
 
-        <p className="text-xs text-[#537a63] mb-1">Sesión activa</p>
-        <p className="text-sm font-semibold text-[#1e2d24] mb-6 truncate">{user?.email}</p>
+        <p className="shrink-0 text-xs text-[#537a63] mb-1">Sesión activa</p>
+        <p className="shrink-0 text-sm font-semibold text-[#1e2d24] mb-6 break-words leading-normal">{user?.email}</p>
 
         <nav className="flex flex-col gap-1">
           
